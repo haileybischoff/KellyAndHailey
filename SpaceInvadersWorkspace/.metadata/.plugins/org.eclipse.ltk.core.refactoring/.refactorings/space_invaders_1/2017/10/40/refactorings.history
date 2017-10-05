@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Rename resource &apos;space_invaders_1/src/image_render.h&apos; to &apos;images.h&apos;" description="Rename resource &apos;image_render.h&apos;" flags="7" id="org.eclipse.ltk.core.refactoring.rename.resource" input="src/image_render.h" name="images.h" stamp="1507191021859" updateReferences="true"/>
+</session>

@@ -1,0 +1,82 @@
+/*
+ * draw.c
+ *
+ *  Created on: Oct 5, 2017
+ *      Author: superman
+ */
+
+#include "draw.h"
+#include "images.h"
+
+#define FRAME_BUFFER_0_ADDR 0xC0000000  // Starting location in DDR where we will store the images that we display.
+
+#define RED 0x00FF0000 // Hexadecimal color value for Red
+#define GREEN 0x0000FF00 // Hexadecimal color value for Green
+#define WHITE 0x00FFFFFF // Hexadecimal color value for White
+#define BLACK 0x00000000 // Hexadecimal color value for Black
+
+#define GROUND_LEVEL 459
+#define SCREEN_HEIGHT 480
+#define SCREEN_WIDTH 640
+#define TANK_Y_POSITION 419
+#define TANK_INITIAL_X_POSITION 314
+
+static uint16_t tankPosition;
+static point_t tankBulletPosition;
+static point_t alienBlockPosition;
+
+void setTankPosition(uint16_t val){
+	tankPosition = val;
+}
+
+uint16_t getTankPosition(){
+	return tankPosition;
+}
+
+void setTankBulletPosition(point_t val){
+	tankBulletPosition.x = val.x;
+	tankBulletPosition.y = val.y;
+}
+
+point_t getTankBulletPosition(){
+	return tankBulletPosition;
+}
+
+void setAlienBlockPosition(point_t val){
+	alienBlockPosition.x = val.x;
+	alienBlockPosition.y = val.y;
+}
+
+point_t getAlienBlockPosition(){
+	return alienBlockPosition;
+}
+
+unsigned int * draw_start_screen(){
+
+	unsigned int * start_frame_pointer = (unsigned int *) FRAME_BUFFER_0_ADDR;
+
+	setTankPosition(TANK_INITIAL_X_POSITION);
+
+    int row=0, col=0;
+    for( row=0; row<480; row++) {
+    	for(col=0; col<640; col++) {
+    		if(row == GROUND_LEVEL || row == (GROUND_LEVEL + 1)){
+    			start_frame_pointer[row*SCREEN_WIDTH + col] = GREEN;
+    		}
+    		else{
+    			start_frame_pointer[row*SCREEN_WIDTH + col] = BLACK;
+    		}
+    	}
+    }
+
+    uint32_t line, pixel;
+    for(line = 0; line < TANK_HEIGHT; line++){
+    	for(pixel = 0; pixel < TANK_WORD; pixel++){
+    		if((tank_symbol[line] & (1<<(TANK_WORD-1-pixel)))){
+    			start_frame_pointer[(line + TANK_Y_POSITION)*SCREEN_WIDTH + (pixel + TANK_INITIAL_X_POSITION)] = GREEN;
+    		}
+    	}
+    }
+
+    return start_frame_pointer;
+}
