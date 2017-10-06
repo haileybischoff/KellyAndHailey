@@ -11,19 +11,22 @@
 #include <stdint.h>
 
 #define SAUCER_HEIGHT 14
+
 #define ALIEN_HEIGHT 16
 #define ALIEN_EXPLOSION_HEIGHT 20
+#define ALIEN_WORD_WIDTH 32
+
 #define TANK_HEIGHT 16
+#define TANK_WORD_WIDTH 30
 #define TANK_EXPLOSION_HEIGHT 16
-#define BUNKER_BLOCK_HEIGHT 12
+
 #define BUNKER_HEIGHT 36
+#define BUNKER_WORD_WIDTH 24
+#define BUNKER_BLOCK_HEIGHT 12
+#define BUNKER_BLOCK_WORD_WIDTH 12
+
 #define ALIEN_BULLET_HEIGHT 10
 #define TANK_BULLET_HEIGHT 8
-
-#define ALIEN_WORD_WIDTH 32
-#define TANK_WORD_WIDTH 30
-#define BUNKER_WORD_WIDTH 24
-#define BUNKER_BLOCK_WORD_WIDTH 12
 
 #define packWord32(b31,b30,b29,b28,b27,b26,b25,b24,b23,b22,b21,b20,b19,b18,b17,b16,b15,b14,b13,b12,b11,b10,b9,b8,b7,b6,b5,b4,b3,b2,b1,b0) \
 	((b31 << 31) | (b30 << 30) | (b29 << 29) | (b28 << 28) | (b27 << 27) | (b26 << 26) | (b25 << 25) | (b24 << 24) | \

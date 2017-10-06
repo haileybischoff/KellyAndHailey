@@ -5,6 +5,8 @@ make all
 Building file: ../src/draw.c
 Invoking: MicroBlaze gcc compiler
 mb-gcc -Wall -O0 -g3 -c -fmessage-length=0 -I../../space_invaders_bsp_1/microblaze_0/include -mlittle-endian -mxl-barrel-shift -mxl-pattern-compare -mcpu=v8.20.b -mno-xl-soft-mul -MMD -MP -MF"src/draw.d" -MT"src/draw.d" -o"src/draw.o" "../src/draw.c"
+../src/draw.c: In function 'getAlienBulletPosition':
+../src/draw.c:128: warning: control reaches end of non-void function
 Finished building: ../src/draw.c
 ' '
 Building target: space_invaders_1.elf
@@ -15,7 +17,7 @@ Finished building target: space_invaders_1.elf
 Invoking: MicroBlaze Print Size
 mb-size space_invaders_1.elf  |tee "space_invaders_1.elf.size"
    text	   data	    bss	    dec	    hex	filename
-  14706	    384	   5182	  20272	   4f30	space_invaders_1.elf
+  86432	   1544	   5248	  93224	  16c28	space_invaders_1.elf
 Finished building: space_invaders_1.elf.size
 ' '
 Invoking: Xilinx ELF Check
