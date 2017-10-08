@@ -5,9 +5,30 @@ make all
 Building file: ../src/draw.c
 Invoking: MicroBlaze gcc compiler
 mb-gcc -Wall -O0 -g3 -c -fmessage-length=0 -I../../space_invaders_bsp_1/microblaze_0/include -mlittle-endian -mxl-barrel-shift -mxl-pattern-compare -mcpu=v8.20.b -mno-xl-soft-mul -MMD -MP -MF"src/draw.d" -MT"src/draw.d" -o"src/draw.o" "../src/draw.c"
-../src/draw.c: In function 'getAlienBulletPosition':
-../src/draw.c:128: warning: control reaches end of non-void function
+../src/draw.c: In function 'getRightAlienBorder':
+../src/draw.c:339: warning: implicit declaration of function 'xil_printf'
+../src/draw.c: In function 'updateAlienBullet':
+../src/draw.c:1492: warning: unused variable 'total'
 Finished building: ../src/draw.c
+' '
+Building file: ../src/main_space_invaders.c
+Invoking: MicroBlaze gcc compiler
+mb-gcc -Wall -O0 -g3 -c -fmessage-length=0 -I../../space_invaders_bsp_1/microblaze_0/include -mlittle-endian -mxl-barrel-shift -mxl-pattern-compare -mcpu=v8.20.b -mno-xl-soft-mul -MMD -MP -MF"src/main_space_invaders.d" -MT"src/main_space_invaders.d" -o"src/main_space_invaders.o" "../src/main_space_invaders.c"
+../src/main_space_invaders.c:29:1: warning: "RAND_MAX" redefined
+In file included from ../src/main_space_invaders.c:9:
+c:/xilinx/13.4/ise_ds/edk/gnu/microblaze/nt64/bin/../lib/gcc/microblaze-xilinx-elf/4.1.2/../../../../microblaze-xilinx-elf/include/stdlib.h:55:1: warning: this is the location of the previous definition
+../src/main_space_invaders.c: In function 'getAlienNumber':
+../src/main_space_invaders.c:43: warning: unused variable 'number'
+../src/main_space_invaders.c: In function 'getBunkerNumber':
+../src/main_space_invaders.c:51: warning: unused variable 'number'
+../src/main_space_invaders.c: In function 'main':
+../src/main_space_invaders.c:121: warning: unused variable 'framePointer0'
+Finished building: ../src/main_space_invaders.c
+' '
+Building file: ../src/platform.c
+Invoking: MicroBlaze gcc compiler
+mb-gcc -Wall -O0 -g3 -c -fmessage-length=0 -I../../space_invaders_bsp_1/microblaze_0/include -mlittle-endian -mxl-barrel-shift -mxl-pattern-compare -mcpu=v8.20.b -mno-xl-soft-mul -MMD -MP -MF"src/platform.d" -MT"src/platform.d" -o"src/platform.o" "../src/platform.c"
+Finished building: ../src/platform.c
 ' '
 Building target: space_invaders_1.elf
 Invoking: MicroBlaze gcc linker
@@ -17,7 +38,7 @@ Finished building target: space_invaders_1.elf
 Invoking: MicroBlaze Print Size
 mb-size space_invaders_1.elf  |tee "space_invaders_1.elf.size"
    text	   data	    bss	    dec	    hex	filename
-  86432	   1544	   5248	  93224	  16c28	space_invaders_1.elf
+ 104292	   1560	   5296	 111148	  1b22c	space_invaders_1.elf
 Finished building: space_invaders_1.elf.size
 ' '
 Invoking: Xilinx ELF Check

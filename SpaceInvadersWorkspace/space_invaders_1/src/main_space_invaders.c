@@ -6,6 +6,7 @@
  */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include "platform.h"
 #include "xparameters.h"
 #include "xaxivdma.h"
@@ -20,6 +21,10 @@
 #define ERODE_BUNKER '7'
 #define KILL_ALIEN '2'
 #define UPDATE_ALIEN_POSITION '8'
+#define UPDATE_ALL_BULLETS '9'
+#define FIRE_TANK_BULLET '5'
+#define FIRE_RANDOM_ALIEN_BULLET '3'
+
 
 #define RAND_MAX 65535
 #define RESET 0
@@ -28,19 +33,28 @@
 #define BLANK_BLOCK_2 10
 
 #define NUMBER_LENGTH 2
-
+#define NUMBER_LENGTH_ONE 1
 #define DEBUG
 void print(char *str);
 
 #define FRAME_BUFFER_0_ADDR 0xC1000000  // Starting location in DDR where we will store the images that we display.
 
-uint8_t getNumber(){
+uint8_t getAlienNumber(){
 	 char number[NUMBER_LENGTH];
 	 int final_number;
 	 //fgets(number, sizeof(number), getchar());
 	 scanf("%d", &final_number);
 	 return final_number;
 }
+
+uint8_t getBunkerNumber(){
+	char number[NUMBER_LENGTH_ONE];
+	int final_number;
+	scanf("%d", &final_number);
+	return final_number;
+}
+
+
 
 int main()
 {
@@ -151,8 +165,12 @@ int main()
      // Oscillate between frame 0 and frame 1.
      uint16_t random_counter = RESET;
      while (1) {
+    	 static uint8_t bullet_tank_count = 0;
+    	 static uint8_t alien_bullet_count = 0;
+    	 uint8_t my_alien_bullet_count = 0;
     	 char input = getchar();
     	 random_counter++;
+    	 //random_counter++;//added this to see if it would change how the bunkers are eroded
     	 if(random_counter == RAND_MAX)
     	 {
     		 random_counter = RESET;
@@ -169,8 +187,11 @@ int main()
   		 case ERODE_BUNKER:
   			 xil_printf("ERODE_BUNKER\n\r");
   			 uint8_t bunker_number, block_number;
-  			 bunker_number = random_counter % 4;
-  			 block_number = random_counter % 12;
+  			 bunker_number = getBunkerNumber(); //We are supposed to choose the bunker we want to erode
+  			 srand(random_counter);
+  			 //bunker_number = rand() % 4; //  			 bunker_number = random_counter % 4;
+  			 block_number = rand() % 12; //  			 block_number = random_counter % 12;
+
   			 if(block_number == BLANK_BLOCK_1){
   				 block_number--;
   			 }
@@ -179,14 +200,44 @@ int main()
   			 }
   			 erodeBunker(bunker_number, block_number);
   			 break;
+  		 case FIRE_TANK_BULLET:
+  			 if(bullet_tank_count == 0){
+  	  			 xil_printf("FIRE_TANK_BULLET\n\r");
+  	  			 bullet_tank_count++;
+  			 }
+  			 else{
+  	  			 xil_printf("ONLY ONE BULLET AT A TIME\n\r");
+  			 }
+  			 drawTankBullet();
+  			 break;
+  		 case FIRE_RANDOM_ALIEN_BULLET:
+  			 if(my_alien_bullet_count <= 4){
+  				alien_bullet_count++;
+  				 xil_printf("FIRE_RANDOM_ALIEN_BULLET\n\r");
+  			 }
+  			 else{
+  				xil_printf("ONLY FOUR ALIEN BULLETS AT A TIME\n\r");
+  			 }
+	  		 uint8_t alienNumber, alienBulletType;
+	    	 random_counter++;
+  			 srand(random_counter);
+  			 alienBulletType = rand()%2;
+  			 alienNumber = 44 + (rand()%11);//This will run into problems if the bottom row is all gone //TODO
+  			 drawAlienBullet(alienNumber, alienBulletType);
+  			 break;
+  		 case UPDATE_ALL_BULLETS:
+  			 bullet_tank_count = updateTankBullet();
+  			 my_alien_bullet_count = updateAlienBullet();
+  			 xil_printf("UPDATE_ALL_BULLETS and %d \n\r", my_alien_bullet_count);
+  			 break;
   		 case KILL_ALIEN:
   			 xil_printf("KILL_ALIEN\n\r");
-  			 uint8_t alien_number = getNumber();
+  			 uint8_t alien_number = getAlienNumber();
   			 killAlien(alien_number);
   			 break;
   		 case UPDATE_ALIEN_POSITION:
   			 xil_printf("UPDATE_ALIEN_POSITION\n\r");
-  			 drawAlienBlock();
+  				 drawAlienBlock();
   			 break;
   		 default:
   			 xil_printf("WE PUSHED A DIFFERENT KEY\n\r");
