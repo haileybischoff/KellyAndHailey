@@ -16,45 +16,47 @@
 
 #include "draw.h"
 
-#define MOVE_TANK_RIGHT_KEY '6'
-#define MOVE_TANK_LEFT_KEY '4'
-#define ERODE_BUNKER '7'
-#define KILL_ALIEN '2'
-#define UPDATE_ALIEN_POSITION '8'
-#define UPDATE_ALL_BULLETS '9'
-#define FIRE_TANK_BULLET '5'
-#define FIRE_RANDOM_ALIEN_BULLET '3'
+#define MOVE_TANK_RIGHT_KEY '6' //Make tank move to the right by pressing number 6
+#define MOVE_TANK_LEFT_KEY '4' //Make tank move to the left by pressing number 4
+#define ERODE_BUNKER '7' //Make the bunker Erode by pushing button 7
+#define KILL_ALIEN '2' //kill and alien with button number 2
+#define UPDATE_ALIEN_POSITION '8' //Update all aliens by pushing button number 8
+#define UPDATE_ALL_BULLETS '9' //update all of the bullets on the screen by pushing button number 9
+#define FIRE_TANK_BULLET '5' //Fire a bullet from the tank by pushing 5
+#define FIRE_RANDOM_ALIEN_BULLET '3' //Fire a bullet from the aliens by pushing 3
 
+#define MAX_NUMBER_OF_ALIENS_IN_A_ROW 11
+#define TOTAL_NUMBER_OF_BLOCKS 12
+#define NUMBER_OF_DIFFERENT_ALIEN_BULLET_TYPES 2
+#define MAX_NUMBER_OF_ALIEN_BULLETS 4
+#define ALIEN_NULL -1
 
-#define RAND_MAX 65535
-#define RESET 0
+#define RAND_MAX 65535 //this is a max for the random
+#define RESET 0// Reset is 0
 
-#define BLANK_BLOCK_1 9
-#define BLANK_BLOCK_2 10
+#define BLANK_BLOCK_1 9 //This is the blank block for the bunkers
+#define BLANK_BLOCK_2 10 //This is the blank block for the bunkers
 
-#define NUMBER_LENGTH 2
-#define NUMBER_LENGTH_ONE 1
-#define DEBUG
-void print(char *str);
+#define NUMBER_LENGTH 2 //The length of a number is 2
+#define NUMBER_LENGTH_ONE 1 //the length of a number is 1
+
+void print(char *str); //This is a void print function
 
 #define FRAME_BUFFER_0_ADDR 0xC1000000  // Starting location in DDR where we will store the images that we display.
 
-uint8_t getAlienNumber(){
-	 char number[NUMBER_LENGTH];
-	 int final_number;
-	 //fgets(number, sizeof(number), getchar());
+uint8_t getAlienNumber(){ //the get alien function
+	 char number[NUMBER_LENGTH]; //This is an array with the length of 2
+	 uint8_t final_number; //This is the final number
 	 scanf("%d", &final_number);
-	 return final_number;
+	 return final_number; //We return the final number
 }
 
-uint8_t getBunkerNumber(){
-	char number[NUMBER_LENGTH_ONE];
-	int final_number;
+uint8_t getBunkerNumber(){ //This is to get the bunker number
+	char number[NUMBER_LENGTH_ONE]; //We have an array of length 1
+	uint8_t final_number; //We have a final number
 	scanf("%d", &final_number);
-	return final_number;
+	return final_number; //We return the final number
 }
-
-
 
 int main()
 {
@@ -119,35 +121,6 @@ int main()
      // The variables framePointer and framePointer1 are just pointers to the base address
      // of frame 0 and frame 1.
      unsigned int * framePointer0 = draw_start_screen();//(unsigned int *) FRAME_BUFFER_0_ADDR;
-     //unsigned int * framePointer1 = ((unsigned int *) FRAME_BUFFER_0_ADDR) + 640*480;
-     // Just paint some large red, green, blue, and white squares in different
-     // positions of the image for each frame in the buffer (framePointer0 and framePointer1).
-     /*int row=0, col=0;
-     for( row=0; row<480; row++) {
-    	 for(col=0; col<640; col++) {
-    	 if(row < 240) {
-    		 if(col<320) {
-    			 // upper left corner.
-    			 framePointer0[row*640 + col] = 0x00FF0000;  // frame 0 is red here.
-    			 framePointer1[row*640 + col] = 0x0000FF00;  // frame 1 is green here.
-    		 } else {
-    			 // upper right corner.
-    			 framePointer0[row*640 + col] = 0x000000FF;  // frame 0 is blue here.
-    			 framePointer1[row*640 + col] = 0x00FF0000;  // frame 1 is red here.
-    		 }
-    	 } else {
-    		 if(col<320) {
-    			 // lower left corner.
-    			 framePointer0[row*640 + col] = 0x0000FF00;  // frame 0 is green here.
-    			 framePointer1[row*640 + col] = 0x00FFFFFF;  // frame 1 is white here.
-    		 } else {
-    			 // lower right corner.
-    			 framePointer0[row*640 + col] = 0x00000000;  // frame 0 is black here.
-    			 framePointer1[row*640 + col] = 0x000000FF;  // frame 1 is blue here.
-    		 }
-    	 }
-       }
-     }*/
 
      // This tells the HDMI controller the resolution of your display (there must be a better way to do this).
      XIo_Out32(XPAR_AXI_HDMI_0_BASEADDR, 640*480);
@@ -165,79 +138,80 @@ int main()
      // Oscillate between frame 0 and frame 1.
      uint16_t random_counter = RESET;
      while (1) {
-    	 static uint8_t bullet_tank_count = 0;
-    	 static uint8_t alien_bullet_count = 0;
-    	 uint8_t my_alien_bullet_count = 0;
-    	 char input = getchar();
-    	 random_counter++;
-    	 //random_counter++;//added this to see if it would change how the bunkers are eroded
-    	 if(random_counter == RAND_MAX)
+    	 static uint8_t bullet_tank_count = RESET; //Keep track of the number of tank bullets
+    	 static uint8_t alien_bullet_count = RESET; //Keep track of the number of alien bullets
+    	 uint8_t my_alien_bullet_count = RESET; //Keep track of the number of alien bullets
+    	 char input = getchar(); //Get the character
+    	 random_counter++; //Increment the random counter
+    	 if(random_counter == RAND_MAX) //Check to see if the random counter is at the max
     	 {
-    		 random_counter = RESET;
+    		 random_counter = RESET; //Reset the random counter when it hits the max.
     	 }
  		 switch(input){
   		 case MOVE_TANK_RIGHT_KEY:
   			 xil_printf("MOVE RIGHT\n\r");
-  			 drawTank(TANK_RIGHT);
+  			 drawTank(TANK_RIGHT);// Call the draw tank function with move right
   			 break;
   		 case MOVE_TANK_LEFT_KEY:
   			 xil_printf("MOVE LEFT\n\r");
-  			 drawTank(TANK_LEFT);
+  			 drawTank(TANK_LEFT); //Call the draw tank function with move left
   			 break;
   		 case ERODE_BUNKER:
   			 xil_printf("ERODE_BUNKER\n\r");
-  			 uint8_t bunker_number, block_number;
+  			 uint8_t bunker_number, block_number; //Variables for bunker and block number
   			 bunker_number = getBunkerNumber(); //We are supposed to choose the bunker we want to erode
-  			 srand(random_counter);
-  			 //bunker_number = rand() % 4; //  			 bunker_number = random_counter % 4;
-  			 block_number = rand() % 12; //  			 block_number = random_counter % 12;
+  			 srand(random_counter); //This allows us to give srand a seed
+  			 block_number = rand() % TOTAL_NUMBER_OF_BLOCKS; //This will give us a random block to disintegrate
 
-  			 if(block_number == BLANK_BLOCK_1){
-  				 block_number--;
+  			 if(block_number == BLANK_BLOCK_1){ //If the block is a 9
+  				 block_number--; //make the block an 8
   			 }
-  			 else if(block_number == BLANK_BLOCK_2){
-  				 block_number++;
+  			 else if(block_number == BLANK_BLOCK_2){ //If the block is a 10
+  				 block_number++; //Make the block 11
   			 }
-  			 erodeBunker(bunker_number, block_number);
+  			 erodeBunker(bunker_number, block_number); //Call erode bunker with the bunker and block numbers
   			 break;
   		 case FIRE_TANK_BULLET:
-  			 if(bullet_tank_count == 0){
+  			 if(bullet_tank_count == RESET){ //If the bullet has not been fired before
   	  			 xil_printf("FIRE_TANK_BULLET\n\r");
-  	  			 bullet_tank_count++;
+  	  			 bullet_tank_count++; //Increment the bullet count
   			 }
   			 else{
   	  			 xil_printf("ONLY ONE BULLET AT A TIME\n\r");
   			 }
-  			 drawTankBullet();
+  			 drawTankBullet(); //Call the draw tank function
   			 break;
   		 case FIRE_RANDOM_ALIEN_BULLET:
-  			 if(my_alien_bullet_count <= 4){
-  				alien_bullet_count++;
-  				 xil_printf("FIRE_RANDOM_ALIEN_BULLET\n\r");
+  			 if(my_alien_bullet_count <= MAX_NUMBER_OF_ALIEN_BULLETS){ //If there are less than 4 bullets on the screen
+				alien_bullet_count++; //Increment alien bullet count
+  				xil_printf("FIRE_RANDOM_ALIEN_BULLET\n\r");
   			 }
   			 else{
   				xil_printf("ONLY FOUR ALIEN BULLETS AT A TIME\n\r");
   			 }
-	  		 uint8_t alienNumber, alienBulletType;
-	    	 random_counter++;
-  			 srand(random_counter);
-  			 alienBulletType = rand()%2;
-  			 alienNumber = 44 + (rand()%11);//This will run into problems if the bottom row is all gone //TODO
-  			 drawAlienBullet(alienNumber, alienBulletType);
+	  		 uint8_t alienColumn, alienBulletType; //Alien number and bullet type
+	    	 random_counter++;//Increment the random counter
+  			 srand(random_counter); //Pass the random counter as the seed to srand
+  			 alienBulletType = rand()%NUMBER_OF_DIFFERENT_ALIEN_BULLET_TYPES; //Set the bullet type
+  			 alienColumn = (rand()%MAX_NUMBER_OF_ALIENS_IN_A_ROW);//Set the column alien number
+  			 while(getMyAlienNumber(alienColumn) == ALIEN_NULL){ //If the column is null
+  	  			 alienColumn = (rand()%MAX_NUMBER_OF_ALIENS_IN_A_ROW);//Keep trying for a new column
+  			 }
+  			 drawAlienBullet(alienColumn, alienBulletType); //Call draw alien bullet with the column and bullet type
   			 break;
   		 case UPDATE_ALL_BULLETS:
-  			 bullet_tank_count = updateTankBullet();
-  			 my_alien_bullet_count = updateAlienBullet();
+  			 bullet_tank_count = updateTankBullet(); //Set the bullet count to the update tank bullet function
+  			 my_alien_bullet_count = updateAlienBullet(); //Set the alien bullet count to the update alien bullet function
   			 xil_printf("UPDATE_ALL_BULLETS and %d \n\r", my_alien_bullet_count);
   			 break;
   		 case KILL_ALIEN:
   			 xil_printf("KILL_ALIEN\n\r");
-  			 uint8_t alien_number = getAlienNumber();
-  			 killAlien(alien_number);
+  			 uint8_t alien_number = getAlienNumber(); //Get the alien number to kill
+  			 killAlien(alien_number); //Kill the alien given
   			 break;
   		 case UPDATE_ALIEN_POSITION:
   			 xil_printf("UPDATE_ALIEN_POSITION\n\r");
-  				 drawAlienBlock();
+  			 drawAlienBlock(); //Draw the block of aliens
   			 break;
   		 default:
   			 xil_printf("WE PUSHED A DIFFERENT KEY\n\r");
