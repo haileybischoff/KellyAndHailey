@@ -1,0 +1,228 @@
+
+#define ALIEN_MOVE_MAX_COUNTER 2500;
+#define MAX_DEBOUNCE_TIME 100;
+#define MAX_ALIEN_BULLET_TIME 100;
+#define MAX_TANK_BULLET_TIME 100;
+#define MAX_TANK_DEATH_TIME 100;
+#define MAX_NUMBER_ALIEN_BULLETS 4;
+#define MAX_ALIEN_DEATH_TIME 100;
+
+enum SpaceInvadersControl_st{
+	init_st,
+	idle_st,
+	move_aliens_st,
+	update_bullet_st,
+	dead_alien_st,
+	bunker_st,
+	dead_tank_st,
+	button_pressed_st,
+	new_alien_bullet_st
+} currentState = init_st;
+
+
+//print state machine for debug purposes
+void debugStatePrint(){
+	static SpaceInvadersControl_st previousState;
+	static vool firstpass = TRUE; 
+	// Only print the message if:
+    // 1. This the first pass and the value for previousState is unknown.
+    // 2. previousState != currentState - this prevents reprinting the same state name over and over.
+    if (previousState != currentState || firstPass) {
+		firstPass = false;                // previousState will be defined, firstPass is false.
+		previousState = currentState;     // keep track of the last state that you were in.
+		switch(currentState){
+			case init_st:
+				xil_printf("INIT State\n\r");
+				break;
+			case idle_st:
+				xil_printf("IDLE State\n\r");
+				break;
+			case move_aliens_st:
+				xil_printf("MOVE ALIENS State\n\r");
+				break;
+			case update_bullet_st:
+				xil_printf("UPDATE BULLETS State\n\r");
+				break;
+			case dead_alien_st:
+				xil_printf("DEAD ALIEN State\n\r");
+				break;
+			case bunker_st:
+				xil_printf("BUNKER State\n\r");
+				break;
+			case dead_tank_st:
+				xil_printf("DEAD TANK State\n\r");
+				break;
+			case button_pressed_st:
+				xil_printf("BUTTON PRESSED State\n\r");
+				break;
+			case new_alien_bullet_st:
+				xil_printf("NEW ALIEN BULLET State\n\r");
+				break;
+			default:
+				xil_printf("spaceInvaders_tick update: hit default\n\r");
+				break;
+		}
+	}
+}
+
+void spaceInvaders_tick(){
+	bool alienDeathFlag = false; //Flag for alien death
+	bool tankDeathFlag = false; //Flag for tank death
+	bool bulletFireFlag = false; //Flag for whether a bullet has been fired
+	bool saucerFlag = false; //Flag for saucer
+	bool saucerDrawnFlag = false;
+	bool tankMoveFlag = false; //Flag for tank
+	
+	bool move_alien_recieved_flag = false; //Flag to let us know we went into the alien moved state;
+	bool button_pressed_recieved_flag = false; //Flag to let us know we went into the button pressed state
+	
+	bool tank_bullet = false; //Bool for tank bullet
+	uint16_t alien_bullets = RESET; //Count for the number of alien bullets on the screen
+	
+	
+	uint16_t alienCounter = RESET; //Alien counter initialized to 0
+	uint16_t debounceCounter = RESET; //Debounce counter initialized to 0
+	uint16_t alienDeathCounter = RESET; //Alien Death Counter initialized to 0
+	uint16_t tankDeathCounter = RESET; //Tank death counter initialized to 0
+	uint16_t tankBulletFiredMinCounter = RESET; //Bullet Fired Min COunter initialized to 0
+	uint16_t alienBulletFiredMinCounter = RESET; //Bullet Fired Min COunter initialized to 0
+	uint26_t saucerCounter = RESET; //Saucer counter initialized to 0
+	uint16_t tankMoveCounter = RESET; //Tank move counter initialized to 0
+	
+	uint32_t saucerCounterMaxValue = RESET; //Saucer max counter value is initialized to 0
+	uint32_t alienBulletMaxValue = RESET; //Alien bullet max value is initialized to 0
+	//State transitions
+	switch(currentState){
+		case init_st:
+			currentState = idle_st;
+			break;
+		case idle_st:		
+			
+
+			if(debounceCounter >= MAX_DEBOUNCE_TIME){ //Check for debounce time
+				currentState = button_pressed_st;
+			}
+			if(alienDeathCounter >= MAX_ALIEN_DEATH_TIME){
+				currentState = dead_alien_st;
+			}
+			if(((tank_bullet == true) && (tankBulletFiredMinCounter >= MAX_TANK_BULLET_TIME))|| ((alien_bullets > 0) && (alienBulletFiredMinCounter >= MAX_ALIEN_BULLET_TIME))){ 
+				currentState = update_bullet_st;
+			}
+			if((alien_bullets < MAX_NUMBER_ALIEN_BULLETS) && (alienBulletMaxValue < alienRandValue)){
+				currentState = new_alien_bullet_st;
+			}
+			if(alienCounter >= ALIEN_MOVE_MAX_COUNTER){ //Check for time to move aliens
+				currentState = move_aliens_st;
+			}
+			currentState = idle_st;
+			break;
+		case move_aliens_st:
+			currentState idle_st;
+			break;
+		case update_bullet_st:
+			//if bullet has collision with bunker
+				//currentState = bunker_st; //Go to bunker state
+			//if tank bullet has collision with alien
+				//currentState = deadAlienSt; //Go to dead alien state
+				alienDeathFlag = true;
+			//if alien bullet has collision with tank
+				//currentState = deadTankSt; //Go to dead tank state
+			//else
+				//currentState = idle_st; //Go to idle state
+			break;
+		case dead_alien_st:
+			currentState = idle_st;
+			break;
+		case bunker_st:
+			currentState = idle_st;
+			break;
+		case dead_tank_st:
+			if(tankDeathCounter >= MAX_TANK_DEATH_TIME){
+				currentState = idle_st;
+			}
+			else{
+				currentState = dead_tank_st;
+			}
+			break;
+		case button_pressed_st:
+				currentState = idle_st;
+			break;
+		case new_alien_bullet_st:
+				currentState = idle_st;
+			break;
+		default:
+			break;
+	}
+
+	
+	//State actions 
+	switch(currentState){
+		case init_st:
+			alienDeathFlag = false; //Alien Death flag set to false
+			tankDeathFlag = false; //Tank Death flag set to false
+			bulletFireFlag = false; //Bullet Fire flag set to false
+			saucerFlag = false; //Saucer flag set to false
+			tankMoveFlag = false; //Tank Move flag set to false
+	 
+			alienCounter = RESET; //Alien counter initialized to 0
+			debounceCounter = RESET; //Debounce counter initialized to 0
+			alienDeathCounter = RESET; //Alien Death Counter initialized to 0
+			tankDeathCounter = RESET; //Tank death counter initialized to 0
+			bulletFiredMinCounter = RESET; //Bullet Fired Min COunter initialized to 0
+			saucerCounter = RESET; //Saucer counter initialized to 0
+			tankMoveCounter = RESET; //Tank move counter initialized to 0
+			
+			uint16_t alienRandValue; //TODO initialize to rand() % y
+			uint16_t saucerRandValue; //TODO initialize to rand() % x
+			break;
+		case idle_st:
+			alienCounter++;
+			saucerCounter++;
+			//if buttons are pressed
+				//debounceCounter++;
+			if(alienDeathFlag == true){
+				alienDeathCounter++;
+			}
+			if(saucerCounter >= saucerRandValue){
+				saucerDrawnFlag = true;
+			}
+			if(tank_bullet == true){
+				tankBulletFiredMinCounter++;
+			}
+			if(alien_bullets > 0){
+				alienBulletFiredMinCounter++;
+			}
+			break;
+		case move_aliens_st:
+			alienCounter = RESET; //Reset alien move counter
+			if(saucerDrawnFlag == true){
+				saucerDrawnFlag = false;
+				//call draw saucer function
+			}
+			drawAlienBlock(); //Draw the block of aliens
+			break;
+		case update_bullet_st:
+			break;
+		case dead_alien_st:
+			break;
+		case bunker_st:
+			break;
+		case dead_tank_st:
+			break;
+		case button_pressed_st:
+			//if left button was pressed
+				//
+			//if right button was presses
+				//
+			//if middle button was pressed
+				//
+			
+			break;
+		case new_alien_bullet_st:
+			break;
+		default:
+			break;
+	}
+
+
+}
