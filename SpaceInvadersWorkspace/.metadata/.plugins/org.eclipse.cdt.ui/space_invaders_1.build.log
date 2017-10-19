@@ -2,12 +2,20 @@
 **** Build of configuration Debug for project space_invaders_1 ****
 
 make all 
-Building file: ../src/draw.c
+Building file: ../src/main_space_invaders.c
 Invoking: MicroBlaze gcc compiler
-mb-gcc -Wall -O0 -g3 -c -fmessage-length=0 -I../../space_invaders_bsp_1/microblaze_0/include -mlittle-endian -mxl-barrel-shift -mxl-pattern-compare -mcpu=v8.20.b -mno-xl-soft-mul -MMD -MP -MF"src/draw.d" -MT"src/draw.d" -o"src/draw.o" "../src/draw.c"
-In file included from ../src/draw.c:8:
+mb-gcc -Wall -O0 -g3 -c -fmessage-length=0 -I../../space_invaders_bsp_1/microblaze_0/include -mlittle-endian -mxl-barrel-shift -mxl-pattern-compare -mcpu=v8.20.b -mno-xl-soft-mul -MMD -MP -MF"src/main_space_invaders.d" -MT"src/main_space_invaders.d" -o"src/main_space_invaders.o" "../src/main_space_invaders.c"
+In file included from ../src/main_space_invaders.c:18:
 ../src/draw.h:27: warning: useless storage class specifier in empty declaration
-Finished building: ../src/draw.c
+../src/main_space_invaders.c:37:1: warning: "RAND_MAX" redefined
+In file included from ../src/main_space_invaders.c:9:
+c:/xilinx/13.4/ise_ds/edk/gnu/microblaze/nt64/bin/../lib/gcc/microblaze-xilinx-elf/4.1.2/../../../../microblaze-xilinx-elf/include/stdlib.h:55:1: warning: this is the location of the previous definition
+../src/main_space_invaders.c: In function 'main':
+../src/main_space_invaders.c:233: warning: implicit declaration of function 'isdigit'
+../src/main_space_invaders.c:136: warning: unused variable 'framePointer0'
+../src/main_space_invaders.c:74: warning: unused variable 'count'
+../src/main_space_invaders.c:72: warning: unused variable 'currentButtonState'
+Finished building: ../src/main_space_invaders.c
 ' '
 Building target: space_invaders_1.elf
 Invoking: MicroBlaze gcc linker
@@ -17,7 +25,7 @@ Finished building target: space_invaders_1.elf
 Invoking: MicroBlaze Print Size
 mb-size space_invaders_1.elf  |tee "space_invaders_1.elf.size"
    text	   data	    bss	    dec	    hex	filename
-  94116	   1572	   5300	 100988	  18a7c	space_invaders_1.elf
+  94116	   1572	   5296	 100984	  18a78	space_invaders_1.elf
 Finished building: space_invaders_1.elf.size
 ' '
 Invoking: Xilinx ELF Check
