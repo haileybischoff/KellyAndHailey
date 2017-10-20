@@ -42,6 +42,7 @@
 #define SAUCER_MOVE 4 // How many pixels our saucer moves when it moves
 #define SAUCER_ERASE_HEIGHT_OFFSET 6 // The amount down we need to know in order to erase.
 
+
 #define LIFE_1_X_POSITION 449 //Life 1 x position
 #define LIFE_2_X_POSITION 489 //Life 2 x position
 #define LIFE_3_X_POSITION 529 //Life 3 x position
@@ -63,6 +64,12 @@
 #define NUMBER_OF_ZIGZAG_TYPES 2 //2 types of cross bullets
 #define ZIGZAG_1 1 //Bullet ZIGZAG number 1
 #define ZIGZAG_2 2 //Bullet ZIGZAG number 2
+
+#define SQUID_POINTS 40
+#define BUG_POINTS 20
+#define JELLYFISH_POINTS 10
+#define SAUCER_POINTS 200 //Hard coded in should be random between 50 and 350
+
 
 #define BUNKER_X_OFFSET BUNKER_BLOCK_WORD_WIDTH //Bunker x offset
 #define BUNKER_Y_OFFSET BUNKER_BLOCK_HEIGHT //Bunker y offset
@@ -145,6 +152,9 @@
 #define ALIEN_FIFTY_THREE 53 //Initial bottom alien 10
 #define ALIEN_FIFTY_FOUR 54 //Initial bottom alien 11
 
+#define WRONG_BUNKER 13
+#define WRONG_ALIEN 61
+
 unsigned int * frame_pointer = (unsigned int *) FRAME_BUFFER_0_ADDR_BASE;
 
 static uint8_t alien_block[ALIEN_AMOUNT] = {1,1,1,1,1,1,1,1,1,1,1, \
@@ -156,12 +166,20 @@ static uint8_t alien_block[ALIEN_AMOUNT] = {1,1,1,1,1,1,1,1,1,1,1, \
 static uint8_t alien_row_dead[ALIEN_MAX_COL] = {ALIEN_MAX_ROW,ALIEN_MAX_ROW,ALIEN_MAX_ROW,ALIEN_MAX_ROW,ALIEN_MAX_ROW,ALIEN_MAX_ROW,ALIEN_MAX_ROW,ALIEN_MAX_ROW,ALIEN_MAX_ROW,ALIEN_MAX_ROW,ALIEN_MAX_ROW};
 static int8_t my_alien_row_dead[ALIEN_MAX_COL] = {ALIEN_FOURTY_FOUR,ALIEN_FOURTY_FIVE,ALIEN_FOURTY_SIX,ALIEN_FOURTY_SEVEN,ALIEN_FOURTY_EIGHT,ALIEN_FOURTY_NINE,ALIEN_FIFTY,ALIEN_FIFTY_ONE,ALIEN_FIFTY_TWO,ALIEN_FIFTY_THREE,ALIEN_FIFTY_FOUR};
 
-static uint8_t bunker_1_block_erosion[BUNKER_NUMBER_TOTAL_BLOCKS] = {0,0,0,0,0,0,0,0,0,4,4,0};
-static uint8_t bunker_2_block_erosion[BUNKER_NUMBER_TOTAL_BLOCKS] = {0,0,0,0,0,0,0,0,0,4,4,0};
-static uint8_t bunker_3_block_erosion[BUNKER_NUMBER_TOTAL_BLOCKS] = {0,0,0,0,0,0,0,0,0,4,4,0};
-static uint8_t bunker_4_block_erosion[BUNKER_NUMBER_TOTAL_BLOCKS] = {0,0,0,0,0,0,0,0,0,4,4,0};
+static uint8_t bunker_1_block_erosion[BUNKER_NUMBER_TOTAL_BLOCKS] = {0,0,0,0,0,0,0,0,0,3,3,0};
+static uint8_t bunker_2_block_erosion[BUNKER_NUMBER_TOTAL_BLOCKS] = {0,0,0,0,0,0,0,0,0,3,3,0};
+static uint8_t bunker_3_block_erosion[BUNKER_NUMBER_TOTAL_BLOCKS] = {0,0,0,0,0,0,0,0,0,3,3,0};
+static uint8_t bunker_4_block_erosion[BUNKER_NUMBER_TOTAL_BLOCKS] = {0,0,0,0,0,0,0,0,0,3,3,0};
 
 static uint16_t tankPosition; //Variable to keep track of tank position
+
+static uint16_t saucerPosition; //Variable to keep track of saucer position
+
+
+static point_t alienCrossBulletPosition; //Variable to keep track of tank bullet position
+
+
+
 
 static point_t tankBulletPosition; //Variable to keep track of tank bullet position
 
@@ -210,7 +228,11 @@ static uint8_t tank_Bullet_Drawn = FALSE; //Was the tank bullet shot
 static uint8_t saucer_move_right = TRUE; // A bool for moving the saucer right or left
 
 point_t alien_dead;
+point_t bunker_shot;
 uint8_t tank_killed_alien = FALSE;
+uint8_t tank_killed_bunker = FALSE;
+uint8_t tank_killed_saucer = FALSE;
+point_t saucer_shot;
 
 static uint8_t collision = FALSE;
 point_t collision_position;
@@ -381,7 +403,7 @@ uint8_t calculateAlienNumber(point_t some_position){
 	x_position = some_position.x;
 	y_position = some_position.y;
 
-	uint8_t alienNumber = RESET;
+	uint8_t alienNumber = WRONG_ALIEN;
 
 	point_t blockPosition = getAlienBlockPosition(); // This is getting the AlienBlockPosition
 
@@ -408,10 +430,15 @@ uint8_t calculateAlienNumber(point_t some_position){
 	return alienNumber;
 }
 
+point_t getDeadSaucerPosition(){
+	return saucer_shot;
+}
+
+/*
 point_t getDeadAlienPosition(){
 	return alien_dead;
 }
-
+ */
 point_t calculateAlienPosition(uint8_t alien_number){ //Calculate the position of the alien
 	point_t position = getAlienBlockPosition(); //Get the position
 	// Get the y_position for all the aliens.
@@ -511,6 +538,37 @@ void eraseAlien(uint16_t x_position, uint16_t y_position, uint8_t alien_type){
 		}
 	}
 }
+
+static uint32_t totalScore = RESET;
+
+void computeScore(uint8_t alien_number){
+	uint8_t alien_Score;
+	if(alien_number < ALIEN_ROW_1){
+		alien_Score = SQUID_POINTS; //Set to squid in
+	}
+	else if((alien_number >= ALIEN_ROW_1) && (alien_number < ALIEN_ROW_3)){
+
+		alien_Score = BUG_POINTS; //Set to bug in
+	}
+	else if((alien_number >= ALIEN_ROW_3) && (alien_number < ALIEN_ROW_5)){
+
+		alien_Score = JELLYFISH_POINTS; //Set to jellyfish in
+	}
+	else{
+		alien_Score = SAUCER_POINTS;
+	}
+	setScore(alien_Score);
+	xil_printf("Score is: %d\n\r", getScore());
+
+}
+
+uint32_t getScore(){
+	return totalScore;
+}
+void setScore(uint32_t score){
+	totalScore += score;
+}
+
 
 void drawAlien(uint16_t x_position, uint16_t y_position, uint8_t alien_type){ //ANDY SAID THAT OUR ALIENS NEED TO MOVE OVER BY EITHER 4 OR 6 PIXELS
 	uint8_t line, pixel;
@@ -825,6 +883,145 @@ void drawTankBullet(){
 	}
 }
 
+uint8_t alien_cross_bullet_drawn = FALSE;
+
+void setAlienCrossBulletPosition(point_t val){
+	alienCrossBulletPosition.x = val.x;
+	alienCrossBulletPosition.y = val.y;
+}
+point_t getAlienCrossBulletPosition(){
+	return alienCrossBulletPosition;
+}
+
+void drawCrossAlienBullet(uint8_t alienNumber){
+	int8_t alien_shooter = my_alien_row_dead[alienNumber]; //Get the alien that shoots
+	if(alien_shooter != ALIEN_NULL){ //If the column that the alien shooter is in is not null
+		if(!alien_cross_bullet_drawn){
+			alien_cross_bullet_drawn = TRUE;
+			point_t updateBullet;
+			point_t alienPos = calculateAlienPosition(alien_shooter);
+			updateBullet.x = alienPos.x + BULLET_MIDDLE_ALIEN;
+			updateBullet.y = alienPos.y + ALIEN_HEIGHT;
+
+			setAlienCrossBulletPosition(updateBullet);
+			uint8_t line, pixel;
+			for(line = 0; line < ALIEN_BULLET_HEIGHT; line++){
+				for(pixel = 0; pixel < ALIEN_CROSS_BULLET_WORD_WIDTH; pixel++){
+					if((alien_cross_bullet_1[line] & (SHIFT<<(ALIEN_CROSS_BULLET_WORD_WIDTH-SHIFT-pixel)))){
+						//xil_printf("We shot an alien bullet from alien %d with an x: %d and y: %d\n\r", alien_shooter, updateBullet.x, updateBullet.y);
+						frame_pointer[(line + updateBullet.y) * SCREEN_WIDTH + (pixel + updateBullet.x)] = RED; //Set to red
+					}
+				}
+			}
+		}
+	}
+}
+
+void eraseAlienCrossBullet(point_t bullet_pos){
+	bullet_pos.x += BULLET_MIDDLE_ALIEN;
+	uint8_t line, pixel;
+	for(line = 0; line < ALIEN_BULLET_HEIGHT; line++){ //Height
+		for(pixel = 0; pixel < ALIEN_CROSS_BULLET_WORD_WIDTH; pixel++){ //Width
+			frame_pointer[(bullet_pos.y - line - FIVE_GAME_PIXELS) * SCREEN_WIDTH + (pixel + bullet_pos.x)] = BLACK;//Black out the last shape
+			frame_pointer[(line - FIVE_GAME_PIXELS + bullet_pos.y) * SCREEN_WIDTH + (pixel + ONE_GAME_PIXELS + bullet_pos.x)] = BLACK;//Black out the last shape
+			frame_pointer[(line - FIVE_GAME_PIXELS + bullet_pos.y) * SCREEN_WIDTH + (pixel - ONE_GAME_PIXELS + bullet_pos.x)] = BLACK;//Black out the last shape
+
+			//frame_pointer[(line + bullet_pos.y) * SCREEN_WIDTH + (pixel + bullet_pos.x)] = BLACK; //Set to red
+		}
+	}
+}
+
+
+uint8_t updateCrossAlienBullet(){
+	if(alien_cross_bullet_drawn){
+		point_t old_alien_cross_bullet_position = getAlienCrossBulletPosition(); //Get tank bullet position
+		old_alien_cross_bullet_position.y += (FIVE_GAME_PIXELS); //Increment by 8 pixels
+		setAlienCrossBulletPosition(old_alien_cross_bullet_position); //Set tank bullet position
+		point_t new_alien_cross_bullet_position = getAlienCrossBulletPosition(); //Get tank bullet position
+		uint8_t line, pixel;
+		uint8_t stop = FALSE;
+		for(line = 0; line < TANK_BULLET_HEIGHT; line++){ //Height
+			for(pixel = 0; pixel < TANK_BULLET_WORD_WIDTH; pixel++){ //Width
+				if(old_alien_cross_bullet_position.y < GROUND_LEVEL && !stop){
+					point_t cross;
+					cross.x = pixel + new_alien_cross_bullet_position.x;
+					cross.y = line + new_alien_cross_bullet_position.y;
+					if(calculateBunkerNumber(cross) != WRONG_BUNKER){
+						if(calculateBunkerNumber(cross) == BUNKER1){
+							if(calculateBlockNumber(BUNKER1, cross) != WRONG_BUNKER){
+								if(bunker_1_block_erosion[calculateBlockNumber(calculateBunkerNumber(cross), cross)] != 3){
+									stop = TRUE;
+									tank_killed_bunker = TRUE;
+									bunker_shot.x = pixel + new_alien_cross_bullet_position.x;
+									bunker_shot.y = line + new_alien_cross_bullet_position.y;
+								}
+							}
+						}
+						else if(calculateBunkerNumber(cross) == BUNKER2){
+							if(calculateBlockNumber(BUNKER2, cross) != WRONG_BUNKER){
+								if(bunker_2_block_erosion[calculateBlockNumber(calculateBunkerNumber(cross), cross)] != 3){
+									stop = TRUE;
+									tank_killed_bunker = TRUE;
+									bunker_shot.x = pixel + new_alien_cross_bullet_position.x;
+									bunker_shot.y = line + new_alien_cross_bullet_position.y;
+								}
+							}
+						}
+						else if(calculateBunkerNumber(cross) == BUNKER3){
+							if(calculateBlockNumber(BUNKER3, cross) != WRONG_BUNKER){
+								if(bunker_3_block_erosion[calculateBlockNumber(calculateBunkerNumber(cross), cross)] != 3){
+									stop = TRUE;
+									tank_killed_bunker = TRUE;
+									bunker_shot.x = pixel + new_alien_cross_bullet_position.x;
+									bunker_shot.y = line + new_alien_cross_bullet_position.y;
+								}
+							}
+						}
+						else if(calculateBunkerNumber(cross) == BUNKER4){
+							if(calculateBlockNumber(BUNKER4, cross) != WRONG_BUNKER){
+								if(bunker_4_block_erosion[calculateBlockNumber(calculateBunkerNumber(cross), cross)] != 3){
+									stop = TRUE;
+									tank_killed_bunker = TRUE;
+									bunker_shot.x = pixel + new_alien_cross_bullet_position.x;
+									bunker_shot.y = line + new_alien_cross_bullet_position.y;
+								}
+							}
+						}
+
+					}
+					else if(frame_pointer[(line + new_alien_cross_bullet_position.y) * SCREEN_WIDTH + (pixel + new_alien_cross_bullet_position.x)] == BLACK){//!RED
+						//xil_printf("Are we gonna draw this new bullet??\n\r");
+						frame_pointer[(line + new_alien_cross_bullet_position.y) * SCREEN_WIDTH + (pixel + new_alien_cross_bullet_position.x)] = RED; //Set to red
+					}
+					else if(frame_pointer[(line + new_alien_cross_bullet_position.y) * SCREEN_WIDTH + (pixel + new_alien_cross_bullet_position.x)] == RED){
+						frame_pointer[(line + new_alien_cross_bullet_position.y) * SCREEN_WIDTH + (pixel + new_alien_cross_bullet_position.x)] = BLACK; //Black out the last shape
+					}
+					if(frame_pointer[(line - FIVE_GAME_PIXELS + new_alien_cross_bullet_position.y) * SCREEN_WIDTH + (pixel + new_alien_cross_bullet_position.x)] == RED){ //Set to black
+						frame_pointer[(line - FIVE_GAME_PIXELS + new_alien_cross_bullet_position.y) * SCREEN_WIDTH + (pixel + new_alien_cross_bullet_position.x)] = BLACK;//Black out the last shape
+						frame_pointer[(line - FIVE_GAME_PIXELS + new_alien_cross_bullet_position.y) * SCREEN_WIDTH + (pixel + ONE_GAME_PIXELS + new_alien_cross_bullet_position.x)] = BLACK;//Black out the last shape
+						frame_pointer[(line - FIVE_GAME_PIXELS + new_alien_cross_bullet_position.y) * SCREEN_WIDTH + (pixel - ONE_GAME_PIXELS + new_alien_cross_bullet_position.x)] = BLACK;//Black out the last shape
+					}
+					//if((calculateBlockNumber(calculateBunkerNumber(tank), tank) != WRONG_BUNKER) && ){
+
+					//}
+
+				}
+				else{
+					frame_pointer[(line - FIVE_GAME_PIXELS + new_alien_cross_bullet_position.y) * SCREEN_WIDTH + (pixel + new_alien_cross_bullet_position.x)] = BLACK; //Make the last pixel black
+					alien_cross_bullet_drawn = FALSE; //Bullet set to false
+				}
+				if(stop){
+					eraseAlienCrossBullet(old_alien_cross_bullet_position);
+					//frame_pointer[(line + TANK_HALF_HEIGHT + new_tank_bullet_position.y) * SCREEN_WIDTH + (pixel + new_tank_bullet_position.x)] = BLACK; //Make the last pixel black
+					alien_cross_bullet_drawn = FALSE; //Bullet set to false
+				}
+			}
+		}
+	}
+	return alien_cross_bullet_drawn;
+}
+
+
 void drawTank(uint8_t direction){
 	if(direction == TANK_LEFT){
 		// Move the tank left.
@@ -889,6 +1086,15 @@ void setDidTankKillAlientoFalse(){
 	tank_killed_alien = FALSE;
 }
 
+uint8_t didTankKillBunker(){
+	return tank_killed_bunker;
+}
+
+void setDidTankKillBunker(){
+	tank_killed_bunker = FALSE;
+}
+
+
 void eraseTankBullet(point_t bullet_pos){
 	uint8_t line, pixel;
 	for(line = 0; line < TANK_BULLET_HEIGHT; line++){ //Height
@@ -896,6 +1102,31 @@ void eraseTankBullet(point_t bullet_pos){
 			frame_pointer[(line + bullet_pos.y) * SCREEN_WIDTH + (pixel + bullet_pos.x)] = BLACK; //Set to red
 		}
 	}
+}
+
+point_t setUpdatedTopLeftSaucer(point_t some_point){
+	uint16_t leftSaucerX = getSaucerPosition();
+	uint16_t rightSacuerX = leftSaucerX + SAUCER_WIDTH;
+	uint16_t saucerTopY = SAUCER_Y_POSITION;
+	uint16_t saucerBottomY = saucerTopY + SAUCER_HEIGHT;
+	point_t mine;
+	if(((some_point.x >= leftSaucerX) && (some_point.x <= rightSacuerX)) && ((some_point.y >= saucerTopY) && (some_point.y <= saucerBottomY))){
+		mine.x = leftSaucerX;
+		mine.y = saucerTopY;
+		return mine;
+	}
+}
+
+uint8_t calculateHitSaucer(point_t some_point){
+	uint16_t leftSaucerX = getSaucerPosition();
+	uint16_t rightSacuerX = leftSaucerX + SAUCER_WIDTH;
+	uint16_t saucerTopY = SAUCER_Y_POSITION;
+	uint16_t saucerBottomY = saucerTopY + SAUCER_HEIGHT;
+	if(((some_point.x >= leftSaucerX) && (some_point.x <= rightSacuerX)) && ((some_point.y >= saucerTopY) && (some_point.y <= saucerBottomY))){
+		tank_killed_saucer = TRUE;
+		return TRUE;
+	}
+	return FALSE;
 }
 
 uint8_t updateTankBullet(){
@@ -909,12 +1140,85 @@ uint8_t updateTankBullet(){
 		for(line = 0; line < TANK_BULLET_HEIGHT; line++){ //Height
 			for(pixel = 0; pixel < TANK_BULLET_WORD_WIDTH; pixel++){ //Width
 				if(old_tank_bullet_position.y > ELEVEN_GAME_PIXELS && !stop){
+					point_t tank;
+					tank.x = pixel + new_tank_bullet_position.x;
+					tank.y = line + new_tank_bullet_position.y;
+					if(calculateBunkerNumber(tank) != WRONG_BUNKER){
+						if(calculateBunkerNumber(tank) == BUNKER1){
+							if(calculateBlockNumber(BUNKER1, tank) != WRONG_BUNKER){
+								if(bunker_1_block_erosion[calculateBlockNumber(calculateBunkerNumber(tank), tank)] != 3){
+									stop = TRUE;
+									tank_killed_bunker = TRUE;
+									bunker_shot.x = pixel + new_tank_bullet_position.x;
+									bunker_shot.y = line + new_tank_bullet_position.y;
+								}
+							}
+						}
+						else if(calculateBunkerNumber(tank) == BUNKER2){
+							if(calculateBlockNumber(BUNKER2, tank) != WRONG_BUNKER){
+								if(bunker_2_block_erosion[calculateBlockNumber(calculateBunkerNumber(tank), tank)] != 3){
+									stop = TRUE;
+									tank_killed_bunker = TRUE;
+									bunker_shot.x = pixel + new_tank_bullet_position.x;
+									bunker_shot.y = line + new_tank_bullet_position.y;
+								}
+							}
+						}
+						else if(calculateBunkerNumber(tank) == BUNKER3){
+							if(calculateBlockNumber(BUNKER3, tank) != WRONG_BUNKER){
+								if(bunker_3_block_erosion[calculateBlockNumber(calculateBunkerNumber(tank), tank)] != 3){
+									stop = TRUE;
+									tank_killed_bunker = TRUE;
+									bunker_shot.x = pixel + new_tank_bullet_position.x;
+									bunker_shot.y = line + new_tank_bullet_position.y;
+								}
+							}
+						}
+						else if(calculateBunkerNumber(tank) == BUNKER4){
+							if(calculateBlockNumber(BUNKER4, tank) != WRONG_BUNKER){
+								if(bunker_4_block_erosion[calculateBlockNumber(calculateBunkerNumber(tank), tank)] != 3){
+									stop = TRUE;
+									tank_killed_bunker = TRUE;
+									bunker_shot.x = pixel + new_tank_bullet_position.x;
+									bunker_shot.y = line + new_tank_bullet_position.y;
+								}
+							}
+						}
+						//if((calculateBlockNumber(calculateBunkerNumber(tank), tank) != WRONG_BUNKER) && ){
+
+						//}
+					}
+					if(calculateAlienNumber(tank) != WRONG_ALIEN){
+						if(alien_block[calculateAlienNumber(tank)]){
+							stop = TRUE;
+							tank_killed_alien = TRUE;
+							alien_dead.x = pixel + new_tank_bullet_position.x;
+							alien_dead.y = line + new_tank_bullet_position.y;
+						}
+					}
+					if(frame_pointer[(line + new_tank_bullet_position.y) * SCREEN_WIDTH + (pixel + new_tank_bullet_position.x)] == RED){
+						//xil_printf("Did we come in here???? \n\r");
+						if(calculateHitSaucer(tank)){
+							//xil_printf("Did we hit a saucer???? \n\r");
+							stop = TRUE;
+							saucer_shot.x = pixel + new_tank_bullet_position.x;
+							saucer_shot.y = line + new_tank_bullet_position.y;
+						}
+					}
 					if(frame_pointer[(line + new_tank_bullet_position.y) * SCREEN_WIDTH + (pixel + new_tank_bullet_position.x)] == WHITE){//!RED
 						stop = TRUE;
 						tank_killed_alien = TRUE;
 						alien_dead.x = pixel + new_tank_bullet_position.x;
 						alien_dead.y = line + new_tank_bullet_position.y;
 						//frame_pointer[(line + new_tank_bullet_position.y) * SCREEN_WIDTH + (pixel + new_tank_bullet_position.x)] = RED; //Set to red
+					}
+
+					else if(frame_pointer[(line + new_tank_bullet_position.y) * SCREEN_WIDTH + (pixel + new_tank_bullet_position.x)] == GREEN){//!RED
+						stop = TRUE;
+						tank_killed_bunker = TRUE;
+						bunker_shot.x = pixel + new_tank_bullet_position.x;
+						bunker_shot.y = line + new_tank_bullet_position.y;
+						//	frame_pointer[(line + new_tank_bullet_position.y) * SCREEN_WIDTH + (pixel + new_tank_bullet_position.x)] = RED; //Set to red
 					}
 					//else if(frame_pointer[(line + new_tank_bullet_position.y) * SCREEN_WIDTH + (pixel + new_tank_bullet_position.x)] == GREEN){//!RED
 					//	frame_pointer[(line + new_tank_bullet_position.y) * SCREEN_WIDTH + (pixel + new_tank_bullet_position.x)] = RED; //Set to red
@@ -939,6 +1243,124 @@ uint8_t updateTankBullet(){
 		}
 	}
 	return tank_Bullet_Drawn;
+}
+
+uint8_t calculateBunkerNumber(point_t bunkerPosition){
+	uint8_t answer = WRONG_BUNKER; //
+	if(((bunkerPosition.x >= BUNKER_1_X_POSITION) && (bunkerPosition.x <= BUNKER_1_X_MAX_POSITION)) && ((bunkerPosition.y >= BUNKER_Y_POSITION) &&(bunkerPosition.y <= BUNKER_Y_BOTTOM_POSITION))){
+		return BUNKER1;
+	}
+	else if(((bunkerPosition.x >= BUNKER_2_X_POSITION) && (bunkerPosition.x <= BUNKER_2_X_MAX_POSITION)) &&((bunkerPosition.y >= BUNKER_Y_POSITION) && (bunkerPosition.y <= BUNKER_Y_BOTTOM_POSITION))){
+		return BUNKER2;
+	}
+	else if(((bunkerPosition.x >= BUNKER_3_X_POSITION) && (bunkerPosition.x <= BUNKER_3_X_MAX_POSITION)) && ((bunkerPosition.y >= BUNKER_Y_POSITION) && (bunkerPosition.y <= BUNKER_Y_BOTTOM_POSITION))){
+		return BUNKER3;
+	}
+	else if(((bunkerPosition.x >= BUNKER_4_X_POSITION) && (bunkerPosition.x <= BUNKER_4_X_MAX_POSITION)) && ((bunkerPosition.y >= BUNKER_Y_POSITION) && (bunkerPosition.y <= BUNKER_Y_BOTTOM_POSITION))){
+		return BUNKER4;
+	}
+	else{
+		return answer;//TODO random number
+	}
+}
+
+
+
+
+uint8_t calculateBlockNumber(uint8_t bunkerNum, point_t bunkerPosition){
+	uint8_t answer = WRONG_BUNKER; //
+	uint16_t left_edge;
+	if(bunkerNum == 0){
+		left_edge = BUNKER_1_X_POSITION;
+	}
+	else if(bunkerNum == 1){
+		left_edge = BUNKER_2_X_POSITION;
+	}
+	else if(bunkerNum == 2){
+		left_edge = BUNKER_3_X_POSITION;
+	}
+	else if(bunkerNum == 3){
+		left_edge = BUNKER_4_X_POSITION;
+	}
+	uint8_t row, col;
+	for(row = 0; row < 3; row++){
+		uint16_t topOfBunkerBlock = BUNKER_Y_POSITION + (BUNKER_BLOCK_HEIGHT * row);
+		uint16_t bottomOfBunkerBlock = BUNKER_Y_POSITION + (BUNKER_BLOCK_HEIGHT * (row + 1));
+		if((bunkerPosition.y >= topOfBunkerBlock) && (bunkerPosition.y < bottomOfBunkerBlock)){
+			for(col = 0; col < 4; col++){
+				uint16_t left_of_block = left_edge + (col * BUNKER_BLOCK_WORD_WIDTH);
+				uint16_t right_of_block = left_edge + ((col + 1) * BUNKER_BLOCK_WORD_WIDTH);
+				if((bunkerPosition.x >= left_of_block) && (bunkerPosition.x < right_of_block)){
+					return ((row*4) + col);
+				}
+			}
+		}
+	}
+	return answer;
+}
+
+point_t getDeadAlienPosition(){
+	return alien_dead;
+}
+
+point_t getShotBunkerPosition(){
+	return bunker_shot;
+}
+
+
+//static uint8_t collision = FALSE;
+point_t collision_position;
+
+uint8_t alien_bullet_array[4] = {0, 0, 0, 0}; //Default is not shot
+uint8_t alien_bullet_type[4] = {0, 0, 0, 0}; //default type is cross
+uint8_t alien_cross[4] = {1, 1, 1, 1}; //default is cross_1
+uint8_t alien_zigzag[4] = {1, 1, 1, 1}; //Default is zigzag_1
+
+void fireAlienBullet(uint8_t alienNum, uint8_t bullet_type){
+	int8_t alien_shooter = my_alien_row_dead[alienNum];
+	if(alien_shooter != ALIEN_NULL){
+		if(alien_bullet_count < BULLET_MAX_COUNT){
+			alien_bullet_count++; //increment bullet count
+			uint8_t count;
+			uint8_t stop = FALSE;
+			uint8_t bullet_num;
+			for(count = 0; count < BULLET_MAX_COUNT && !stop; count++){
+				if(!alien_bullet_array[count]){
+					alien_bullet_array[count] = TRUE;
+					alien_bullet_type[count] = 0; //bullet_type;
+					//if(alien_bullet_type[count] == BULLET_TYPE)
+					bullet_num = count;
+					stop = TRUE;
+				}
+			}
+			//xil_printf("This is the bullet weare on up to 3 it is: %d \n\r", bullet_num);
+			//This assumption is that count keeps its value when I break out of this loop
+			point_t myalienPos = calculateAlienPosition(alien_shooter);
+			myalienPos.x += BULLET_MIDDLE_ALIEN; //Set the x
+			myalienPos.y += ALIEN_HEIGHT; //Set the y
+			setAlienBulletPosition(myalienPos, alien_bullet_count); //Set the position
+			if(!alien_bullet_type[bullet_num]){
+				uint8_t line, pixel;
+				for(line = 0; line < ALIEN_BULLET_HEIGHT; line++){ //For height
+					for(pixel = 0; pixel < ALIEN_CROSS_BULLET_WORD_WIDTH; pixel++){//For width
+						if((alien_cross_bullet_1[line] & (SHIFT<<(ALIEN_CROSS_BULLET_WORD_WIDTH-SHIFT-pixel)))){
+							frame_pointer[(line + myalienPos.y) * SCREEN_WIDTH + (pixel + myalienPos.x)] = WHITE; //Set to white
+						}
+					}
+				}
+			}
+			else{
+				uint8_t line, pixel;
+				for(line = 0; line < ALIEN_BULLET_HEIGHT; line++){ //For height
+					for(pixel = 0; pixel < ALIEN_ZIGZAG_BULLET_WORD_WIDTH; pixel++){ //For width
+						if((alien_zig_zag_bullet_1[line] & (SHIFT<<(ALIEN_ZIGZAG_BULLET_WORD_WIDTH-SHIFT-pixel)))){
+							frame_pointer[(line + myalienPos.y) * SCREEN_WIDTH + (pixel + myalienPos.x)] = WHITE; //Set to white
+						}
+					}
+				}
+			}
+		}
+	}
 }
 
 
@@ -975,10 +1397,10 @@ uint8_t draw_alien_cross_type(uint8_t my_bullet_shot, uint8_t my_bullet_cross, p
 							collision = TRUE;
 							collision_position.x = pixel + my_new_alien_bullet_position.x - ALIEN_CROSS_BULLET_WORD_WIDTH;
 							collision_position.y = line + my_new_alien_bullet_position.y - ALIEN_BULLET_HEIGHT;
-							xil_printf("We have a collision\n\r");
+							//xil_printf("We have a collision\n\r");
 							stop = TRUE;
 						}
-						else if(frame_pointer[(line + my_new_alien_bullet_position.y) * SCREEN_WIDTH + (pixel + 	my_new_alien_bullet_position.x)] != WHITE){ //Said not white
+						else if(frame_pointer[(line + my_new_alien_bullet_position.y) * SCREEN_WIDTH + (pixel + my_new_alien_bullet_position.x)] != WHITE){ //Said not white
 							frame_pointer[(line + my_new_alien_bullet_position.y) * SCREEN_WIDTH + (pixel + my_new_alien_bullet_position.x)] = WHITE; //Set to white
 						}
 						else if(frame_pointer[(line + my_new_alien_bullet_position.y) * SCREEN_WIDTH + (pixel + my_new_alien_bullet_position.x)] == WHITE){
@@ -1224,6 +1646,25 @@ void drawLife(uint16_t x_position, uint16_t y_position){ //Draw life function
 	}
 }
 
+
+void eraseSaucer(point_t position){
+	//xil_printf("Did we erase the saucer??\n\r");
+	uint8_t line, pixel;
+	//int16_t x_position = update_saucer_x_position();
+	//xil_printf("start erasing at x is : %d and y is : %d \n\r", position.x, position.y);
+	for(line = 0; line < SAUCER_HEIGHT; line++){ // We only need to overwrite a few pixels within a 4x4 area
+		for(pixel = 0; pixel < SAUCER_WIDTH; pixel++){
+			//if(frame_pointer[(line + position.y)*SCREEN_WIDTH + (pixel + position.x)] == RED){
+			frame_pointer[(line + position.y)*SCREEN_WIDTH + (pixel + position.x)] = BLACK; //Set to black
+			//}
+			//if(frame_pointer[(line + position.y + SAUCER_ERASE_HEIGHT_OFFSET)*SCREEN_WIDTH + (pixel + position.x - SAUCER_MOVE)] == RED){
+			//	frame_pointer[(line + position.y + SAUCER_ERASE_HEIGHT_OFFSET)*SCREEN_WIDTH + (pixel + position.x - SAUCER_MOVE)] = BLACK; //Set to black
+			//}
+		}
+	}
+}
+
+
 // This function will erase the extra bits on the side of the saucer that will get missed by the automatic update.
 void eraseExtraSaucerBits(int16_t x_position){
 	uint8_t line, pixel;
@@ -1263,15 +1704,34 @@ uint16_t update_saucer_x_position(){
 		eraseExtraSaucerBits(x_position); // We need to erase the final bits of saucer.
 		saucer_move_right = TRUE; // We need to go right for next time.
 	}
-
 	return x_position;
 }
+
+
+void setDidTankKillSaucertoFalse(){
+	tank_killed_saucer = FALSE;
+}
+
+uint8_t didTankKillSaucer(){
+	return tank_killed_saucer;
+}
+
+uint16_t getSaucerPosition(){
+	return saucerPosition;
+}
+void setSaucerPosition(uint16_t val){
+	saucerPosition = val;
+}
+
+
+
 
 uint8_t drawSaucer(){
 	uint8_t line, pixel;
 
 	int16_t x_position = update_saucer_x_position();
-
+	//xil_printf("Draw saucer at x is : %d and y is : %d \n\r", x_position, SAUCER_Y_POSITION);
+	setSaucerPosition(x_position);
 	if((x_position == SAUCER_MAX_X_POSITION) || (x_position == SAUCER_MIN_X_POSITION)){
 		return FALSE; // We need to stop the draw saucer functionality now that we have gone off the board.
 	}
@@ -1334,7 +1794,6 @@ uint8_t drawSaucer(){
 		}
 		eraseExtraSaucerBits(x_position);
 	}
-
 	return TRUE;
 }
 

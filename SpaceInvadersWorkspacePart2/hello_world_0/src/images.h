@@ -16,6 +16,8 @@
 #define ALIEN_HEIGHT 16 // The height of an individual alien in pixels.
 #define ALIEN_EXPLOSION_HEIGHT 20 // The height of an alien explosion in pixels.
 #define ALIEN_WORD_WIDTH 32 // The width of an individual alien in pixels.
+#define HALF_ALIEN_WORD_WIDTH 16 // The width of an individual alien in pixels.
+
 
 #define TANK_HEIGHT 16 // The tank height in pixels.
 #define TANK_WORD_WIDTH 30 // The tank width in pixels.
@@ -27,6 +29,9 @@
 #define BUNKER_FULL_BUNKER_WIDTH 48 // The full width of the bunker.
 #define BUNKER_BLOCK_HEIGHT 12 // The height of a single bunker block in pixels.
 #define BUNKER_BLOCK_WORD_WIDTH 12 // The width of a single bunker block in pixels.
+
+
+#define FULL_BUNKER_WORD_WIDTH 48 // The width of the bunker in pixels.
 
 #define ALIEN_BULLET_HEIGHT 10 // The height of an alien bullet in pexels.
 #define ALIEN_CROSS_BULLET_WORD_WIDTH 6 // The width of the alien cross bullet in pixels.

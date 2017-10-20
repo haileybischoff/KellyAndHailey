@@ -34,11 +34,43 @@ point_t getDeadAlienPosition();
 
 void setDidTankKillAlientoFalse();
 
+uint8_t updateCrossAlienBullet();
+
+
+point_t getShotBunkerPosition();
+uint8_t calculateBlockNumber(uint8_t bunkerNum, point_t bunkerPosition);
+uint8_t calculateBunkerNumber(point_t bunkerPosition);
+void setDidTankKillBunker();
+uint8_t didTankKillBunker();
+
+void setDidTankKillSaucertoFalse();
+uint8_t didTankKillSaucer();
+uint16_t update_saucer_x_position();
+uint16_t getSaucerPosition();
+void setSaucerPosition(uint16_t val);
+
+uint8_t calculateHitSaucer(point_t some_point);
+
+point_t setUpdatedTopLeftSaucer(point_t some_point);
+
+void computeScore(uint8_t alien_number);
+
+uint32_t getScore();
+void setScore(uint32_t score);
+
+point_t getDeadSaucerPosition();
+
+
 void setTankPosition(uint16_t val); // This sets the tank's position.
 uint16_t getTankPosition(); // This gets the tank's position.
 
 void setTankBulletPosition(point_t val); // This sets the tank's bullet position.
 point_t getTankBulletPosition(); // This gets the tank's bullet position.
+
+void setAlienCrossBulletPosition(point_t val); // This sets the tank's bullet position.
+point_t getAlienCrossBulletPosition(); // This gets the tank's bullet position.
+
+void drawCrossAlienBullet(uint8_t alienNumber);
 
 void setAlienBlockPosition(point_t val); // This sets the aliens' block position.
 point_t getAlienBlockPosition(); // This gets the aliens' block position
@@ -64,7 +96,6 @@ void drawTankBullet(); // This draws the tank's bullet.
 uint8_t updateTankBullet(); // Updates the tank's bullet.
 
 void drawTank(uint8_t direction); // This draws the tank. TANK_RIGHT or TANK_LEFT is the direction we pass in.
-
 uint8_t drawSaucer(); // If it is done moving across the screen then it returns TRUE aka 1 and if it isn't it returns FALSE;
 
 unsigned int * draw_start_screen(); // This draws the inital start screen.
