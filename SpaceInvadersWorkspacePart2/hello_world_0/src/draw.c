@@ -1135,6 +1135,17 @@ void drawLife(uint16_t x_position, uint16_t y_position){ //Draw life function
 	}
 }
 
+uint8_t drawSaucer(){
+	uint8_t line, pixel;
+	for(line = 0; line < TANK_HEIGHT; line++){ //For height
+		for(pixel = 0; pixel < TANK_WORD_WIDTH; pixel++){ //For width
+			if((tank_symbol[line] & (SHIFT<<(TANK_WORD_WIDTH-SHIFT-pixel)))){
+				//frame_pointer[(line + y_position)*SCREEN_WIDTH + (pixel + x_position)] = GREEN; //Set to green
+			}
+		}
+	}
+}
+
 unsigned int * draw_start_screen(){
 	setTankPosition(TANK_INITIAL_X_POSITION); //Set tank position
 	uint16_t row, col;

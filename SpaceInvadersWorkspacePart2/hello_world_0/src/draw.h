@@ -57,6 +57,8 @@ uint8_t updateTankBullet(); // Updates the tank's bullet.
 
 void drawTank(uint8_t direction); // This draws the tank. TANK_RIGHT or TANK_LEFT is the direction we pass in.
 
+uint8_t drawSaucer(); // If it is done moving across the screen then it returns TRUE aka 1 and if it isn't it returns FALSE;
+
 unsigned int * draw_start_screen(); // This draws the inital start screen.
 
 #endif /* DRAW_H_ */

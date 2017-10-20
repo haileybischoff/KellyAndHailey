@@ -18,9 +18,6 @@
 #include "draw.h"
 #include <stdbool.h>
 
-#define TRUE 1 // Because C doesn't provide a default true. Sigh.
-#define FALSE 0 // Because C doesn't provide a default false. Sigh.
-
 #define TANK_LEFT_MASK 8 //This is the hour mask
 #define TANK_FIRE_BULLET_MASK 1 //This is the minute mask
 #define TANK_RIGHT_MASK 2 //This is the second mask
@@ -57,6 +54,8 @@
 
 void print(char *str); //This is a void print function
 
+#define SAUCER_MAX_TIME 2000 // This is the max time before a saucer will go accross the board again.
+
 #define FRAME_BUFFER_0_ADDR 0xC1000000  // Starting location in DDR where we will store the images that we display.
 #define DEBOUNCE_VALUE 0x0000001F
 
@@ -66,26 +65,77 @@ void print(char *str); //This is a void print function
 #define TOP_BUTTON_MASK 16 //This is the mask for the top push button it will be used fro incrementing volume eventually
 #define BOTTOM_BUTTON_MASK 4 //This is the mask for the bottom push button it will be used for decrementing volume eventually
 
+#define TANK_MOVE_MAX_COUNTER 5 // 5 is a 50th of a second
+#define ALIEN_MOVE_MAX_COUNTER 50 // 50 is a half second since the interrupt happens every 10 mS.
+#define SAUCER_MOVE_MAX_COUNTER 10 // 10 is a tenth of a second for moving the saucer.
+
+/***************** INTERRUPT HANDLER STUFF *****************************/
+XGpio gpPB;   // This is a handle for the push-button GPIO block.
+
+uint16_t alien_bullets = RESET; //Count for the number of alien bullets on the screen
+uint32_t alienCounter = RESET; //Alien counter initialized to 0
+uint16_t debounceCounter = RESET; //Debounce counter initialized to 0
+uint16_t alienDeathCounter = RESET; //Alien Death Counter initialized to 0
+uint16_t tankDeathCounter = RESET; //Tank death counter initialized to 0
+uint16_t tankBulletFiredMinCounter = RESET; //Bullet Fired Min COunter initialized to 0
+uint16_t alienBulletFiredMinCounter = RESET; //Bullet Fired Min COunter initialized to 0
+
+uint32_t updateBulletCounter = RESET;
+
+uint32_t randomCounter = RESET;
+
+
+uint32_t alienBulletMaxValue = RESET; //Alien bullet max value is initialized to 0
+uint16_t alienRandValue = RESET; //
+
+
+uint8_t alienColumn = RESET;
+uint8_t alienBulletType = RESET;
+
+bool alienDeathFlag = false; //Flag for alien death
+bool tankDeathFlag = false; //Flag for tank death
+bool bulletFireFlag = false; //Flag for whether a bullet has been fired
+
+bool move_alien_recieved_flag = false; //Flag to let us know we went into the alien moved state;
+bool button_pressed_recieved_flag = false; //Flag to let us know we went into the button pressed state
+bool tank_bullet = false; //Bool for tank bullet
+
 uint32_t currentButtonState = 0;
 uint32_t debouncedButtonState = 0;	// Saves the debounced button states
 uint16_t btn_count; //Timer for buttons
 
-bool moveLeftFlag = FALSE;
-bool moveRightFlag = FALSE;
-bool shootTankBulletFlag = FALSE;
+/****************** DRAW TANK STUFF ************************************/
+uint16_t tankMoveCounter = RESET; //Tank move counter initialized to 0
+uint8_t moveTankCounter = RESET;
 
-void debounce_buttons(){ //this takes the button and debounces it for us
+bool moveLeftFlag = false;
+bool moveRightFlag = false;
+
+/****************** DRAW TANK BULLET STUFF *****************************/
+bool shootTankBulletFlag = false;
+
+/****************** DRAW SUACER STUFF **********************************/
+uint16_t saucerMoveCounter = RESET; // This is the counter that counts how long between when we update saucer draw.
+uint16_t saucerRandValueCounter = RESET; // This is the time that we have between drawing saucers
+uint16_t saucerRandValueMax = RESET; // This value will hold the recalculated max for the Random Value counter
+
+bool drawSaucerFlag = false; // Tells us to draw the saucer
+bool saucerDrawnFlag = false;
+
+/***************** FUNCTIONS *******************************************/
+
+void debounce_buttons(){ //this takes the button and debounces it for us it also sets the flags for each button
 	debouncedButtonState = currentButtonState & DEBOUNCE_VALUE;
 	if((debouncedButtonState & LEFT_BUTTON_MASK) && !(debouncedButtonState & RIGHT_BUTTON_MASK)){
-		moveLeftFlag = TRUE;
-		moveRightFlag = FALSE;
+		moveLeftFlag = true;
+		moveRightFlag = false;
 	}
 	if((debouncedButtonState & RIGHT_BUTTON_MASK) && !(debouncedButtonState & LEFT_BUTTON_MASK)){
-		moveRightFlag = TRUE;
-		moveLeftFlag = FALSE;
+		moveRightFlag = true;
+		moveLeftFlag = false;
 	}
 	if(debouncedButtonState & MIDDLE_BUTTON_MASK){
-		shootTankBulletFlag = TRUE;
+		shootTankBulletFlag = true;
 	}
 }
 
@@ -99,6 +149,7 @@ enum SpaceInvadersControl_st{
 	dead_tank_st,
 	move_tank_right_st,
 	move_tank_left_st,
+	draw_saucer_st,
 	new_alien_bullet_st
 } currentState = init_st;
 
@@ -143,6 +194,8 @@ void debugStatePrint(){
 			break;
 		case move_tank_left_st:
 			break;
+		case draw_saucer_st:
+			break;
 		case new_alien_bullet_st:
 			xil_printf("NEW ALIEN BULLET State\n\r");
 			break;
@@ -154,51 +207,17 @@ void debugStatePrint(){
 
 }
 
-#define ALIEN_MOVE_MAX_COUNTER 50 // 50 is a half second since the interrupt happens every 10 mS.
-#define TANK_MOVE_MAX_COUNTER 5 // 10 is a tenth of a second
-
-uint16_t alien_bullets = RESET; //Count for the number of alien bullets on the screen
-uint32_t alienCounter = RESET; //Alien counter initialized to 0
-uint16_t debounceCounter = RESET; //Debounce counter initialized to 0
-uint16_t alienDeathCounter = RESET; //Alien Death Counter initialized to 0
-uint16_t tankDeathCounter = RESET; //Tank death counter initialized to 0
-uint16_t tankBulletFiredMinCounter = RESET; //Bullet Fired Min COunter initialized to 0
-uint16_t alienBulletFiredMinCounter = RESET; //Bullet Fired Min COunter initialized to 0
-uint16_t saucerCounter = RESET; //Saucer counter initialized to 0
-uint16_t tankMoveCounter = RESET; //Tank move counter initialized to 0
-uint8_t moveTankCounter = RESET;
-
-uint32_t updateBulletCounter = RESET;
-
-uint32_t randomCounter = RESET;
-
-uint32_t saucerCounterMaxValue = RESET; //Saucer max counter value is initialized to 0
-uint32_t alienBulletMaxValue = RESET; //Alien bullet max value is initialized to 0
-uint16_t alienRandValue = RESET; //
-uint16_t saucerRandValue = RESET; //
-
-uint8_t alienColumn = RESET;
-uint8_t alienBulletType = RESET;
-
-bool alienDeathFlag = false; //Flag for alien death
-bool tankDeathFlag = false; //Flag for tank death
-bool bulletFireFlag = false; //Flag for whether a bullet has been fired
-bool saucerFlag = false; //Flag for saucer
-bool saucerDrawnFlag = false;
-bool tankMoveFlag = false; //Flag for tank
-bool move_alien_recieved_flag = false; //Flag to let us know we went into the alien moved state;
-bool button_pressed_recieved_flag = false; //Flag to let us know we went into the button pressed state
-bool tank_bullet = false; //Bool for tank bullet
-
 void spaceInvaders_tick(){
+
+	uint8_t isSaucerDrawn = RESET;
+
 	//State actions
 	switch(currentState){
 	case init_st:
 		alienDeathFlag = false; //Alien Death flag set to false
 		tankDeathFlag = false; //Tank Death flag set to false
 		bulletFireFlag = false; //Bullet Fire flag set to false
-		saucerFlag = false; //Saucer flag set to false
-		tankMoveFlag = false; //Tank Move flag set to false
+		drawSaucerFlag = false; //Saucer flag set to false
 
 		alienCounter = RESET; //Alien counter initialized to 0
 		debounceCounter = RESET; //Debounce counter initialized to 0
@@ -206,14 +225,17 @@ void spaceInvaders_tick(){
 		tankDeathCounter = RESET; //Tank death counter initialized to 0
 		tankBulletFiredMinCounter = RESET; //Bullet Fired Min COunter initialized to 0
 		alienBulletFiredMinCounter = RESET; //Bullet Fired Min COunter initialized to 0
-		saucerCounter = RESET; //Saucer counter initialized to 0
-		tankMoveCounter = RESET; //Tank move counter initialized to 0
+		saucerMoveCounter = RESET; //Saucer counter initialized to 0
+		saucerRandValueCounter = RESET; // Reset this random value saucer counter.
 
+		moveTankCounter = RESET; //Tank move counter initialized to 0
+		moveLeftFlag = false;
+		moveRightFlag = false;
 
 		randomCounter = 1000000;//Increment the random counter //TODO
 		srand(randomCounter); //Pass the random counter as the seed to srand
 		alienRandValue = rand() % MAX_NUMBER_OF_ALIENS_IN_A_ROW; //TODO initialize to rand() % y
-		saucerRandValue = 0; //TODO initialize to rand() % x
+		saucerRandValueMax = RESET; //TODO initialize to rand() % x
 
 		break;
 	case idle_st:
@@ -228,7 +250,20 @@ void spaceInvaders_tick(){
 			alienBulletMaxValue++;
 			updateBulletCounter++;
 		}
-		saucerCounter++;
+
+
+		if(drawSaucerFlag){ // If the saucer is supposed to be drawn
+			saucerMoveCounter++; // Increment the time for how long between when we move the saucer
+		}
+		else{ // Otherwise there is no saucer on the screen
+			saucerRandValueCounter++; // So we have to count between when the next suacer get's drawn.
+			if(saucerMoveCounter >= saucerRandValueMax){ // If we get above our saucer random max then
+				drawSaucerFlag = true; // We'll need to set our draw saucer flag to true
+				saucerRandValueMax = rand() % SAUCER_MAX_TIME; // We'll need to generate a new random saucer max
+				saucerRandValueCounter = RESET; // We'll need to reset the saucer rand value counter.
+			}
+		}
+
 		//if buttons are pressed
 		//debounceCounter++;
 
@@ -236,7 +271,7 @@ void spaceInvaders_tick(){
 			if(alienDeathFlag == true){
 				alienDeathCounter++;
 			}
-			if(saucerCounter >= saucerRandValue){
+			if(saucerMoveCounter >= saucerRandValue){
 				saucerDrawnFlag = true;
 			}
 			if(tank_bullet == true){
@@ -270,6 +305,12 @@ void spaceInvaders_tick(){
 		break;
 	case move_tank_left_st:
 		drawTank(TANK_LEFT);
+		break;
+	case draw_saucer_st:
+		isSaucerDrawn = drawSaucer();
+		if(!isSaucerDrawn){
+			drawSaucerFlag = false;
+		}
 		break;
 	case new_alien_bullet_st:
 		alienBulletMaxValue = RESET;
@@ -307,12 +348,12 @@ void spaceInvaders_tick(){
 
 		if(moveRightFlag && (moveTankCounter >= TANK_MOVE_MAX_COUNTER)){
 			moveTankCounter = RESET;
-			moveRightFlag = FALSE;
+			moveRightFlag = false;
 			currentState = move_tank_right_st; // We need to go move the tank right.
 		}
 		else if(moveLeftFlag && (moveTankCounter >= TANK_MOVE_MAX_COUNTER)){ // Basically if a button is pushed
 			moveTankCounter = RESET;
-			moveLeftFlag = FALSE;
+			moveLeftFlag = false;
 			currentState = move_tank_left_st; // We need to go move the tank left.
 		}
 		else if((alien_bullets < MAX_NUMBER_ALIEN_BULLETS) && (alienBulletMaxValue >= randomCounter)){
@@ -321,9 +362,12 @@ void spaceInvaders_tick(){
 		else if((alien_bullets < MAX_NUMBER_ALIEN_BULLETS) &&(updateBulletCounter >= 15000)){//MAX_ALIEN_BULLET_TIME //TODO
 			currentState = update_bullet_st;
 		}
-
 		else if(alienCounter >= ALIEN_MOVE_MAX_COUNTER){ //Check for time to move aliens
 			currentState = move_aliens_st;
+		}
+		else if(drawSaucerFlag && saucerMoveCounter >= SAUCER_MOVE_MAX_COUNTER){
+			saucerMoveCounter = RESET;
+			currentState = draw_saucer_st;
 		}
 		else{
 			currentState = idle_st;
@@ -366,17 +410,16 @@ void spaceInvaders_tick(){
 	case move_tank_left_st:
 		currentState = idle_st;
 		break;
+	case draw_saucer_st:
+		currentState = idle_st;
+		break;
 	case new_alien_bullet_st:
 		currentState = idle_st;
 		break;
 	default:
 		break;
 	}
-
-
 }
-
-XGpio gpPB;   // This is a handle for the push-button GPIO block.
 
 // This is invoked each time there is a change in the button state (result of a push or a bounce).
 void pb_interrupt_handler() {
@@ -427,12 +470,6 @@ int main()
 	XIntc_MasterEnable(XPAR_INTC_0_BASEADDR);
 	microblaze_enable_interrupts();
 
-
-	int8_t lives = DEFAULT_LIVES;
-	uint32_t count = RESET; //This is a counter for drawing the aliens
-	uint32_t buttonCount = RESET; //This count should keep track of how long the button has been pressed
-	uint32_t bulletCount = RESET;
-	uint32_t alienBulletCounter = RESET;
 	//init_platform();                   // Necessary for all programs.
 	int Status;                        // Keep track of success/failure of system function calls.
 	XAxiVdma videoDMAController;
@@ -509,13 +546,10 @@ int main()
 		xil_printf("vdma parking failed\n\r");
 	}
 	// Oscillate between frame 0 and frame 1.
-	uint16_t random_counter = RESET;
 	while (1) { //Keep playing the game until you run out of lives
-		if(lives){
-			//frameIndex = (frameIndex + 1) % 2;  // Alternate between frame 0 and frame 1.
-			if (XST_FAILURE == XAxiVdma_StartParking(&videoDMAController, frameIndex,  XAXIVDMA_READ)) {
-				xil_printf("vdma parking failed\n\r");
-			}
+		//frameIndex = (frameIndex + 1) % 2;  // Alternate between frame 0 and frame 1.
+		if (XST_FAILURE == XAxiVdma_StartParking(&videoDMAController, frameIndex,  XAXIVDMA_READ)) {
+			xil_printf("vdma parking failed\n\r");
 		}
 	}
 	cleanup_platform();

@@ -11,6 +11,7 @@
 #include <stdint.h>
 
 #define SAUCER_HEIGHT 14 // The height of the saucer in pixels.
+#define SUACER_WIDTH 32 // The width of the saucer.
 
 #define ALIEN_HEIGHT 16 // The height of an individual alien in pixels.
 #define ALIEN_EXPLOSION_HEIGHT 20 // The height of an alien explosion in pixels.
