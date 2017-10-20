@@ -42,7 +42,6 @@
 #define SAUCER_MOVE 4 // How many pixels our saucer moves when it moves
 #define SAUCER_ERASE_HEIGHT_OFFSET 6 // The amount down we need to know in order to erase.
 
-
 #define LIFE_1_X_POSITION 449 //Life 1 x position
 #define LIFE_2_X_POSITION 489 //Life 2 x position
 #define LIFE_3_X_POSITION 529 //Life 3 x position
@@ -78,11 +77,20 @@
 #define BUNKER_3_X_POSITION 360 //Third bunker x position
 #define BUNKER_4_X_POSITION	488 //Fourth bunker x position
 #define BUNKER_Y_POSITION 367 //Y position for bunkers
+#define BUNKER_1_X_MAX_POSITION BUNKER_1_X_POSITION + FULL_BUNKER_WORD_WIDTH //First bunker x position
+#define BUNKER_2_X_MAX_POSITION	BUNKER_2_X_POSITION + FULL_BUNKER_WORD_WIDTH//Second bunker x position
+#define BUNKER_3_X_MAX_POSITION BUNKER_3_X_POSITION + FULL_BUNKER_WORD_WIDTH//Third bunker x position
+#define BUNKER_4_X_MAX_POSITION	BUNKER_4_X_POSITION + FULL_BUNKER_WORD_WIDTH//Fourth bunker x position
+#define BUNKER_Y_BOTTOM_POSITION BUNKER_Y_POSITION + BUNKER_HEIGHT //Y position for bunkers
 #define BUNKER_DEAD_BLOCK 4 //Dead bunker block
 #define BUNKER_DAMAGE_1 0 //Bunker damage 1
 #define BUNKER_DAMAGE_2 1 //Bunker damage 2
 #define BUNKER_DAMAGE_3 2 //Bunker damage 3
 #define BUNKER_DAMAGE_4 3 //Bunker damage 4
+#define BUNKER1 0
+#define BUNKER2 1
+#define BUNKER3 2
+#define BUNKER4 3
 
 #define ALIEN_INITIAL_X_POSITION 144 //Initial alien x position
 #define ALIEN_INITIAL_Y_POSITION 51 //Initial alien  position
@@ -200,6 +208,12 @@ static uint8_t bullet4collision = FALSE;
 static uint8_t tank_Bullet_Drawn = FALSE; //Was the tank bullet shot
 
 static uint8_t saucer_move_right = TRUE; // A bool for moving the saucer right or left
+
+point_t alien_dead;
+uint8_t tank_killed_alien = FALSE;
+
+static uint8_t collision = FALSE;
+point_t collision_position;
 
 int8_t getMyAlienNumber(int8_t alienIndex){ //Get the number for an alien when given a number
 	return my_alien_row_dead[alienIndex];//Return the index of the bottom most alien or null
@@ -362,6 +376,42 @@ void drawAlienBullet(uint8_t alienNum, uint8_t bullet_type){ //Draw alien bullet
 	}
 }
 
+uint8_t calculateAlienNumber(point_t some_position){
+	uint16_t x_position, y_position;
+	x_position = some_position.x;
+	y_position = some_position.y;
+
+	uint8_t alienNumber = RESET;
+
+	point_t blockPosition = getAlienBlockPosition(); // This is getting the AlienBlockPosition
+
+	uint8_t h;
+	for(h = 0; h < ALIEN_MAX_ROW; h++){ // Calculating the numbers for the row.
+		uint8_t i;
+
+		uint16_t topOfAlien = blockPosition.y + (ALIEN_Y_OFFSET * h); // this is just getting the top of the Alien boundary
+		uint16_t bottomOfAlien = blockPosition.y + (ALIEN_Y_OFFSET * h) + ALIEN_HEIGHT; // This is just getting the bottom of the alien boundary
+
+		if((y_position >= topOfAlien && y_position <= bottomOfAlien)){ // No need to go through this for loop more than we have to
+			for(i = 0; i < ALIEN_MAX_COL; i++){ // Calculating the number for the column
+				uint16_t leftOfAlien = blockPosition.x + (ALIEN_X_OFFSET * i); // The left boundary of the alien.
+				uint16_t rightOfAlien = blockPosition.x + (ALIEN_X_OFFSET * (i + INCREMENT_OR_DECREMENT)); // the right boundary of the alien.
+
+				if((x_position >= leftOfAlien) && (x_position < rightOfAlien)){ // If the x_poisition is in the boundaries.
+					alienNumber = (h * ALIEN_MAX_COL) + i; // calculate alienNumber.
+					return alienNumber;
+				}
+			}
+		}
+	}
+
+	return alienNumber;
+}
+
+point_t getDeadAlienPosition(){
+	return alien_dead;
+}
+
 point_t calculateAlienPosition(uint8_t alien_number){ //Calculate the position of the alien
 	point_t position = getAlienBlockPosition(); //Get the position
 	// Get the y_position for all the aliens.
@@ -384,7 +434,7 @@ point_t calculateAlienPosition(uint8_t alien_number){ //Calculate the position o
 
 uint16_t getLeftAlienBorder(){//Get the left border for the aliens
 	uint16_t left_position = ALIEN_MIN_LEFT_MOVE_DEFAULT;//This is the default
-	uint8_t left_most_alive_col; //Create left most column variablle
+	uint8_t left_most_alive_col; //Create left most column variable
 	for(left_most_alive_col = 0; left_most_alive_col < ALIEN_MAX_COL; left_most_alive_col++){
 		if(alien_row_dead[left_most_alive_col] != ALIEN_COLUMN_EMPTY){ //If column is not empty
 			break;
@@ -831,6 +881,23 @@ void drawTank(uint8_t direction){
 	}
 }
 
+uint8_t didTankKillAlien(){
+	return tank_killed_alien;
+}
+
+void setDidTankKillAlientoFalse(){
+	tank_killed_alien = FALSE;
+}
+
+void eraseTankBullet(point_t bullet_pos){
+	uint8_t line, pixel;
+	for(line = 0; line < TANK_BULLET_HEIGHT; line++){ //Height
+		for(pixel = 0; pixel < TANK_BULLET_WORD_WIDTH; pixel++){ //Width
+			frame_pointer[(line + bullet_pos.y) * SCREEN_WIDTH + (pixel + bullet_pos.x)] = BLACK; //Set to red
+		}
+	}
+}
+
 uint8_t updateTankBullet(){
 	if(tank_Bullet_Drawn){
 		point_t old_tank_bullet_position = getTankBulletPosition(); //Get tank bullet position
@@ -838,10 +905,21 @@ uint8_t updateTankBullet(){
 		setTankBulletPosition(old_tank_bullet_position); //Set tank bullet position
 		point_t new_tank_bullet_position = getTankBulletPosition(); //Get tank bullet position
 		uint8_t line, pixel;
+		uint8_t stop = FALSE;
 		for(line = 0; line < TANK_BULLET_HEIGHT; line++){ //Height
 			for(pixel = 0; pixel < TANK_BULLET_WORD_WIDTH; pixel++){ //Width
-				if(old_tank_bullet_position.y > ELEVEN_GAME_PIXELS){
-					if(frame_pointer[(line + new_tank_bullet_position.y) * SCREEN_WIDTH + (pixel + new_tank_bullet_position.x)] != RED){
+				if(old_tank_bullet_position.y > ELEVEN_GAME_PIXELS && !stop){
+					if(frame_pointer[(line + new_tank_bullet_position.y) * SCREEN_WIDTH + (pixel + new_tank_bullet_position.x)] == WHITE){//!RED
+						stop = TRUE;
+						tank_killed_alien = TRUE;
+						alien_dead.x = pixel + new_tank_bullet_position.x;
+						alien_dead.y = line + new_tank_bullet_position.y;
+						//frame_pointer[(line + new_tank_bullet_position.y) * SCREEN_WIDTH + (pixel + new_tank_bullet_position.x)] = RED; //Set to red
+					}
+					//else if(frame_pointer[(line + new_tank_bullet_position.y) * SCREEN_WIDTH + (pixel + new_tank_bullet_position.x)] == GREEN){//!RED
+					//	frame_pointer[(line + new_tank_bullet_position.y) * SCREEN_WIDTH + (pixel + new_tank_bullet_position.x)] = RED; //Set to red
+					//}
+					else if(frame_pointer[(line + new_tank_bullet_position.y) * SCREEN_WIDTH + (pixel + new_tank_bullet_position.x)] == BLACK){//!RED
 						frame_pointer[(line + new_tank_bullet_position.y) * SCREEN_WIDTH + (pixel + new_tank_bullet_position.x)] = RED; //Set to red
 					}
 					if(frame_pointer[(line + TANK_HALF_HEIGHT + new_tank_bullet_position.y) * SCREEN_WIDTH + (pixel + new_tank_bullet_position.x)] == RED){ //Set to black
@@ -852,6 +930,11 @@ uint8_t updateTankBullet(){
 					frame_pointer[(line + TANK_HALF_HEIGHT + new_tank_bullet_position.y) * SCREEN_WIDTH + (pixel + new_tank_bullet_position.x)] = BLACK; //Make the last pixel black
 					tank_Bullet_Drawn = FALSE; //Bullet set to false
 				}
+				if(stop){
+					eraseTankBullet(old_tank_bullet_position);
+					//frame_pointer[(line + TANK_HALF_HEIGHT + new_tank_bullet_position.y) * SCREEN_WIDTH + (pixel + new_tank_bullet_position.x)] = BLACK; //Make the last pixel black
+					tank_Bullet_Drawn = FALSE; //Bullet set to false
+				}
 			}
 		}
 	}
@@ -859,9 +942,6 @@ uint8_t updateTankBullet(){
 }
 
 
-
-static uint8_t collision = FALSE;
-point_t collision_position;
 
 
 uint8_t draw_alien_cross_type(uint8_t my_bullet_shot, uint8_t my_bullet_cross, point_t my_old_alien_bullet_position, point_t my_new_alien_bullet_position){

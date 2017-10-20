@@ -24,6 +24,7 @@
 
 #define BUNKER_HEIGHT 36 // The height of the bunker in pixels.
 #define BUNKER_WORD_WIDTH 24 // The width of the bunker in pixels.
+#define BUNKER_FULL_BUNKER_WIDTH 48 // The full width of the bunker.
 #define BUNKER_BLOCK_HEIGHT 12 // The height of a single bunker block in pixels.
 #define BUNKER_BLOCK_WORD_WIDTH 12 // The width of a single bunker block in pixels.
 

@@ -21,13 +21,18 @@
 
 #define NUMBER_OF_ALIEN_BULLETS 4 // The number of bullets the aliens can shoot.
 
-typedef struct point_t { // A new data structure to hold the x and y coordinates for individaul parts.
+typedef struct point_t { // A new data structure to hold the x and y coordinates for individual parts.
 	uint16_t x;
 	uint16_t y;
 };
 
 typedef struct point_t point_t; // Andy you put this here because according to Kelly you didn't like my declaration of point_t I'm gonna have to ask you about that later.
-int8_t getMyAlienNumber(int8_t alienIndex); // This get's the aleins number.
+int8_t getMyAlienNumber(int8_t alienIndex); // This get's the aliens number.
+
+uint8_t didTankKillAlien();
+point_t getDeadAlienPosition();
+
+void setDidTankKillAlientoFalse();
 
 void setTankPosition(uint16_t val); // This sets the tank's position.
 uint16_t getTankPosition(); // This gets the tank's position.
@@ -41,12 +46,15 @@ point_t getAlienBlockPosition(); // This gets the aliens' block position
 void setAlienBulletPosition(point_t val, uint8_t bullet_number); // This sets the alien's bullet position for a given bullet number.
 point_t getAlienBulletPosition(uint8_t bullet_number); // This gets the alien's bullet position for a given bullet numbe.r
 
+void fireAlienBullet(uint8_t alien_number, uint8_t bullet_type); // Draws the alien's bullet.
 void drawAlienBullet(uint8_t alien_number, uint8_t bullet_type); // Draws the alien's bullet.
 uint8_t updateAlienBullet(); // Updates the aliens bullet.
 
-point_t calculateAlienPosition(uint8_t alien_number); // This calculates an individual aleins posisiton.
+point_t calculateAlienPosition(uint8_t alien_number); // This calculates an individual aliens position.
 
-void killAlien(uint8_t alien_number); // This kills an individual alein.
+uint8_t calculateAlienNumber(point_t some_position); // This calculates which alien is at the position.
+
+void killAlien(uint8_t alien_number); // This kills an individual alien.
 
 void drawAlienBlock(); // This draws the entire aliens block.
 

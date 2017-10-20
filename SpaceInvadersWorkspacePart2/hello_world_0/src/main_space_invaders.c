@@ -43,7 +43,7 @@
 #define NUMBER_LENGTH_ONE 1 //the length of a number is 1
 
 #define MAX_DEBOUNCE_TIME 100
-#define MAX_ALIEN_BULLET_TIME 100000
+#define MAX_ALIEN_BULLET_TIME 10 //TODO from pull
 #define MAX_TANK_BULLET_TIME 100
 #define MAX_TANK_DEATH_TIME 100
 #define MAX_NUMBER_ALIEN_BULLETS 4
@@ -54,7 +54,7 @@
 
 void print(char *str); //This is a void print function
 
-#define SAUCER_MAX_TIME 2000 // This is the max time before a saucer will go across the board again.
+#define SAUCER_MAX_TIME 2000 // This is the max time before a saucer will go accross the board again.
 
 #define FRAME_BUFFER_0_ADDR 0xC1000000  // Starting location in DDR where we will store the images that we display.
 #define DEBOUNCE_VALUE 0x0000001F
@@ -176,7 +176,7 @@ void debugStatePrint(){
 			xil_printf("IDLE State\n\r");
 			break;
 		case move_aliens_st:
-			xil_printf("MOVE ALIENS State\n\r");
+			//xil_printf("MOVE ALIENS State\n\r");
 			break;
 		case update_bullet_st:
 			xil_printf("UPDATE BULLETS State\n\r");
@@ -206,7 +206,7 @@ void debugStatePrint(){
 	}
 
 }
-
+uint8_t isTankBulletDrawn = FALSE;
 void spaceInvaders_tick(){
 
 	uint8_t isSaucerDrawn = RESET;
@@ -232,10 +232,10 @@ void spaceInvaders_tick(){
 		moveLeftFlag = false;
 		moveRightFlag = false;
 
-		randomCounter = 1000000;//Increment the random counter //TODO
+		randomCounter = 200;//Increment the random counter //TODO from pull
 		srand(randomCounter); //Pass the random counter as the seed to srand
 		alienRandValue = rand() % MAX_NUMBER_OF_ALIENS_IN_A_ROW; //TODO initialize to rand() % y
-		saucerRandValueMax = rand() % SAUCER_MAX_TIME; // Initialize our Saucer rand value max time.
+		saucerRandValueMax = RESET; //TODO initialize to rand() % x
 
 		break;
 	case idle_st:
@@ -246,7 +246,7 @@ void spaceInvaders_tick(){
 		moveTankCounter++; // This is a counter to know the timing of when we need to move the tank.
 
 		alienCounter++;
-		if(alien_bullets < MAX_NUMBER_ALIEN_BULLETS){
+		if(alien_bullets <= MAX_NUMBER_ALIEN_BULLETS){
 			alienBulletMaxValue++;
 			updateBulletCounter++;
 		}
@@ -257,11 +257,16 @@ void spaceInvaders_tick(){
 		}
 		else{ // Otherwise there is no saucer on the screen
 			saucerRandValueCounter++; // So we have to count between when the next suacer get's drawn.
-			if(saucerRandValueCounter >= saucerRandValueMax){ // If we get above our saucer random max then
+			if(saucerMoveCounter >= saucerRandValueMax){ // If we get above our saucer random max then
 				drawSaucerFlag = true; // We'll need to set our draw saucer flag to true
 				saucerRandValueMax = rand() % SAUCER_MAX_TIME; // We'll need to generate a new random saucer max
 				saucerRandValueCounter = RESET; // We'll need to reset the saucer rand value counter.
 			}
+		}
+		if(shootTankBulletFlag){
+			shootTankBulletFlag = false;
+			isTankBulletDrawn = TRUE;
+			drawTankBullet();
 		}
 
 		//if buttons are pressed
@@ -292,9 +297,17 @@ void spaceInvaders_tick(){
 		break;
 	case update_bullet_st:
 		updateBulletCounter = RESET;
-		alien_bullets = updateAlienBullet();
+		if(isTankBulletDrawn){
+			xil_printf("Do we come in here???? \n\r");
+			isTankBulletDrawn = updateTankBullet();
+		}
+
+		//alien_bullets = updateAlienBullet();
+		xil_printf("Alien bullets: %d \n\r", alien_bullets);
 		break;
 	case dead_alien_st:
+		killAlien(calculateAlienNumber(getDeadAlienPosition()));
+		setDidTankKillAlientoFalse();
 		break;
 	case bunker_st:
 		break;
@@ -321,7 +334,7 @@ void spaceInvaders_tick(){
 		while(getMyAlienNumber(alienColumn) == ALIEN_NULL){ //If the column is null
 			alienColumn = (rand()%MAX_NUMBER_OF_ALIENS_IN_A_ROW);//Keep trying for a new column
 		}
-		drawAlienBullet(alienColumn, alienBulletType); //Call draw alien bullet with the column and bullet type
+		//fireAlienBullet(alienColumn, alienBulletType); //Call draw alien bullet with the column and bullet type //Said draw
 		break;
 	default:
 		break;
@@ -356,12 +369,17 @@ void spaceInvaders_tick(){
 			moveLeftFlag = false;
 			currentState = move_tank_left_st; // We need to go move the tank left.
 		}
-		else if((alien_bullets < MAX_NUMBER_ALIEN_BULLETS) && (alienBulletMaxValue >= randomCounter)){
+		//else if(){
+
+		//}
+/*
+		else if((alien_bullets < 4) && (alienBulletMaxValue >= randomCounter)){//TODO
 			currentState = new_alien_bullet_st;
-		}
-		else if((alien_bullets < MAX_NUMBER_ALIEN_BULLETS) &&(updateBulletCounter >= 15000)){//MAX_ALIEN_BULLET_TIME //TODO
+		}*/
+		else if((alien_bullets <= MAX_NUMBER_ALIEN_BULLETS) &&(updateBulletCounter >= MAX_ALIEN_BULLET_TIME)){//5 MAX_ALIEN_BULLET_TIME //TODO from pull
 			currentState = update_bullet_st;
 		}
+
 		else if(alienCounter >= ALIEN_MOVE_MAX_COUNTER){ //Check for time to move aliens
 			currentState = move_aliens_st;
 		}
@@ -382,10 +400,15 @@ void spaceInvaders_tick(){
 		//else if tank bullet has collision with alien
 		//currentState = deadAlienSt; //Go to dead alien state
 		alienDeathFlag = true;
+		if(didTankKillAlien()){
+			currentState = dead_alien_st;
+		}
+		else{
 		//else if alien bullet has collision with tank
 		//currentState = deadTankSt; //Go to dead tank state
 		//else
 		currentState = idle_st; //Go to idle state
+		}
 		break;
 	case dead_alien_st:
 		currentState = idle_st;
@@ -442,6 +465,7 @@ void interrupt_handler_dispatcher(void* ptr) {
 	// Check the FIT interrupt first.
 	if (intc_status & XPAR_FIT_TIMER_0_INTERRUPT_MASK){
 		XIntc_AckIntr(XPAR_INTC_0_BASEADDR, XPAR_FIT_TIMER_0_INTERRUPT_MASK);
+		debugStatePrint();
 		spaceInvaders_tick();
 	}
 	// Check the push buttons.
