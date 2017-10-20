@@ -36,6 +36,13 @@
 #define MOVE_RIGHT 26 //move right by 26
 #define MOVE 4 //Move is 4
 
+#define SAUCER_Y_POSITION 29 // This is the Y position for when we draw the saucer.
+#define SAUCER_MIN_X_POSITION -32 // The minimum X position for our saucer
+#define SAUCER_MAX_X_POSITION 640 // The maximum X position for our saucer
+#define SAUCER_MOVE 4 // How many pixels our saucer moves when it moves
+#define SAUCER_ERASE_HEIGHT_OFFSET 6 // The amount down we need to know in order to erase.
+
+
 #define LIFE_1_X_POSITION 449 //Life 1 x position
 #define LIFE_2_X_POSITION 489 //Life 2 x position
 #define LIFE_3_X_POSITION 529 //Life 3 x position
@@ -191,6 +198,8 @@ static uint8_t bullet3collision = FALSE;
 static uint8_t bullet4collision = FALSE;
 
 static uint8_t tank_Bullet_Drawn = FALSE; //Was the tank bullet shot
+
+static uint8_t saucer_move_right = TRUE; // A bool for moving the saucer right or left
 
 int8_t getMyAlienNumber(int8_t alienIndex){ //Get the number for an alien when given a number
 	return my_alien_row_dead[alienIndex];//Return the index of the bottom most alien or null
@@ -1135,15 +1144,118 @@ void drawLife(uint16_t x_position, uint16_t y_position){ //Draw life function
 	}
 }
 
-uint8_t drawSaucer(){
+// This function will erase the extra bits on the side of the saucer that will get missed by the automatic update.
+void eraseExtraSaucerBits(int16_t x_position){
 	uint8_t line, pixel;
-	for(line = 0; line < TANK_HEIGHT; line++){ //For height
-		for(pixel = 0; pixel < TANK_WORD_WIDTH; pixel++){ //For width
-			if((tank_symbol[line] & (SHIFT<<(TANK_WORD_WIDTH-SHIFT-pixel)))){
-				//frame_pointer[(line + y_position)*SCREEN_WIDTH + (pixel + x_position)] = GREEN; //Set to green
+
+	for(line = 0; line < SAUCER_MOVE; line++){ // We only need to overwrite a few pixels within a 4x4 area
+		for(pixel = 0; pixel < SAUCER_MOVE; pixel++){
+			if(saucer_move_right){ // This is what we need to erase if we are moving right.
+				if(frame_pointer[(line + SAUCER_Y_POSITION + SAUCER_ERASE_HEIGHT_OFFSET)*SCREEN_WIDTH + (pixel + x_position - SAUCER_MOVE)] == RED){
+					frame_pointer[(line + SAUCER_Y_POSITION + SAUCER_ERASE_HEIGHT_OFFSET)*SCREEN_WIDTH + (pixel + x_position - SAUCER_MOVE)] = BLACK; //Set to black
+				}
+			}
+			else{ // This is what we need to erase if we are moving left.
+				if(frame_pointer[(line + SAUCER_Y_POSITION + SAUCER_ERASE_HEIGHT_OFFSET)*SCREEN_WIDTH + (pixel + x_position + SAUCER_WIDTH)] == RED){
+					frame_pointer[(line + SAUCER_Y_POSITION + SAUCER_ERASE_HEIGHT_OFFSET)*SCREEN_WIDTH + (pixel + x_position + SAUCER_WIDTH)] = BLACK; //Set to black
+				}
 			}
 		}
 	}
+}
+
+// This calculates the new x position for the saucer.
+uint16_t update_saucer_x_position(){
+	static int16_t x_position = RESET; // A static variable to to hold the x position
+
+	if(saucer_move_right){
+		x_position += SAUCER_MOVE; // If we are moving right increment our position.
+	}
+	else{
+		x_position -= SAUCER_MOVE; // If we are moving left decrement our position.
+	}
+
+	if(x_position == SAUCER_MAX_X_POSITION){ // If we reach the max saucer position
+		eraseExtraSaucerBits(x_position); // We need to erase the final bits of saucer
+		saucer_move_right = FALSE; // We need to go left for next time.
+	}
+	else if(x_position == SAUCER_MIN_X_POSITION){ // If we reach the min saucer position
+		eraseExtraSaucerBits(x_position); // We need to erase the final bits of saucer.
+		saucer_move_right = TRUE; // We need to go right for next time.
+	}
+
+	return x_position;
+}
+
+uint8_t drawSaucer(){
+	uint8_t line, pixel;
+
+	int16_t x_position = update_saucer_x_position();
+
+	if((x_position == SAUCER_MAX_X_POSITION) || (x_position == SAUCER_MIN_X_POSITION)){
+		return FALSE; // We need to stop the draw saucer functionality now that we have gone off the board.
+	}
+
+	if(x_position < LEFT_BORDER){ // We have some partial drawing to do when it gets to the left border.
+		for(line = 0; line < SAUCER_HEIGHT; line++){ //For height
+			for(pixel = 0; pixel < SAUCER_WIDTH; pixel++){ // So we need to do a smaller width because we are only drawing some of the saucer.
+				if((pixel + x_position) >= RESET){
+					if((saucer_symbol[line] & (SHIFT<<(SAUCER_WIDTH-SHIFT-pixel)))){
+						if(frame_pointer[(line + SAUCER_Y_POSITION)*SCREEN_WIDTH + (pixel + x_position)] == BLACK){
+							frame_pointer[(line + SAUCER_Y_POSITION)*SCREEN_WIDTH + (pixel + x_position)] = RED; //Set to red
+						}
+					}
+					else{
+						if(frame_pointer[(line + SAUCER_Y_POSITION)*SCREEN_WIDTH + (pixel + x_position)] == RED){
+							frame_pointer[(line + SAUCER_Y_POSITION)*SCREEN_WIDTH + (pixel + x_position)] = BLACK; //Set to black
+						}
+					}
+				}
+			}
+		}
+		if(!saucer_move_right){
+			eraseExtraSaucerBits(x_position);
+		}
+
+	}
+	else if(x_position > (RIGHT_BORDER - SAUCER_WIDTH)){ // We have some partial drawing to do when it gets to the right border.
+		for(line = 0; line < SAUCER_HEIGHT; line++){ //For height
+			for(pixel = 0; pixel < (SCREEN_WIDTH - x_position); pixel++){ //
+				if((saucer_symbol[line] & (SHIFT<<(SAUCER_WIDTH-SHIFT-pixel)))){
+					if(frame_pointer[(line + SAUCER_Y_POSITION)*SCREEN_WIDTH + (pixel + x_position)] == BLACK){
+						frame_pointer[(line + SAUCER_Y_POSITION)*SCREEN_WIDTH + (pixel + x_position)] = RED; //Set to red
+					}
+				}
+				else{
+					if(frame_pointer[(line + SAUCER_Y_POSITION)*SCREEN_WIDTH + (pixel + x_position)] == RED){
+						frame_pointer[(line + SAUCER_Y_POSITION)*SCREEN_WIDTH + (pixel + x_position)] = BLACK; //Set to black
+					}
+				}
+			}
+		}
+		if(saucer_move_right){
+			eraseExtraSaucerBits(x_position);
+		}
+	}
+	else{ // Erasing and drawing for normal operation.
+		for(line = 0; line < SAUCER_HEIGHT; line++){ //For height
+			for(pixel = 0; pixel < SAUCER_WIDTH; pixel++){ //For width
+				if((saucer_symbol[line] & (SHIFT<<(SAUCER_WIDTH-SHIFT-pixel)))){
+					if(frame_pointer[(line + SAUCER_Y_POSITION)*SCREEN_WIDTH + (pixel + x_position)] == BLACK){
+						frame_pointer[(line + SAUCER_Y_POSITION)*SCREEN_WIDTH + (pixel + x_position)] = RED; //Set to red
+					}
+				}
+				else{
+					if(frame_pointer[(line + SAUCER_Y_POSITION)*SCREEN_WIDTH + (pixel + x_position)] == RED){
+						frame_pointer[(line + SAUCER_Y_POSITION)*SCREEN_WIDTH + (pixel + x_position)] = BLACK; //Set to black
+					}
+				}
+			}
+		}
+		eraseExtraSaucerBits(x_position);
+	}
+
+	return TRUE;
 }
 
 unsigned int * draw_start_screen(){

@@ -54,7 +54,7 @@
 
 void print(char *str); //This is a void print function
 
-#define SAUCER_MAX_TIME 2000 // This is the max time before a saucer will go accross the board again.
+#define SAUCER_MAX_TIME 2000 // This is the max time before a saucer will go across the board again.
 
 #define FRAME_BUFFER_0_ADDR 0xC1000000  // Starting location in DDR where we will store the images that we display.
 #define DEBOUNCE_VALUE 0x0000001F
@@ -235,7 +235,7 @@ void spaceInvaders_tick(){
 		randomCounter = 1000000;//Increment the random counter //TODO
 		srand(randomCounter); //Pass the random counter as the seed to srand
 		alienRandValue = rand() % MAX_NUMBER_OF_ALIENS_IN_A_ROW; //TODO initialize to rand() % y
-		saucerRandValueMax = RESET; //TODO initialize to rand() % x
+		saucerRandValueMax = rand() % SAUCER_MAX_TIME; // Initialize our Saucer rand value max time.
 
 		break;
 	case idle_st:
@@ -257,7 +257,7 @@ void spaceInvaders_tick(){
 		}
 		else{ // Otherwise there is no saucer on the screen
 			saucerRandValueCounter++; // So we have to count between when the next suacer get's drawn.
-			if(saucerMoveCounter >= saucerRandValueMax){ // If we get above our saucer random max then
+			if(saucerRandValueCounter >= saucerRandValueMax){ // If we get above our saucer random max then
 				drawSaucerFlag = true; // We'll need to set our draw saucer flag to true
 				saucerRandValueMax = rand() % SAUCER_MAX_TIME; // We'll need to generate a new random saucer max
 				saucerRandValueCounter = RESET; // We'll need to reset the saucer rand value counter.
