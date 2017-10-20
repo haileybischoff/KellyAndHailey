@@ -1,0 +1,252 @@
+#define MOVE_TANK_RIGHT_KEY '6' //Make tank move to the right by pressing number 6
+#define MOVE_TANK_LEFT_KEY '4' //Make tank move to the left by pressing number 4
+#define ERODE_BUNKER '7' //Make the bunker Erode by pushing button 7
+#define KILL_ALIEN '2' //kill and alien with button number 2
+#define UPDATE_ALIEN_POSITION '8' //Update all aliens by pushing button number 8
+#define UPDATE_ALL_BULLETS '9' //update all of the bullets on the screen by pushing button number 9
+#define FIRE_TANK_BULLET '5' //Fire a bullet from the tank by pushing 5
+#define FIRE_RANDOM_ALIEN_BULLET '3' //Fire a bullet from the aliens by pushing 3
+
+#define RAND_MAX 65535 //this is a max for the random
+
+int32_t getAlienNumber(){ //the get alien function
+	//char number[NUMBER_LENGTH]; //This is an array with the length of 2
+	int32_t final_number; //This is the final number
+	scanf("%ld", &final_number);
+	return final_number; //We return the final number
+}
+
+int getBunkerNumber(){ //This is to get the bunker number
+	//char number[NUMBER_LENGTH_ONE]; //We have an array of length 1
+	int final_number; //We have a final number
+	scanf("%d", &final_number);
+	return final_number; //We return the final number
+}
+
+/*********************************Stuff in main**************************************************************/
+
+			//debugStatePrint();
+			//spaceInvaders_tick();
+
+			/*
+
+			currentButtonState = XGpio_DiscreteRead(&gpPB, 1) & 0x0000001F;  // Get the current state of the buttons.
+			//xil_printf("These are the buttons: %d\n\r", currentButtonState);
+			random_counter++; //Increment the random counter
+
+
+			srand(random_counter); //This allows us to give srand a seed
+
+
+			static uint8_t bullet_tank_count = RESET; //Keep track of the number of tank bullets
+			static uint8_t alien_bullet_count = RESET; //Keep track of the number of alien bullets
+			uint8_t my_alien_bullet_count = RESET; //Keep track of the number of alien bullets
+			//char input = getchar(); //Get the character
+			if(random_counter == RAND_MAX) //Check to see if the random counter is at the max
+			{
+				random_counter = RESET; //Reset the random counter when it hits the max.
+			}
+
+			//This should always draw the aliens
+
+			count++; //Increment counter
+			//xil_printf("Woohoo! I made it int the while loop.\n\r");
+			//xil_printf("Count is: %d \n\r", count);
+			if(count >= ALIEN_MOVE_TIME){
+				//xil_printf("Do we ever come in here?\n\r");
+				drawAlienBlock(); //Draw the block of aliens
+				count = RESET;
+			}
+
+			if(currentButtonState & TANK_LEFT_MASK){
+				while(currentButtonState & TANK_LEFT_MASK){
+					buttonCount++;
+					if(buttonCount >= BUTTON_TIME){
+						drawTank(TANK_LEFT); //Call the draw tank function with move left
+					}
+				}
+				if(buttonCount >= BUTTON_TIME){
+					drawTank(TANK_LEFT); //Call the draw tank function with move left
+					buttonCount = RESET;
+				}
+			}
+			if(currentButtonState & TANK_RIGHT_MASK){
+				drawTank(TANK_RIGHT); //Call the draw tank function with move left
+			}
+			if(currentButtonState & TANK_FIRE_BULLET_MASK){
+				if(bullet_tank_count == RESET){ //If the bullet has not been fired before
+					xil_printf("FIRE_TANK_BULLET\n\r");
+					bullet_tank_count++; //Increment the bullet count
+					while(buttonCount <= 700){
+						buttonCount++;
+					}
+
+				}
+				else{
+					xil_printf("ONLY ONE BULLET AT A TIME\n\r");
+				}
+				drawTankBullet(); //Call the draw tank function
+			}
+			while(bullet_tank_count){
+				bulletCount++;
+				if(bulletCount >= BULLET_UPDATE_TIME){
+					bullet_tank_count = updateTankBullet(); //Set the bullet count to the update tank bullet function
+				}
+			}
+
+			if(my_alien_bullet_count < 1){ //If there are less than 4 bullets on the screen MAX_NUMBER_OF_ALIEN_BULLETS
+				alien_bullet_count++; //Increment alien bullet count
+				///xil_printf("FIRE_RANDOM_ALIEN_BULLET\n\r");
+				uint8_t alienColumn, alienBulletType; //Alien number and bullet type
+				random_counter++;//Increment the random counter
+				srand(random_counter); //Pass the random counter as the seed to srand
+				alienBulletType = rand()%NUMBER_OF_DIFFERENT_ALIEN_BULLET_TYPES; //Set the bullet type
+				alienColumn = (rand()%MAX_NUMBER_OF_ALIENS_IN_A_ROW);//Set the column alien number
+				while(getMyAlienNumber(alienColumn) == ALIEN_NULL){ //If the column is null
+					alienColumn = (rand()%MAX_NUMBER_OF_ALIENS_IN_A_ROW);//Keep trying for a new column
+				}
+				drawAlienBullet(alienColumn, alienBulletType); //Call draw alien bullet with the column and bullet type
+				while(alienBulletCounter < 1000){
+					alienBulletCounter++;
+				}
+			}
+			else{
+				///xil_printf("ONLY FOUR ALIEN BULLETS AT A TIME\n\r");
+			}
+
+			 */
+
+
+
+
+
+			/*
+			if(alien_bullet_count){
+				alienBulletCounter++;
+				if(alienBulletCounter >= 50000){//10,000 and 5,000 are too slow ALIEN_BULLET_UPDATE_TIME
+					alien_bullet_count = updateAlienBullet(); //Set the alien bullet count to the update alien bullet function
+					alienBulletCounter = RESET;
+				}
+			}
+
+			 */
+
+			/***
+		switch(input){
+		case MOVE_TANK_RIGHT_KEY:
+			xil_printf("MOVE RIGHT\n\r");
+			drawTank(TANK_RIGHT);// Call the draw tank function with move right
+			break;
+		case MOVE_TANK_LEFT_KEY:
+			xil_printf("MOVE LEFT\n\r");
+			drawTank(TANK_LEFT); //Call the draw tank function with move left
+			break;
+		case FIRE_TANK_BULLET:
+			if(bullet_tank_count == RESET){ //If the bullet has not been fired before
+				xil_printf("FIRE_TANK_BULLET\n\r");
+				bullet_tank_count++; //Increment the bullet count
+			}
+			else{
+				xil_printf("ONLY ONE BULLET AT A TIME\n\r");
+			}
+			drawTankBullet(); //Call the draw tank function
+			break;
+		case UPDATE_ALIEN_POSITION:
+			//xil_printf("UPDATE_ALIEN_POSITION\n\r");
+			drawAlienBlock(); //Draw the block of aliens
+			break;
+		default:
+			//xil_printf("WE PUSHED A DIFFERENT KEY\n\r");
+			break;
+		}
+
+			 */
+
+			/* This is the main for lab 3
+ 		 switch(input){
+  		 case MOVE_TANK_RIGHT_KEY:
+  			 xil_printf("MOVE RIGHT\n\r");
+  			 drawTank(TANK_RIGHT);// Call the draw tank function with move right
+  			 break;
+  		 case MOVE_TANK_LEFT_KEY:
+  			 xil_printf("MOVE LEFT\n\r");
+  			 drawTank(TANK_LEFT); //Call the draw tank function with move left
+  			 break;
+  		 case ERODE_BUNKER:
+  			 xil_printf("ERODE_BUNKER\n\r");
+  			 uint8_t bunker_number, block_number; //Variables for bunker and block number
+  			 bunker_number = getBunkerNumber(); //We are supposed to choose the bunker we want to erode
+  			 srand(random_counter); //This allows us to give srand a seed
+  			 block_number = rand() % TOTAL_NUMBER_OF_BLOCKS; //This will give us a random block to disintegrate
+
+  			 if(block_number == BLANK_BLOCK_1){ //If the block is a 9
+  				 block_number--; //make the block an 8
+  			 }
+  			 else if(block_number == BLANK_BLOCK_2){ //If the block is a 10
+  				 block_number++; //Make the block 11
+  			 }
+  			 erodeBunker(bunker_number, block_number); //Call erode bunker with the bunker and block numbers
+  			 break;
+  		 case FIRE_TANK_BULLET:
+  			 if(bullet_tank_count == RESET){ //If the bullet has not been fired before
+  	  			 xil_printf("FIRE_TANK_BULLET\n\r");
+  	  			 bullet_tank_count++; //Increment the bullet count
+  			 }
+  			 else{
+  	  			 xil_printf("ONLY ONE BULLET AT A TIME\n\r");
+  			 }
+  			 drawTankBullet(); //Call the draw tank function
+  			 break;
+  		 case FIRE_RANDOM_ALIEN_BULLET:
+  			 if(my_alien_bullet_count <= MAX_NUMBER_OF_ALIEN_BULLETS){ //If there are less than 4 bullets on the screen
+				alien_bullet_count++; //Increment alien bullet count
+  				xil_printf("FIRE_RANDOM_ALIEN_BULLET\n\r");
+  			 }
+  			 else{
+  				xil_printf("ONLY FOUR ALIEN BULLETS AT A TIME\n\r");
+  			 }
+	  		 uint8_t alienColumn, alienBulletType; //Alien number and bullet type
+	    	 random_counter++;//Increment the random counter
+  			 srand(random_counter); //Pass the random counter as the seed to srand
+  			 alienBulletType = rand()%NUMBER_OF_DIFFERENT_ALIEN_BULLET_TYPES; //Set the bullet type
+  			 alienColumn = (rand()%MAX_NUMBER_OF_ALIENS_IN_A_ROW);//Set the column alien number
+  			 while(getMyAlienNumber(alienColumn) == ALIEN_NULL){ //If the column is null
+  	  			 alienColumn = (rand()%MAX_NUMBER_OF_ALIENS_IN_A_ROW);//Keep trying for a new column
+  			 }
+  			 drawAlienBullet(alienColumn, alienBulletType); //Call draw alien bullet with the column and bullet type
+  			 break;
+  		 case UPDATE_ALL_BULLETS:
+  			 bullet_tank_count = updateTankBullet(); //Set the bullet count to the update tank bullet function
+  			 my_alien_bullet_count = updateAlienBullet(); //Set the alien bullet count to the update alien bullet function
+  			 xil_printf("UPDATE_ALL_BULLETS and %d \n\r", my_alien_bullet_count);
+  			 break;
+  		 case KILL_ALIEN:
+  			 xil_printf("KILL_ALIEN\n\r");
+  			 //uint8_t alien_number = getAlienNumber(); //Get the alien number to kill
+  			 //char my_alien = getchar();
+  			 //if(isDigit(my_alien)){
+  			 uint8_t alien_number = 0; //Get the alien number to kill
+
+
+  			 char c1 = getchar();
+  			 while(isdigit(c1))
+  			 {
+  				alien_number = (alien_number * 10) + (c1 - '0');
+  				c1 = getchar();
+  			 }
+  			 xil_printf("KILL_ALIEN %d \n\r", alien_number);
+  			 killAlien(alien_number); //Kill the alien given
+  			 //}
+  			 break;
+  		 case UPDATE_ALIEN_POSITION:
+  			 //xil_printf("UPDATE_ALIEN_POSITION\n\r");
+  			 drawAlienBlock(); //Draw the block of aliens
+  			 break;
+  		 default:
+  			 //xil_printf("WE PUSHED A DIFFERENT KEY\n\r");
+  			 break;
+  		 }
+
+
+
+			 */

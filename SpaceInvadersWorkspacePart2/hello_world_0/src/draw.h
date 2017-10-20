@@ -55,7 +55,7 @@ void erodeBunker(uint8_t bunker_number, uint8_t block_number); // This erodes a 
 void drawTankBullet(); // This draws the tank's bullet.
 uint8_t updateTankBullet(); // Updates the tank's bullet.
 
-void drawTank(uint8_t direction); // This draws the tank.
+void drawTank(uint8_t direction); // This draws the tank. TANK_RIGHT or TANK_LEFT is the direction we pass in.
 
 unsigned int * draw_start_screen(); // This draws the inital start screen.
 

@@ -185,6 +185,11 @@ static uint8_t alien_step_out = FALSE; //Alien step out
 static uint8_t erase_top_row = FALSE; //Erase the top row
 static point_t last_alien_position;
 
+static uint8_t bullet1collision = FALSE;
+static uint8_t bullet2collision = FALSE;
+static uint8_t bullet3collision = FALSE;
+static uint8_t bullet4collision = FALSE;
+
 static uint8_t tank_Bullet_Drawn = FALSE; //Was the tank bullet shot
 
 int8_t getMyAlienNumber(int8_t alienIndex){ //Get the number for an alien when given a number
@@ -259,6 +264,7 @@ void drawAlienBullet(uint8_t alienNum, uint8_t bullet_type){ //Draw alien bullet
 			alien_bullet_count++; //increment bullet count
 			//if(alien_bullet_count == ALIEN_BULLET_1){ //if we have one bullet
 			if(!bullet_1_shot){ //If bullet one hasn't been shot
+				bullet1collision = FALSE;
 				bullet_1_shot = TRUE; //Set to true
 				bullet_1_type = bullet_type; //Set the bullet type
 				if(bullet_1_type == BULLET_TYPE_1){ //bullet type is a cross
@@ -273,6 +279,7 @@ void drawAlienBullet(uint8_t alienNum, uint8_t bullet_type){ //Draw alien bullet
 			//}
 			//else if(alien_bullet_count == ALIEN_BULLET_2){ //If we have two bullets
 			else if(!bullet_2_shot){ //IF bullet two hasn't been shot
+				bullet2collision = FALSE;
 				bullet_2_shot = TRUE; //Set to true
 				bullet_2_type = bullet_type; //Set the bullet type
 				if(bullet_2_type == BULLET_TYPE_1){ //Bullet type is a cross
@@ -287,6 +294,7 @@ void drawAlienBullet(uint8_t alienNum, uint8_t bullet_type){ //Draw alien bullet
 			//}
 			//else if(alien_bullet_count == ALIEN_BULLET_3){ //If we have three bullets
 			else if(!bullet_3_shot){ //Bullet three hasn't been shot
+				bullet3collision = FALSE;
 				bullet_3_shot = TRUE; //Set to true
 				bullet_3_type = bullet_type; //Set the bullet type
 				if(bullet_3_type == BULLET_TYPE_1){ //Bullet type is a cross
@@ -301,6 +309,7 @@ void drawAlienBullet(uint8_t alienNum, uint8_t bullet_type){ //Draw alien bullet
 			//}
 			//else{
 			else if(!bullet_4_shot){ //Bullet four hasn't been shot
+				bullet4collision = FALSE;
 				bullet_4_shot = TRUE; //Set to true
 				bullet_4_type = bullet_type; //Set bullet type
 				if(bullet_4_type == BULLET_TYPE_1){ //bullet type is a cross
@@ -840,50 +849,83 @@ uint8_t updateTankBullet(){
 	return tank_Bullet_Drawn;
 }
 
+
+
+static uint8_t collision = FALSE;
+point_t collision_position;
+
+
 uint8_t draw_alien_cross_type(uint8_t my_bullet_shot, uint8_t my_bullet_cross, point_t my_old_alien_bullet_position, point_t my_new_alien_bullet_position){
 	uint8_t line, pixel;
-	for(line = 0; line < ALIEN_BULLET_HEIGHT; line++){
-		for(pixel = 0; pixel < ALIEN_CROSS_BULLET_WORD_WIDTH; pixel++){
-			if(my_old_alien_bullet_position.y < _ALIEN_BULLET_GROUND_LEVEL){
+	uint8_t stop = FALSE;
+	if(!collision){
+		for(line = 0; line < ALIEN_BULLET_HEIGHT && !stop; line++){
+			for(pixel = 0; pixel < ALIEN_CROSS_BULLET_WORD_WIDTH && !stop; pixel++){
 				uint8_t mine = FALSE;
-				if(my_bullet_cross == CROSS_1){ //If cross one
-					if(alien_cross_bullet_2[line] & (SHIFT<<(ALIEN_CROSS_BULLET_WORD_WIDTH-SHIFT-pixel))){ //Use cross 2
-						mine = TRUE; //Set to true
+				if((my_old_alien_bullet_position.y < _ALIEN_BULLET_GROUND_LEVEL) && !stop){
+					if(my_bullet_cross == CROSS_1){ //If cross one
+						if(alien_cross_bullet_2[line] & (SHIFT<<(ALIEN_CROSS_BULLET_WORD_WIDTH-SHIFT-pixel))){ //Use cross 2
+							mine = TRUE; //Set to true
+						}
+					}
+					else if(my_bullet_cross == CROSS_2){ //If cross two
+						if(alien_cross_bullet_3[line] & (SHIFT<<(ALIEN_CROSS_BULLET_WORD_WIDTH-SHIFT-pixel))){ //Use cross 3
+							mine = TRUE; //Set to true
+						}
+					}
+					else if(my_bullet_cross == CROSS_3){ //If cross three
+						if(alien_cross_bullet_1[line] & (SHIFT<<(ALIEN_CROSS_BULLET_WORD_WIDTH-SHIFT-pixel))){ //Use cross 1
+							mine = TRUE; //Set to true
+						}
+					}
+					else{
+						mine = FALSE; //Set to false
+					}
+					if(mine){ //If bool is true
+						if(frame_pointer[(line + my_new_alien_bullet_position.y) * SCREEN_WIDTH + (pixel + 	my_new_alien_bullet_position.x)] == GREEN){ //Said not white
+							collision = TRUE;
+							collision_position.x = pixel + my_new_alien_bullet_position.x - ALIEN_CROSS_BULLET_WORD_WIDTH;
+							collision_position.y = line + my_new_alien_bullet_position.y - ALIEN_BULLET_HEIGHT;
+							xil_printf("We have a collision\n\r");
+							stop = TRUE;
+						}
+						else if(frame_pointer[(line + my_new_alien_bullet_position.y) * SCREEN_WIDTH + (pixel + 	my_new_alien_bullet_position.x)] != WHITE){ //Said not white
+							frame_pointer[(line + my_new_alien_bullet_position.y) * SCREEN_WIDTH + (pixel + my_new_alien_bullet_position.x)] = WHITE; //Set to white
+						}
+						else if(frame_pointer[(line + my_new_alien_bullet_position.y) * SCREEN_WIDTH + (pixel + my_new_alien_bullet_position.x)] == WHITE){
+							frame_pointer[(line + my_new_alien_bullet_position.y) * SCREEN_WIDTH + (pixel + my_new_alien_bullet_position.x)] = BLACK; //Black out the last shape
+						}
+						if(frame_pointer[(line - FIVE_GAME_PIXELS + my_new_alien_bullet_position.y) * SCREEN_WIDTH + (pixel + my_new_alien_bullet_position.x)] == WHITE){
+							frame_pointer[(line - FIVE_GAME_PIXELS + my_new_alien_bullet_position.y) * SCREEN_WIDTH + (pixel + my_new_alien_bullet_position.x)] = BLACK;//Black out the last shape
+							frame_pointer[(line - FIVE_GAME_PIXELS + my_new_alien_bullet_position.y) * SCREEN_WIDTH + (pixel + ONE_GAME_PIXELS + my_new_alien_bullet_position.x)] = BLACK;//Black out the last shape
+							frame_pointer[(line - FIVE_GAME_PIXELS + my_new_alien_bullet_position.y) * SCREEN_WIDTH + (pixel - ONE_GAME_PIXELS + my_new_alien_bullet_position.x)] = BLACK;//Black out the last shape
+						}
 					}
 				}
-				else if(my_bullet_cross == CROSS_2){ //If cross two
-					if(alien_cross_bullet_3[line] & (SHIFT<<(ALIEN_CROSS_BULLET_WORD_WIDTH-SHIFT-pixel))){ //Use cross 3
-						mine = TRUE; //Set to true
-					}
-				}
-				else if(my_bullet_cross == CROSS_3){ //If cross three
-					if(alien_cross_bullet_1[line] & (SHIFT<<(ALIEN_CROSS_BULLET_WORD_WIDTH-SHIFT-pixel))){ //Use cross 1
-						mine = TRUE; //Set to true
-					}
+				else if(stop){
+					frame_pointer[(line - FIVE_GAME_PIXELS + my_new_alien_bullet_position.y) * SCREEN_WIDTH + (pixel + my_new_alien_bullet_position.x)] = BLACK; //Black out the last shape
+					my_bullet_shot = FALSE; //Set to false
 				}
 				else{
-					mine = FALSE; //Set to false
+					frame_pointer[(line - FIVE_GAME_PIXELS + my_new_alien_bullet_position.y) * SCREEN_WIDTH + (pixel + my_new_alien_bullet_position.x)] = BLACK; //Black out the last shape
+					my_bullet_shot = FALSE; //Set to false
 				}
-				if(mine){ //If bool is true
-					if(frame_pointer[(line + my_new_alien_bullet_position.y) * SCREEN_WIDTH + (pixel + 	my_new_alien_bullet_position.x)] != WHITE){
-						frame_pointer[(line + my_new_alien_bullet_position.y) * SCREEN_WIDTH + (pixel + my_new_alien_bullet_position.x)] = WHITE; //Set to white
-					}
-					else if(frame_pointer[(line + my_new_alien_bullet_position.y) * SCREEN_WIDTH + (pixel + my_new_alien_bullet_position.x)] == WHITE){
-						frame_pointer[(line + my_new_alien_bullet_position.y) * SCREEN_WIDTH + (pixel + my_new_alien_bullet_position.x)] = BLACK; //Black out the last shape
-					}
-					if(frame_pointer[(line - FIVE_GAME_PIXELS + my_new_alien_bullet_position.y) * SCREEN_WIDTH + (pixel + my_new_alien_bullet_position.x)] == WHITE){
-						frame_pointer[(line - FIVE_GAME_PIXELS + my_new_alien_bullet_position.y) * SCREEN_WIDTH + (pixel + my_new_alien_bullet_position.x)] = BLACK;//Black out the last shape
-						frame_pointer[(line - FIVE_GAME_PIXELS + my_new_alien_bullet_position.y) * SCREEN_WIDTH + (pixel + ONE_GAME_PIXELS + my_new_alien_bullet_position.x)] = BLACK;//Black out the last shape
-						frame_pointer[(line - FIVE_GAME_PIXELS + my_new_alien_bullet_position.y) * SCREEN_WIDTH + (pixel - ONE_GAME_PIXELS + my_new_alien_bullet_position.x)] = BLACK;//Black out the last shape
-					}
-				}
-			}
-			else{
-				frame_pointer[(line - FIVE_GAME_PIXELS + my_new_alien_bullet_position.y) * SCREEN_WIDTH + (pixel + my_new_alien_bullet_position.x)] = BLACK; //Black out the last shape
-				my_bullet_shot = FALSE; //Set to false
 			}
 		}
 	}
+	if(collision){
+		uint8_t pixel, line;
+		for(line = 0; line < ALIEN_BULLET_HEIGHT + 4; line++){
+			for(pixel = 0; pixel < ALIEN_CROSS_BULLET_WORD_WIDTH; pixel++){
+				if(frame_pointer[(line - FIVE_GAME_PIXELS + my_new_alien_bullet_position.y) * SCREEN_WIDTH + (pixel + my_new_alien_bullet_position.x)] == WHITE){
+					frame_pointer[(line - FIVE_GAME_PIXELS + my_new_alien_bullet_position.y) * SCREEN_WIDTH + (pixel + my_new_alien_bullet_position.x)] = BLACK;//Black out the last shape
+					frame_pointer[(line - FIVE_GAME_PIXELS + my_new_alien_bullet_position.y) * SCREEN_WIDTH + (pixel + ONE_GAME_PIXELS + my_new_alien_bullet_position.x)] = BLACK;//Black out the last shape
+					frame_pointer[(line - FIVE_GAME_PIXELS + my_new_alien_bullet_position.y) * SCREEN_WIDTH + (pixel - ONE_GAME_PIXELS + my_new_alien_bullet_position.x)] = BLACK;//Black out the last shape
+				}
+			}
+		}
+	}
+
 	return my_bullet_shot;
 }
 
@@ -939,12 +981,18 @@ void updateIndividualAlienBullet(uint8_t bullet_number){
 			setAlienBulletPosition(old_alien_bullet_position, bullet_number); //Set the alien bullet position
 			new_alien_bullet_position = getAlienBulletPosition(bullet_number); //Get alien bullet position
 			if(bullet1_cross){ //Bullet cross  is true
-				bullet_1_shot = draw_alien_cross_type(bullet_1_shot, bullet1_cross, old_alien_bullet_position, new_alien_bullet_position);
-				if(bullet1_cross < CROSS_3){
-					bullet1_cross++; //Increment cross shape
-				}
-				else{
-					bullet1_cross = CROSS_1; //When maxed out set to the first
+				if(!bullet1collision){
+					bullet_1_shot = draw_alien_cross_type(bullet_1_shot, bullet1_cross, old_alien_bullet_position, new_alien_bullet_position);
+					if(collision){
+						bullet1collision = TRUE;
+						collision = FALSE;
+					}
+					if(bullet1_cross < CROSS_3){
+						bullet1_cross++; //Increment cross shape
+					}
+					else{
+						bullet1_cross = CROSS_1; //When maxed out set to the first
+					}
 				}
 			}
 			else if(bullet1_zigzag){ //We have a zigzag bullet
@@ -968,12 +1016,18 @@ void updateIndividualAlienBullet(uint8_t bullet_number){
 			setAlienBulletPosition(old_alien_bullet_position, bullet_number); //Set alien bullet position
 			new_alien_bullet_position = getAlienBulletPosition(bullet_number); //Get alien bullet position
 			if(bullet2_cross){ //Bullet cross  is true
-				bullet_2_shot = draw_alien_cross_type(bullet_2_shot, bullet2_cross, old_alien_bullet_position, new_alien_bullet_position);
-				if(bullet2_cross < CROSS_3){
-					bullet2_cross++; //Increment cross shape
-				}
-				else{
-					bullet2_cross = CROSS_1; //When maxed out set to the first
+				if(!bullet2collision){
+					bullet_2_shot = draw_alien_cross_type(bullet_2_shot, bullet2_cross, old_alien_bullet_position, new_alien_bullet_position);
+					if(collision){
+						bullet2collision = TRUE;
+						collision = FALSE;
+					}
+					if(bullet2_cross < CROSS_3){
+						bullet2_cross++; //Increment cross shape
+					}
+					else{
+						bullet2_cross = CROSS_1; //When maxed out set to the first
+					}
 				}
 			}
 			else if(bullet2_zigzag){
@@ -997,12 +1051,18 @@ void updateIndividualAlienBullet(uint8_t bullet_number){
 			setAlienBulletPosition(old_alien_bullet_position, bullet_number); //Set alien bullet position
 			new_alien_bullet_position = getAlienBulletPosition(bullet_number); //Get alien bullet position
 			if(bullet3_cross){ //Bullet cross  is true
-				bullet_3_shot = draw_alien_cross_type(bullet_3_shot, bullet3_cross, old_alien_bullet_position, new_alien_bullet_position);
-				if(bullet3_cross < CROSS_3){
-					bullet3_cross++; //Increment cross shape
-				}
-				else{
-					bullet3_cross = CROSS_1; //When maxed out set to the first
+				if(!bullet3collision){
+					bullet_3_shot = draw_alien_cross_type(bullet_3_shot, bullet3_cross, old_alien_bullet_position, new_alien_bullet_position);
+					if(collision){
+						bullet3collision = TRUE;
+						collision = FALSE;
+					}
+					if(bullet3_cross < CROSS_3){
+						bullet3_cross++; //Increment cross shape
+					}
+					else{
+						bullet3_cross = CROSS_1; //When maxed out set to the first
+					}
 				}
 			}
 			else if(bullet3_zigzag){
@@ -1026,12 +1086,18 @@ void updateIndividualAlienBullet(uint8_t bullet_number){
 			setAlienBulletPosition(old_alien_bullet_position, bullet_number); //Set alien bullet position
 			new_alien_bullet_position = getAlienBulletPosition(bullet_number); //Get alien bullet position
 			if(bullet4_cross){//Bullet cross  is true
-				bullet_4_shot = draw_alien_cross_type(bullet_4_shot, bullet4_cross, old_alien_bullet_position, new_alien_bullet_position);
-				if(bullet4_cross < CROSS_3){
-					bullet4_cross++; //Increment cross shape
-				}
-				else {
-					bullet4_cross = CROSS_1; //When maxed out set to the first
+				if(!bullet4collision){
+					bullet_4_shot = draw_alien_cross_type(bullet_4_shot, bullet4_cross, old_alien_bullet_position, new_alien_bullet_position);
+					if(collision){
+						bullet4collision = TRUE;
+						collision = FALSE;
+					}
+					if(bullet4_cross < CROSS_3){
+						bullet4_cross++; //Increment cross shape
+					}
+					else {
+						bullet4_cross = CROSS_1; //When maxed out set to the first
+					}
 				}
 			}
 			else if(bullet4_zigzag){

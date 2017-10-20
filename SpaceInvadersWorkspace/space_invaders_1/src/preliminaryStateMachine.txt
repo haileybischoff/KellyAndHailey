@@ -7,6 +7,9 @@
 #define MAX_NUMBER_ALIEN_BULLETS 4;
 #define MAX_ALIEN_DEATH_TIME 100;
 
+#define MOVE_LEFT 4 //move left by 4
+#define MOVE_RIGHT 26 //move right by 26
+
 enum SpaceInvadersControl_st{
 	init_st,
 	idle_st,
@@ -91,68 +94,7 @@ void spaceInvaders_tick(){
 	
 	uint32_t saucerCounterMaxValue = RESET; //Saucer max counter value is initialized to 0
 	uint32_t alienBulletMaxValue = RESET; //Alien bullet max value is initialized to 0
-	//State transitions
-	switch(currentState){
-		case init_st:
-			currentState = idle_st;
-			break;
-		case idle_st:		
-			
-
-			if(debounceCounter >= MAX_DEBOUNCE_TIME){ //Check for debounce time
-				currentState = button_pressed_st;
-			}
-			if(alienDeathCounter >= MAX_ALIEN_DEATH_TIME){
-				currentState = dead_alien_st;
-			}
-			if(((tank_bullet == true) && (tankBulletFiredMinCounter >= MAX_TANK_BULLET_TIME))|| ((alien_bullets > 0) && (alienBulletFiredMinCounter >= MAX_ALIEN_BULLET_TIME))){ 
-				currentState = update_bullet_st;
-			}
-			if((alien_bullets < MAX_NUMBER_ALIEN_BULLETS) && (alienBulletMaxValue < alienRandValue)){
-				currentState = new_alien_bullet_st;
-			}
-			if(alienCounter >= ALIEN_MOVE_MAX_COUNTER){ //Check for time to move aliens
-				currentState = move_aliens_st;
-			}
-			currentState = idle_st;
-			break;
-		case move_aliens_st:
-			currentState idle_st;
-			break;
-		case update_bullet_st:
-			//if bullet has collision with bunker
-				//currentState = bunker_st; //Go to bunker state
-			//if tank bullet has collision with alien
-				//currentState = deadAlienSt; //Go to dead alien state
-				alienDeathFlag = true;
-			//if alien bullet has collision with tank
-				//currentState = deadTankSt; //Go to dead tank state
-			//else
-				//currentState = idle_st; //Go to idle state
-			break;
-		case dead_alien_st:
-			currentState = idle_st;
-			break;
-		case bunker_st:
-			currentState = idle_st;
-			break;
-		case dead_tank_st:
-			if(tankDeathCounter >= MAX_TANK_DEATH_TIME){
-				currentState = idle_st;
-			}
-			else{
-				currentState = dead_tank_st;
-			}
-			break;
-		case button_pressed_st:
-				currentState = idle_st;
-			break;
-		case new_alien_bullet_st:
-				currentState = idle_st;
-			break;
-		default:
-			break;
-	}
+	
 
 	
 	//State actions 
@@ -211,14 +153,80 @@ void spaceInvaders_tick(){
 			break;
 		case button_pressed_st:
 			//if left button was pressed
-				//
+				//drawTank(TANK_LEFT); //Call the draw tank function with move left
 			//if right button was presses
-				//
+				//drawTank(TANK_RIGHT); //Call the draw tank function with move right
 			//if middle button was pressed
-				//
-			
+				//if (tank_bullet == false)
+					//drawTankBullet(); //Call the draw tank function		
 			break;
 		case new_alien_bullet_st:
+			break;
+		default:
+			break;
+	}
+	
+	
+	//State transitions
+	switch(currentState){
+		case init_st:
+			currentState = idle_st;
+			break;
+		case idle_st:		
+			
+
+			if(debounceCounter >= MAX_DEBOUNCE_TIME){ //Check for debounce time
+				currentState = button_pressed_st;
+			}
+			else if(alienDeathCounter >= MAX_ALIEN_DEATH_TIME){
+				currentState = dead_alien_st;
+			}
+			else if(((tank_bullet == true) && (tankBulletFiredMinCounter >= MAX_TANK_BULLET_TIME))|| ((alien_bullets > 0) && (alienBulletFiredMinCounter >= MAX_ALIEN_BULLET_TIME))){ 
+				currentState = update_bullet_st;
+			}
+			else if((alien_bullets < MAX_NUMBER_ALIEN_BULLETS) && (alienBulletMaxValue < alienRandValue)){
+				currentState = new_alien_bullet_st;
+			}
+			else if(alienCounter >= ALIEN_MOVE_MAX_COUNTER){ //Check for time to move aliens
+				currentState = move_aliens_st;
+			}
+			else{
+				currentState = idle_st;
+			}
+			break;
+		case move_aliens_st:
+			currentState idle_st;
+			break;
+		case update_bullet_st:
+			//if bullet has collision with bunker
+				//currentState = bunker_st; //Go to bunker state
+			//else if tank bullet has collision with alien
+				//currentState = deadAlienSt; //Go to dead alien state
+				alienDeathFlag = true;
+			//else if alien bullet has collision with tank
+				//currentState = deadTankSt; //Go to dead tank state
+			//else
+				//currentState = idle_st; //Go to idle state
+			break;
+		case dead_alien_st:
+			currentState = idle_st;
+			break;
+		case bunker_st:
+			currentState = idle_st;
+			break;
+		case dead_tank_st:
+			if(tankDeathCounter >= MAX_TANK_DEATH_TIME){
+				currentState = idle_st;
+			}
+			else{
+				currentState = dead_tank_st;
+			}
+			break;
+		case button_pressed_st:
+			currentState = idle_st;
+			break;
+		case new_alien_bullet_st:
+			currentState = idle_st;
 			break;
 		default:
 			break;
