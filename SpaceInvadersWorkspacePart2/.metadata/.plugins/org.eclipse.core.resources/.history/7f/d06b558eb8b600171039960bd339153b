@@ -48,8 +48,6 @@
 #define ALIEN_FIFTY_THREE 53 //Initial bottom alien 10
 #define ALIEN_FIFTY_FOUR 54 //Initial bottom alien 11
 
-#define EXPLOSION_OFFSET -2
-
 static uint8_t alien_block[ALIEN_AMOUNT] = {1,1,1,1,1,1,1,1,1,1,1, \
 		1,1,1,1,1,1,1,1,1,1,1, \
 		1,1,1,1,1,1,1,1,1,1,1, \
@@ -240,19 +238,16 @@ void killAlien(uint8_t alien_number){
 	uint8_t line, pixel;
 	for(line = 0; line < ALIEN_EXPLOSION_HEIGHT; line++){ //Height
 		for(pixel = 0; pixel < ALIEN_WORD_WIDTH; pixel++){ //Width
-			if((alien_explosion[line] & (SHIFT<<(ALIEN_WORD_WIDTH-SHIFT-pixel)))){
-				if(frame_pointer[(line + y_position + EXPLOSION_OFFSET)*SCREEN_WIDTH + (pixel + x_position)] == BLACK){
-					frame_pointer[(line + y_position + EXPLOSION_OFFSET)*SCREEN_WIDTH + (pixel + x_position)] = WHITE; //Set to black
-				}
+			if((squid_step_in_symbol[line] & (SHIFT<<(ALIEN_WORD_WIDTH-SHIFT-pixel)))){
+			if(frame_pointer[(line + y_position)*SCREEN_WIDTH + (pixel + x_position)] != BLACK){
+				frame_pointer[(line + y_position)*SCREEN_WIDTH + (pixel + x_position)] = BLACK; //Set to black
 			}
-			else{
-				if(frame_pointer[(line + y_position + EXPLOSION_OFFSET)*SCREEN_WIDTH + (pixel + x_position)] == WHITE){
-					frame_pointer[(line + y_position + EXPLOSION_OFFSET)*SCREEN_WIDTH + (pixel + x_position)] = BLACK; //Set to black
-				}
 			}
 		}
 	}
 }
+
+alien_explosion
 
 void drawAlien(uint16_t x_position, uint16_t y_position, uint8_t alien_type){ //ANDY SAID THAT OUR ALIENS NEED TO MOVE OVER BY EITHER 4 OR 6 PIXELS
 	uint8_t line, pixel;

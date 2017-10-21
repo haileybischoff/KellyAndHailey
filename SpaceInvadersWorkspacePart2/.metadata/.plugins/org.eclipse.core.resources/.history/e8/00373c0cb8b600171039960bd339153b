@@ -48,8 +48,6 @@
 #define ALIEN_FIFTY_THREE 53 //Initial bottom alien 10
 #define ALIEN_FIFTY_FOUR 54 //Initial bottom alien 11
 
-#define EXPLOSION_OFFSET -2
-
 static uint8_t alien_block[ALIEN_AMOUNT] = {1,1,1,1,1,1,1,1,1,1,1, \
 		1,1,1,1,1,1,1,1,1,1,1, \
 		1,1,1,1,1,1,1,1,1,1,1, \
@@ -238,17 +236,10 @@ void killAlien(uint8_t alien_number){
 	}
 	alien_block[alien_number] = ALIEN_ERASE; //Erase alien
 	uint8_t line, pixel;
-	for(line = 0; line < ALIEN_EXPLOSION_HEIGHT; line++){ //Height
+	for(line = 0; line < ALIEN_HEIGHT; line++){ //Height
 		for(pixel = 0; pixel < ALIEN_WORD_WIDTH; pixel++){ //Width
-			if((alien_explosion[line] & (SHIFT<<(ALIEN_WORD_WIDTH-SHIFT-pixel)))){
-				if(frame_pointer[(line + y_position + EXPLOSION_OFFSET)*SCREEN_WIDTH + (pixel + x_position)] == BLACK){
-					frame_pointer[(line + y_position + EXPLOSION_OFFSET)*SCREEN_WIDTH + (pixel + x_position)] = WHITE; //Set to black
-				}
-			}
-			else{
-				if(frame_pointer[(line + y_position + EXPLOSION_OFFSET)*SCREEN_WIDTH + (pixel + x_position)] == WHITE){
-					frame_pointer[(line + y_position + EXPLOSION_OFFSET)*SCREEN_WIDTH + (pixel + x_position)] = BLACK; //Set to black
-				}
+			if(frame_pointer[(line + y_position)*SCREEN_WIDTH + (pixel + x_position)] != BLACK){
+				frame_pointer[(line + y_position)*SCREEN_WIDTH + (pixel + x_position)] = BLACK; //Set to black
 			}
 		}
 	}
@@ -439,6 +430,21 @@ void drawAlienBlock(){ //Draw alien block
 		}
 	}
 	if(erase_top_row_flag){ //We need to erase the top row
+		/*int8_t number_of_blank_rows = EMPTY_COL_COUNT_INITIALIEZED_TO_ONE;
+		uint8_t i, j;
+		int8_t count = RESET;
+		for(i = 0; i < ALIEN_MAX_ROW; i++){ //Height
+			for(j = 0; j < ALIEN_MAX_COL; j++){ //Row
+				int8_t num = (i * ALIEN_MAX_COL) + j;
+				if(alien_block[num] == false){ //Doesn't exist
+					count++; //Increment count
+				}
+				if(count == ALIEN_MAX_COL){ //Count is 11
+					number_of_blank_rows++; //Increment blank rows
+					count = RESET; //Reset count
+				}
+			}
+		}*/
 		eraseTopRow(); //Erase alien block
 		erase_top_row_flag = false; //Set to false
 	}
