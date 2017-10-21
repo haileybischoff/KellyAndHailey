@@ -14,7 +14,8 @@
 #define ALIEN_X_OFFSET ALIEN_WORD_WIDTH //Alien x offset
 #define ALIEN_Y_OFFSET (ALIEN_HEIGHT + 8) //Alien y offset
 #define ALIEN_AMOUNT 55 //Number of aliens
-#define ALIEN_BLOCK_WIDTH 352 //the width of the alien block
+#define ALIEN_BLOCK_WIDTH 352 // The width of the alien block.
+#define ALIEN_BLOCK_HEIGHT 112 // The height of the alien block.
 #define SQUID_IN 1 //The squid in
 #define SQUID_OUT 2 //the squid out
 #define BUG_IN 3 //The bug in
@@ -64,7 +65,7 @@ static int8_t left_most_alien_column; //Left most alien column
 
 static bool alien_move_right = true; //Start by moving right
 static bool alien_step_out = false; //Alien step out
-static bool erase_top_row = false; //Erase the top row
+static bool erase_top_row_flag = false; //Erase the top row
 static point_t last_alien_position;
 
 static point_t alienBlockPosition; //Keep track of alien block position
@@ -324,10 +325,11 @@ void drawAlien(uint16_t x_position, uint16_t y_position, uint8_t alien_type){ //
 	}
 }
 
-void eraseTopRowAliens(int8_t howManyRows){ //Erase the tops rows
+void eraseTopRow(){ //Erase the tops rows
+	point_t blockPosition = getAlienBlockPosition();
 	uint8_t line;
 	uint16_t pixel;
-	for(line = 0; line < (ALIEN_Y_OFFSET * howManyRows); line++){ //Height increased by the number of empty rows
+	for(line = 0; line < ALIEN_HEIGHT; line++){ //Height increased by the number of empty rows
 		for(pixel = 0; pixel < ALIEN_BLOCK_WIDTH; pixel++){ //Width
 			if(frame_pointer[(line + last_alien_position.y)*SCREEN_WIDTH + (pixel + last_alien_position.x)] == WHITE){
 				frame_pointer[(line + last_alien_position.y)*SCREEN_WIDTH + (pixel + last_alien_position.x)] = BLACK; //Set to black
@@ -336,14 +338,14 @@ void eraseTopRowAliens(int8_t howManyRows){ //Erase the tops rows
 	}
 }
 
+
 void updateAlienPosition(){
 	point_t alien_position = getAlienBlockPosition(); //Get alien block position
 	last_alien_position = getAlienBlockPosition(); //Make a copy of the alien block position to manipulate
 	if((alien_position.x == LEFT_BORDER && all_left_columns_alive) || alien_position.x == getLeftAlienBorder()){//If we hit the left border then change to move right
 		alien_position.y += ALIEN_MOVE_VERTICAL;//This it moves the block down but it doesn't erase the ones that didn't move
 		alien_move_right = true; //Set to true
-		erase_top_row = true; //Set to true
-
+		erase_top_row_flag = true; //Set to true
 		if(alien_position.x == LEFT_BORDER && !all_left_columns_alive){
 			alien_position.x = RIGHT_BORDER; //Set to right border
 		}
@@ -351,7 +353,7 @@ void updateAlienPosition(){
 	else if(alien_position.x == getRightAlienBorder()){//If we hit the right border then change to move left
 		alien_position.y += ALIEN_MOVE_VERTICAL;//This it moves the block down but it doesn't erase the ones that didn't move
 		alien_move_right = false; //Set move right to false
-		erase_top_row = true; //Set erase top row to true
+		erase_top_row_flag = true; //Set erase top row to true
 	}
 
 	if(alien_move_right){ //If move right then increment horizontally
@@ -427,8 +429,8 @@ void drawAlienBlock(){ //Draw alien block
 			eraseAlien(alien_x_position, alien_y_position, alien_type); //Erase what ever is in that square
 		}
 	}
-	if(erase_top_row){ //We need to erase the top row
-		int8_t number_of_blank_rows = EMPTY_COL_COUNT_INITIALIEZED_TO_ONE;
+	if(erase_top_row_flag){ //We need to erase the top row
+		/*int8_t number_of_blank_rows = EMPTY_COL_COUNT_INITIALIEZED_TO_ONE;
 		uint8_t i, j;
 		int8_t count = RESET;
 		for(i = 0; i < ALIEN_MAX_ROW; i++){ //Height
@@ -442,9 +444,9 @@ void drawAlienBlock(){ //Draw alien block
 					count = RESET; //Reset count
 				}
 			}
-		}
-		eraseTopRowAliens(number_of_blank_rows); //Erase top row of aliens
-		erase_top_row = false; //Set to false
+		}*/
+		eraseTopRow(); //Erase alien block
+		erase_top_row_flag = false; //Set to false
 	}
 	updateAlienPosition();
 }
