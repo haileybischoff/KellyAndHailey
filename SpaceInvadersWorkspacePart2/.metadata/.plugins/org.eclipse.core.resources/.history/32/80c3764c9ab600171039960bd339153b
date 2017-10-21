@@ -1,0 +1,18 @@
+/*
+ * score_keeping.h
+ *
+ *  Created on: Oct 21, 2017
+ *      Author: superman
+ */
+
+#ifndef SCORE_KEEPING_H_
+#define SCORE_KEEPING_H_
+
+#include <stdint.h>
+
+void computeScore(uint8_t alien_number);
+
+uint32_t getScore();
+void setScore(uint32_t score);
+
+#endif /* SCORE_KEEPING_H_ */

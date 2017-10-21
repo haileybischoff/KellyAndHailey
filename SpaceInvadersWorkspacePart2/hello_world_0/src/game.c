@@ -13,6 +13,10 @@
 #include "draw_tank.h"
 #include "draw_saucer.h"
 #include "draw_aliens.h"
+#include "score_keeping.h"
+#include "draw_bunker.h"
+#include "draw_tank_bullet.h"
+#include "draw_alien_bullet.h"
 
 /******* Stuff for shooting bullets for the aliens *******/
 #define MAX_NUMBER_OF_ALIENS_IN_A_ROW 11
@@ -102,10 +106,7 @@ uint8_t moveTankCounter = RESET;
 bool moveLeftFlag = false;
 bool moveRightFlag = false;
 
-
-
 bool shootAlienCrossBulletFlag = false;
-
 
 /****************** DRAW TANK BULLET STUFF *****************************/
 bool shootTankBulletFlag = false;
@@ -361,7 +362,7 @@ void spaceInvaders_tick(){
 		bunkerNumber = calculateBunkerNumber(bunk_pos);
 		blockNumber = calculateBlockNumber(bunkerNumber, bunk_pos);
 		erodeBunker(bunkerNumber, blockNumber); // This erodes a certain block in a certain bunker.
-		setDidTankKillBunker();
+		setDidTankKillBunkerFlag(false);
 		//getShotBunkerPosition
 		break;
 	case dead_tank_st:
