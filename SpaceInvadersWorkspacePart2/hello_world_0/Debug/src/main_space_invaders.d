@@ -15,7 +15,8 @@ src/main_space_invaders.d src/main_space_invaders.o:  \
   ../../hello_world_bsp_0/microblaze_0/include/xintc_l.h \
   ../../hello_world_bsp_0/microblaze_0/include/xparameters.h \
   ../../hello_world_bsp_0/microblaze_0/include/xgpio.h \
-  ../../hello_world_bsp_0/microblaze_0/include/xgpio_l.h ../src/draw.h
+  ../../hello_world_bsp_0/microblaze_0/include/xgpio_l.h ../src/game.h \
+  ../src/draw.h
 
 ../src/platform.h:
 
@@ -52,5 +53,7 @@ src/main_space_invaders.d src/main_space_invaders.o:  \
 ../../hello_world_bsp_0/microblaze_0/include/xgpio.h:
 
 ../../hello_world_bsp_0/microblaze_0/include/xgpio_l.h:
+
+../src/game.h:
 
 ../src/draw.h:
