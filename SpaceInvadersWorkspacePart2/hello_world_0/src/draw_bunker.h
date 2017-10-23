@@ -32,7 +32,7 @@ uint8_t calculateBlockNumber(uint8_t bunkerNum, point_t bunkerPosition);
 
 uint8_t calculateBunkerNumber(point_t bunkerPosition);
 
-void setDidTankKillBunker();
+void setDidTankKillBunkerFlag(bool tankKilledBunkerFlag);
 
 uint8_t didTankKillBunker();
 

@@ -3,35 +3,36 @@
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog_dialogBounds">
 		<item value="257" key="DIALOG_WIDTH"/>
 		<item value="216" key="DIALOG_Y_ORIGIN"/>
-		<item value="1120" key="DIALOG_X_ORIGIN"/>
 		<item value="356" key="DIALOG_HEIGHT"/>
+		<item value="1120" key="DIALOG_X_ORIGIN"/>
 		<item value="1|Segoe UI|9.0|0|WINDOWS|1|-12|0|0|0|400|0|0|0|1|0|0|0|0|Segoe UI" key="DIALOG_FONT_NAME"/>
 	</section>
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
 		<item value="true" key="wrap"/>
-		<item value="false" key="casesensitive"/>
 		<item value="false" key="isRegEx"/>
+		<item value="false" key="casesensitive"/>
 		<item value="false" key="incremental"/>
 		<item value="false" key="wholeword"/>
-		<item value="drawAlienBlock()" key="selection"/>
+		<item value="erase_top_row_flag" key="selection"/>
 		<list key="findhistory">
-			<item value="drawAlienBlock()"/>
-			<item value="draw_block()"/>
-			<item value="EMPTY_COL_COUNT_INITIALIEZED_TO_ONE"/>
-			<item value="number_of_blank_rows"/>
+			<item value="erase_block"/>
+			<item value="eraseAlienBlock"/>
 			<item value="last_alien_position"/>
-			<item value="alien_block_position"/>
-			<item value="alien"/>
-			<item value="alien_block"/>
+			<item value="erase_top_row"/>
+			<item value="eraseTopRowAliens"/>
+			<item value="_ALIEN_BULLET_GROUND_LEVEL"/>
+			<item value="setDidTankKillBunker"/>
+			<item value="if(isTankBulletDrawn){"/>
 		</list>
 		<list key="replacehistory">
+			<item value="erase_top_row_flag"/>
+			<item value="eraseTopRow"/>
+			<item value="erase_block"/>
+			<item value="eraseAlienBlock"/>
+			<item value="ALIEN_BULLET_GROUND_LEVEL"/>
 			<item value="true"/>
 			<item value="false"/>
 			<item value="TANK_MOVE"/>
-			<item value="TANK_MOVE_RIGHT"/>
-			<item value="TANK_MOVE_LEFT"/>
-			<item value="saucerMoveCounter"/>
-			<item value="drawSaucerFlag"/>
 		</list>
 	</section>
 </section>

@@ -14,6 +14,10 @@
 #define LIFE_2_X_POSITION 489 //Life 2 x position
 #define LIFE_3_X_POSITION 529 //Life 3 x position
 #define LIFE_Y_POSITION 5 //Y position for life
+#define LIVES_MESSAGE_X 393
+#define LIVES_MESSAGE_Y 11
+
+void drawLifeMessage(uint16_t x_position, uint16_t y_position);
 
 void computeScore(uint8_t alien_number);
 

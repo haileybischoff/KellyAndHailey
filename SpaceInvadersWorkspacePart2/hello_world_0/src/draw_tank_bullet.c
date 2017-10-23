@@ -11,6 +11,7 @@
 #include "images.h"
 #include "draw_aliens.h"
 #include "draw_tank.h"
+#include "draw_saucer.h"
 
 #define TANK_HALF_HEIGHT 8 //Half of the height for the tank is 8
 #define TANK_HALF_WIDTH 14 //Half of the width for the tank

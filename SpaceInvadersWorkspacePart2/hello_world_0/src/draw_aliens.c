@@ -12,7 +12,7 @@
 #define ALIEN_INITIAL_X_POSITION 144 //Initial alien x position
 #define ALIEN_INITIAL_Y_POSITION 51 //Initial alien  position
 #define ALIEN_X_OFFSET ALIEN_WORD_WIDTH //Alien x offset
-#define ALIEN_Y_OFFSET (ALIEN_HEIGHT + 8) //Alien y offset
+#define ALIEN_Y_OFFSET (ALIEN_HEIGHT + 4) //Alien y offset
 #define ALIEN_AMOUNT 55 //Number of aliens
 #define ALIEN_BLOCK_WIDTH 352 // The width of the alien block.
 #define ALIEN_BLOCK_HEIGHT 112 // The height of the alien block.
@@ -47,8 +47,6 @@
 #define ALIEN_FIFTY_TWO 52 //Initial bottom alien 9
 #define ALIEN_FIFTY_THREE 53 //Initial bottom alien 10
 #define ALIEN_FIFTY_FOUR 54 //Initial bottom alien 11
-
-#define EXPLOSION_OFFSET -2
 
 static uint8_t alien_block[ALIEN_AMOUNT] = {1,1,1,1,1,1,1,1,1,1,1, \
 		1,1,1,1,1,1,1,1,1,1,1, \
@@ -241,13 +239,13 @@ void killAlien(uint8_t alien_number){
 	for(line = 0; line < ALIEN_EXPLOSION_HEIGHT; line++){ //Height
 		for(pixel = 0; pixel < ALIEN_WORD_WIDTH; pixel++){ //Width
 			if((alien_explosion[line] & (SHIFT<<(ALIEN_WORD_WIDTH-SHIFT-pixel)))){
-				if(frame_pointer[(line + y_position + EXPLOSION_OFFSET)*SCREEN_WIDTH + (pixel + x_position)] == BLACK){
-					frame_pointer[(line + y_position + EXPLOSION_OFFSET)*SCREEN_WIDTH + (pixel + x_position)] = WHITE; //Set to black
+				if(frame_pointer[(line + y_position)*SCREEN_WIDTH + (pixel + x_position)] == BLACK){
+					frame_pointer[(line + y_position)*SCREEN_WIDTH + (pixel + x_position)] = WHITE; //Set to black
 				}
 			}
 			else{
-				if(frame_pointer[(line + y_position + EXPLOSION_OFFSET)*SCREEN_WIDTH + (pixel + x_position)] == WHITE){
-					frame_pointer[(line + y_position + EXPLOSION_OFFSET)*SCREEN_WIDTH + (pixel + x_position)] = BLACK; //Set to black
+				if(frame_pointer[(line + y_position)*SCREEN_WIDTH + (pixel + x_position)] == WHITE){
+					frame_pointer[(line + y_position)*SCREEN_WIDTH + (pixel + x_position)] = BLACK; //Set to black
 				}
 			}
 		}
@@ -335,7 +333,6 @@ void drawAlien(uint16_t x_position, uint16_t y_position, uint8_t alien_type){ //
 }
 
 void eraseTopRow(){ //Erase the tops rows
-	point_t blockPosition = getAlienBlockPosition();
 	uint8_t line;
 	uint16_t pixel;
 	for(line = 0; line < ALIEN_HEIGHT; line++){ //Height increased by the number of empty rows

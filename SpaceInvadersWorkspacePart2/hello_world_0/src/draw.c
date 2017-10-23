@@ -39,6 +39,7 @@ unsigned int * draw_start_screen(){
 	drawLife(LIFE_1_X_POSITION, LIFE_Y_POSITION); //Draw life 1
 	drawLife(LIFE_2_X_POSITION, LIFE_Y_POSITION); //Draw life 2
 	drawLife(LIFE_3_X_POSITION, LIFE_Y_POSITION); //Draw life 3
+	drawLifeMessage(LIVES_MESSAGE_X, LIVES_MESSAGE_Y);
 	drawBunker(BUNKER_1_X_POSITION, BUNKER_Y_POSITION); //Draw bunker 1
 	drawBunker(BUNKER_2_X_POSITION, BUNKER_Y_POSITION); //Draw bunker 2
 	drawBunker(BUNKER_3_X_POSITION, BUNKER_Y_POSITION); //Draw bunker 3

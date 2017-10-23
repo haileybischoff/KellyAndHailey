@@ -14,6 +14,8 @@
 
 uint16_t getSaucerPosition();
 
+void setDeadSaucerPosition(point_t deadSaucer);
+
 point_t getDeadSaucerPosition();
 
 void setDidTankKillSaucertoFalse();
@@ -23,6 +25,10 @@ bool didTankKillSaucer();
 void setSaucerPosition(uint16_t val);
 
 point_t setUpdatedTopLeftSaucer(point_t some_point);
+
+bool calculateHitSaucer(point_t some_point);
+
+void eraseSaucer(point_t position);
 
 bool drawSaucer(); // If it is done moving across the screen then it returns TRUE aka 1 and if it isn't it returns FALSE;
 
