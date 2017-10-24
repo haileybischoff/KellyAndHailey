@@ -12,23 +12,23 @@
 #include <stdbool.h>
 #include "draw.h"
 
+#define SAUCER_Y_POSITION 29 // This is the Y position for when we draw the saucer.
+
 uint16_t getSaucerPosition();
 
-void setDeadSaucerPosition(point_t deadSaucer);
+uint16_t getSaucerDeathPosition();
 
-point_t getDeadSaucerPosition();
+void setSaucerDeathPosition(uint16_t deathPosition);
 
-void setDidTankKillSaucertoFalse();
+void setDidTankKillSaucerFlag(bool saucerFlag);
 
 bool didTankKillSaucer();
 
 void setSaucerPosition(uint16_t val);
 
-point_t setUpdatedTopLeftSaucer(point_t some_point);
-
 bool calculateHitSaucer(point_t some_point);
 
-void eraseSaucer(point_t position);
+void eraseSaucer();
 
 bool drawSaucer(); // If it is done moving across the screen then it returns TRUE aka 1 and if it isn't it returns FALSE;
 

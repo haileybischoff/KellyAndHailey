@@ -8,17 +8,16 @@
 #include "draw_saucer.h"
 #include "images.h"
 
-#define SAUCER_Y_POSITION 29 // This is the Y position for when we draw the saucer.
 #define SAUCER_MIN_X_POSITION -32 // The minimum X position for our saucer
 #define SAUCER_MAX_X_POSITION 640 // The maximum X position for our saucer
 #define SAUCER_MOVE 4 // How many pixels our saucer moves when it moves
 #define SAUCER_ERASE_HEIGHT_OFFSET 6 // The amount down we need to know in order to erase.
 
-static uint16_t saucerPosition; //Variable to keep track of saucer position
+static uint16_t saucerPosition = RESET; //Variable to keep track of saucer position
+static uint16_t saucerDeathPosition = RESET;
 static bool saucer_move_right = true; // A bool for moving the saucer right or left
 static bool tank_killed_saucer = false;
-
-static point_t saucer_shot;
+static bool getNewPosition = false;
 
 extern unsigned int * frame_pointer;
 
@@ -26,17 +25,16 @@ uint16_t getSaucerPosition(){
 	return saucerPosition;
 }
 
-void setDeadSaucerPosition(point_t deadSaucer){
-	saucer_shot.x = deadSaucer.x;
-	saucer_shot.y = deadSaucer.y;
+uint16_t getSaucerDeathPosition(){
+	return saucerDeathPosition;
 }
 
-point_t getDeadSaucerPosition(){
-	return saucer_shot;
+void setSaucerDeathPosition(uint16_t deathPosition){
+	saucerDeathPosition = deathPosition;
 }
 
-void setDidTankKillSaucertoFalse(){
-	tank_killed_saucer = false;
+void setDidTankKillSaucerFlag(bool saucerFlag){
+	tank_killed_saucer = saucerFlag;
 }
 
 bool didTankKillSaucer(){
@@ -47,21 +45,6 @@ void setSaucerPosition(uint16_t val){
 	saucerPosition = val;
 }
 
-point_t setUpdatedTopLeftSaucer(point_t some_point){
-	uint16_t leftSaucerX = getSaucerPosition();
-	uint16_t rightSacuerX = leftSaucerX + SAUCER_WIDTH;
-	uint16_t saucerTopY = SAUCER_Y_POSITION;
-	uint16_t saucerBottomY = saucerTopY + SAUCER_HEIGHT;
-	point_t mine;
-	if(((some_point.x >= leftSaucerX) && (some_point.x <= rightSacuerX)) && ((some_point.y >= saucerTopY) && (some_point.y <= saucerBottomY))){
-		mine.x = leftSaucerX;
-		mine.y = saucerTopY;
-		return mine;
-	}
-
-	return mine;
-}
-
 bool calculateHitSaucer(point_t some_point){
 	uint16_t leftSaucerX = getSaucerPosition();
 	uint16_t rightSacuerX = leftSaucerX + SAUCER_WIDTH;
@@ -69,6 +52,8 @@ bool calculateHitSaucer(point_t some_point){
 	uint16_t saucerBottomY = saucerTopY + SAUCER_HEIGHT;
 	if(((some_point.x >= leftSaucerX) && (some_point.x <= rightSacuerX)) && ((some_point.y >= saucerTopY) && (some_point.y <= saucerBottomY))){
 		tank_killed_saucer = true;
+		setDidTankKillSaucerFlag(true);
+		getNewPosition = true;
 		return true;
 	}
 	return false;
@@ -98,6 +83,11 @@ void eraseExtraSaucerBits(int16_t x_position){
 uint16_t update_saucer_x_position(){
 	static int16_t x_position = RESET; // A static variable to to hold the x position
 
+	if(getNewPosition){
+		x_position = getSaucerPosition();
+		getNewPosition = false;
+	}
+
 	if(saucer_move_right){
 		x_position += SAUCER_MOVE; // If we are moving right increment our position.
 	}
@@ -116,20 +106,24 @@ uint16_t update_saucer_x_position(){
 	return x_position;
 }
 
-void eraseSaucer(point_t position){
-	//xil_printf("Did we erase the saucer??\n\r");
+void eraseSaucer(){
+	uint16_t x_position = getSaucerPosition();
+	setSaucerDeathPosition(x_position);
 	uint8_t line, pixel;
-	//int16_t x_position = update_saucer_x_position();
-	//xil_printf("start erasing at x is : %d and y is : %d \n\r", position.x, position.y);
 	for(line = 0; line < SAUCER_HEIGHT; line++){ // We only need to overwrite a few pixels within a 4x4 area
 		for(pixel = 0; pixel < SAUCER_WIDTH; pixel++){
-			//if(frame_pointer[(line + position.y)*SCREEN_WIDTH + (pixel + position.x)] == RED){
-			frame_pointer[(line + position.y)*SCREEN_WIDTH + (pixel + position.x)] = BLACK; //Set to black
-			//}
-			//if(frame_pointer[(line + position.y + SAUCER_ERASE_HEIGHT_OFFSET)*SCREEN_WIDTH + (pixel + position.x - SAUCER_MOVE)] == RED){
-			//	frame_pointer[(line + position.y + SAUCER_ERASE_HEIGHT_OFFSET)*SCREEN_WIDTH + (pixel + position.x - SAUCER_MOVE)] = BLACK; //Set to black
-			//}
+			if(frame_pointer[(line + SAUCER_Y_POSITION)*SCREEN_WIDTH + (pixel + x_position)] == RED){
+				frame_pointer[(line + SAUCER_Y_POSITION)*SCREEN_WIDTH + (pixel + x_position)] = BLACK; //Set to black
+			}
 		}
+	}
+	if(saucer_move_right){
+		saucer_move_right = false;
+		setSaucerPosition(SAUCER_MAX_X_POSITION);
+	}
+	else{
+		saucer_move_right = true;
+		setSaucerPosition(SAUCER_MIN_X_POSITION);
 	}
 }
 

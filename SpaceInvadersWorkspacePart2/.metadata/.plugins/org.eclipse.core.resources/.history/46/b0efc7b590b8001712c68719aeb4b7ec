@@ -1,0 +1,308 @@
+/*
+ * score_keeping.c
+ *
+ *  Created on: Oct 21, 2017
+ *      Author: superman
+ */
+
+#include <stdlib.h>
+#include "score_keeping.h"
+#include "draw_aliens.h"
+#include "images.h"
+
+#define SQUID_POINTS 40
+#define BUG_POINTS 20
+#define JELLYFISH_POINTS 10
+#define SAUCER_POINTS 200 //Hard coded in should be random between 50 and 350
+#define SAUCER_NUMBER_POSSIBLE_SCORES 7
+
+#define COMMA_Y_POSITION 19
+#define COMMA_ERASE_HEIGHT 4
+
+#define TENTH 10
+#define HUNDREDTH 100
+#define THOUSANDTH 1000
+#define TEN_THOUSANDTH 10000
+#define HUNDRED_THOUSANDTH 100000
+#define MILLIONTH 1000000
+#define TEN_MILLIONTH 10000000
+#define HUNDRED_MILLIONTH 100000000
+#define BILLIONTH 1000000000
+
+#define ZERO 0
+#define ONE 1
+#define TWO 2
+#define THREE 3
+#define FOUR 4
+#define FIVE 5
+#define SIX 6
+#define SEVEN 7
+#define EIGHT 8
+#define NINE 9
+
+#define GET_PLACE_NUMBER(a_score, place) ((a_score - (a_score % place)) / place)
+#define GET_REMAINDER(aScore, placeHolder) (aScore % placeHolder)
+
+static uint32_t totalScore = RESET;
+
+static uint16_t saucerPointOptions[SAUCER_NUMBER_POSSIBLE_SCORES] = {50, 100, 150, 200, 250, 300, 350};
+
+static uint16_t saucerPoints = RESET;
+
+extern unsigned int * frame_pointer;
+
+void drawScoreMessage(uint16_t x_position, uint16_t y_position){
+	uint8_t line, pixel;
+	for(line = 0; line < SCORE_MESSAGE_HEIGHT; line++){ //For height
+		for(pixel = 0; pixel < SCORE_MESSAGE_WIDTH; pixel++){ //For width
+			if((score_message_1[line] & (SHIFT<<(SCORE_MESSAGE_WIDTH-SHIFT-pixel)))){
+				frame_pointer[(line + y_position)*SCREEN_WIDTH + (pixel + x_position)] = WHITE; //Set to green
+			}
+		}
+	}
+
+	for(line = 0; line < SCORE_MESSAGE_HEIGHT; line++){ //For height
+		for(pixel = 0; pixel < SCORE_MESSAGE_WIDTH; pixel++){ //For width
+			if((score_message_2[line] & (SHIFT<<(SCORE_MESSAGE_WIDTH-SHIFT-pixel)))){
+				frame_pointer[(line + y_position)*SCREEN_WIDTH + (pixel + x_position + SCORE_MESSAGE_WIDTH)] = WHITE; //Set to green
+			}
+		}
+	}
+}
+
+void drawLifeMessage(uint16_t x_position, uint16_t y_position){
+	uint8_t line, pixel;
+	for(line = 0; line < LIVES_MESSAGE_HEIGHT; line++){ //For height
+		for(pixel = 0; pixel < LIVES_MESSAGE_WIDTH; pixel++){ //For width
+			if((lives_message_1[line] & (SHIFT<<(LIVES_MESSAGE_WIDTH-SHIFT-pixel)))){
+				frame_pointer[(line + y_position)*SCREEN_WIDTH + (pixel + x_position)] = WHITE; //Set to green
+			}
+		}
+	}
+
+	for(line = 0; line < LIVES_MESSAGE_HEIGHT; line++){ //For height
+		for(pixel = 0; pixel < LIVES_MESSAGE_WIDTH; pixel++){ //For width
+			if((lives_message_2[line] & (SHIFT<<(LIVES_MESSAGE_WIDTH-SHIFT-pixel)))){
+				frame_pointer[(line + y_position)*SCREEN_WIDTH + (pixel + x_position + LIVES_MESSAGE_WIDTH)] = WHITE; //Set to green
+			}
+		}
+	}
+}
+
+void setSaucerPoints(){
+	uint8_t saucerIndex = rand() % SAUCER_NUMBER_POSSIBLE_SCORES;
+	saucerPoints = saucerPointOptions[saucerIndex];
+}
+
+uint16_t getSaucerPoints(){
+
+	return saucerPoints;
+}
+
+void drawNumber(point_t position, const uint32_t* number){
+	uint8_t line, pixel;
+	for(line = 0; line < NUMBER_HEIGHT; line++){ //For height
+		for(pixel = 0; pixel < NUMBER_WIDTH; pixel++){ //For width
+			if((number[line] & (SHIFT<<(NUMBER_WIDTH-SHIFT-pixel)))){
+				if(frame_pointer[(line + position.y)*SCREEN_WIDTH + (pixel + position.x)] == BLACK){
+					frame_pointer[(line + position.y)*SCREEN_WIDTH + (pixel + position.x)] = WHITE;
+				}
+			}
+			else{
+				if(frame_pointer[(line + position.y)*SCREEN_WIDTH + (pixel + position.x)] == WHITE){
+					frame_pointer[(line + position.y)*SCREEN_WIDTH + (pixel + position.x)] = BLACK;
+				}
+			}
+		}
+	}
+}
+
+const uint32_t* getNumber(uint8_t number){
+    if(number == ONE){
+		return one;
+	}
+	else if(number == TWO){
+		return two;
+	}
+	else if(number == THREE){
+		return three;
+	}
+	else if(number == FOUR){
+		return four;
+	}
+	else if(number == FIVE){
+		return five;
+	}
+	else if(number == SIX){
+		return six;
+	}
+	else if(number == SEVEN){
+		return seven;
+	}
+	else if(number == EIGHT){
+		return eight;
+	}
+	else if(number == NINE){
+		return nine;
+	}
+	else{
+		return zero;
+	}
+}
+
+void drawComma(point_t position){
+	uint8_t line, pixel;
+	for(line = 0; line < COMMA_HEIGHT; line++){ //For height
+		for(pixel = 0; pixel < COMMA_WIDTH; pixel++){ //For width
+			if((comma[line] & (SHIFT<<(COMMA_WIDTH-SHIFT-pixel)))){
+				if(frame_pointer[(line + position.y)*SCREEN_WIDTH + (pixel + position.x)] == BLACK){
+					frame_pointer[(line + position.y)*SCREEN_WIDTH + (pixel + position.x)] = WHITE;
+				}
+			}
+			else{
+				if(frame_pointer[(line + position.y)*SCREEN_WIDTH + (pixel + position.x)] == WHITE){
+					frame_pointer[(line + position.y)*SCREEN_WIDTH + (pixel + position.x)] = BLACK;
+				}
+			}
+		}
+	}
+}
+
+void eraseCommas(uint16_t erase_width, point_t position){
+	uint8_t line, pixel;
+	for(line = 0; line < COMMA_ERASE_HEIGHT; line++){ //For height
+		for(pixel = 0; pixel < erase_width; pixel++){ //For width
+			if(frame_pointer[(line + position.y)*SCREEN_WIDTH + (pixel + position.x)] == WHITE){
+				frame_pointer[(line + position.y)*SCREEN_WIDTH + (pixel + position.x)] = BLACK;
+			}
+		}
+	}
+}
+
+void drawScore(){
+	uint32_t score = getScore();
+	point_t position;
+
+	position.x = SCORE_X;
+	position.y = SCORE_Y;
+
+	uint32_t modifiedScore = score;
+	uint32_t number = RESET;
+	if(score >= BILLIONTH){
+		number = GET_PLACE_NUMBER(modifiedScore, BILLIONTH);
+		modifiedScore = GET_REMAINDER(modifiedScore, BILLIONTH);
+		drawNumber(position, getNumber(number));
+		position.x = position.x + NUMBER_WIDTH;
+		drawComma(position);
+		position.x = position.x + COMMA_WIDTH;
+		position.y = SCORE_Y;
+	}
+	if(score >= HUNDRED_MILLIONTH){
+		number = GET_PLACE_NUMBER(modifiedScore, HUNDRED_MILLIONTH);
+		modifiedScore = GET_REMAINDER(modifiedScore, HUNDRED_MILLIONTH);
+		drawNumber(position, getNumber(number));
+		position.x = position.x + NUMBER_WIDTH;
+	}
+	if(score >= TEN_MILLIONTH){
+		number = GET_PLACE_NUMBER(modifiedScore, TEN_MILLIONTH);
+		modifiedScore = GET_REMAINDER(modifiedScore, TEN_MILLIONTH);
+		drawNumber(position, getNumber(number));
+		position.x = position.x + NUMBER_WIDTH;
+	}
+	if(score >= MILLIONTH){
+		number = GET_PLACE_NUMBER(modifiedScore, MILLIONTH);
+		modifiedScore = GET_REMAINDER(modifiedScore, MILLIONTH);
+		drawNumber(position, getNumber(number));
+		position.x = position.x + NUMBER_WIDTH;
+		drawComma(position);
+		position.x = position.x + COMMA_WIDTH;
+		position.y = SCORE_Y;
+	}
+	if(score >= HUNDRED_THOUSANDTH){
+		number = GET_PLACE_NUMBER(modifiedScore, HUNDRED_THOUSANDTH);
+		modifiedScore = GET_REMAINDER(modifiedScore, HUNDRED_THOUSANDTH);
+		drawNumber(position, getNumber(number));
+		position.x = position.x + NUMBER_WIDTH;
+	}
+	if(score >= TEN_THOUSANDTH){
+		number = GET_PLACE_NUMBER(modifiedScore, TEN_THOUSANDTH);
+		modifiedScore = GET_REMAINDER(modifiedScore, TEN_THOUSANDTH);
+		xil_printf("10000 number is: %d\n\r",number);
+		xil_printf("10000 Score is: %d\n\r", modifiedScore);
+		drawNumber(position, getNumber(number));
+		position.x = position.x + NUMBER_WIDTH;
+	}
+	if(score >= THOUSANDTH){
+		number = GET_PLACE_NUMBER(modifiedScore, THOUSANDTH);
+		modifiedScore = GET_REMAINDER(modifiedScore, THOUSANDTH);
+		xil_printf("1000 number is: %d\n\r",number);
+		xil_printf("1000 Score is: %d\n\r", modifiedScore);
+		drawNumber(position, getNumber(number));
+		position.x = position.x + NUMBER_WIDTH;
+		drawComma(position);
+		position.x = position.x + COMMA_WIDTH;
+		position.y = SCORE_Y;
+	}
+	if(score >= HUNDREDTH){
+		number = GET_PLACE_NUMBER(modifiedScore, HUNDREDTH);
+		modifiedScore = GET_REMAINDER(modifiedScore, HUNDREDTH);
+		xil_printf("100 number is: %d\n\r",number);
+		xil_printf("100 Score is: %d\n\r", modifiedScore);
+		drawNumber(position, getNumber(number));
+		position.x = position.x + NUMBER_WIDTH;
+	}
+	if(score >= TENTH){
+		number = GET_PLACE_NUMBER(modifiedScore, TENTH);
+		modifiedScore = GET_REMAINDER(modifiedScore, TENTH);
+		xil_printf("10 number is: %d\n\r",number);
+		xil_printf("10 Score is: %d\n\r", modifiedScore);
+		drawNumber(position, getNumber(number));
+		position.x = position.x + NUMBER_WIDTH;
+	}
+	drawNumber(position, zero);
+
+	//point_t eraseCommaPosition;
+	//eraseCommaPosition.x = SCORE_X;
+	//eraseCommaPosition.y = SCORE_Y + NUMBER_HEIGHT;
+	//eraseCommas(position.x, eraseCommaPosition);
+}
+
+void computeScore(uint8_t alien_number){
+	uint8_t alien_Score;
+	if(alien_number < ALIEN_ROW_1){
+		alien_Score = SQUID_POINTS; //Set to squid in
+	}
+	else if((alien_number >= ALIEN_ROW_1) && (alien_number < ALIEN_ROW_3)){
+
+		alien_Score = BUG_POINTS; //Set to bug in
+	}
+	else if((alien_number >= ALIEN_ROW_3) && (alien_number < ALIEN_ROW_5)){
+
+		alien_Score = JELLYFISH_POINTS; //Set to jellyfish in
+	}
+	else{
+		setSaucerPoints();
+		alien_Score = getSaucerPoints();
+	}
+	setScore(alien_Score);
+	xil_printf("Score is: %d\n\r", getScore());
+
+}
+
+uint32_t getScore(){
+	return totalScore;
+}
+void setScore(uint32_t score){
+	totalScore += score;
+}
+
+void drawLife(uint16_t x_position, uint16_t y_position){ //Draw life function
+	uint8_t line, pixel;
+	for(line = 0; line < TANK_HEIGHT; line++){ //For height
+		for(pixel = 0; pixel < TANK_WORD_WIDTH; pixel++){ //For width
+			if((tank_symbol[line] & (SHIFT<<(TANK_WORD_WIDTH-SHIFT-pixel)))){
+				frame_pointer[(line + y_position)*SCREEN_WIDTH + (pixel + x_position)] = GREEN; //Set to green
+			}
+		}
+	}
+}

@@ -145,12 +145,7 @@ uint8_t updateTankBullet(){
 					if(frame_pointer[(line + new_tank_bullet_position.y) * SCREEN_WIDTH + (pixel + new_tank_bullet_position.x)] == RED){
 						//xil_printf("Did we come in here???? \n\r");
 						if(calculateHitSaucer(tank)){
-							//xil_printf("Did we hit a saucer???? \n\r");
 							stop = true;
-							point_t deadSaucer;
-							deadSaucer.x = pixel + new_tank_bullet_position.x;
-							deadSaucer.y = line + new_tank_bullet_position.y;
-							setDeadSaucerPosition(deadSaucer);
 						}
 					}
 					if(frame_pointer[(line + new_tank_bullet_position.y) * SCREEN_WIDTH + (pixel + new_tank_bullet_position.x)] == WHITE){//!RED

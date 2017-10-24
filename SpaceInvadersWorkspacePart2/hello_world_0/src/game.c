@@ -53,6 +53,8 @@
 
 #define SAUCER_MAX_TIME 2000 // This is the max time before a saucer will go across the board again.
 
+#define SAUCER_SCORE_MAX_DRAWS 3 // This is how many times we will flash the score.
+
 #define DEBOUNCE_VALUE 0x0000001F
 
 #define LEFT_BUTTON_MASK 8 //This is the mask for the left push button it moves the tank left.
@@ -63,6 +65,7 @@
 
 #define TANK_MOVE_MAX_COUNTER 5 // 5 is a 50th of a second
 #define ALIEN_MOVE_MAX_COUNTER 50 // 50 is a half second since the interrupt happens every 10 mS.
+#define SAUCER_SCORE_MAX_COUNTER 20 // 20 is a fifth of a second this is for flashing the score.
 #define SAUCER_MOVE_MAX_COUNTER 10 // 10 is a tenth of a second for moving the saucer.
 
 uint16_t alien_bullets = RESET; //Count for the number of alien bullets on the screen
@@ -111,13 +114,20 @@ bool shootAlienCrossBulletFlag = false;
 /****************** DRAW TANK BULLET STUFF *****************************/
 bool shootTankBulletFlag = false;
 
-/****************** DRAW SUACER STUFF **********************************/
+/****************** DRAW SAUCER STUFF **********************************/
 uint16_t saucerMoveCounter = RESET; // This is the counter that counts how long between when we update saucer draw.
 uint16_t saucerRandValueCounter = RESET; // This is the time that we have between drawing saucers
 uint16_t saucerRandValueMax = RESET; // This value will hold the recalculated max for the Random Value counter
 
 bool drawSaucerFlag = false; // Tells us to draw the saucer
 bool saucerDrawnFlag = false;
+
+/****************** DRAW SAUCER SCORE STUFF ****************************/
+uint8_t saucerScoreFlashCounter = RESET;
+uint8_t numberOfFlashes = RESET;
+
+bool drawSaucerScoreFlag = false;
+bool eraseSaucerScoreFlag = false;
 
 /***************** FUNCTIONS *******************************************/
 
@@ -147,6 +157,7 @@ enum SpaceInvadersControl_st{
 	move_aliens_st,
 	update_bullet_st,
 	dead_alien_st,
+	flash_saucer_score_st,
 	bunker_st,
 	dead_tank_st,
 	move_tank_right_st,
@@ -186,6 +197,9 @@ void debugStatePrint(){
 		case dead_alien_st:
 			xil_printf("DEAD ALIEN State\n\r");
 			break;
+		case flash_saucer_score_st:
+			xil_printf("FLASH_SAUCER_SCORE State\n\r");
+			break;
 		case bunker_st:
 			xil_printf("BUNKER State\n\r");
 			break;
@@ -213,15 +227,15 @@ uint8_t isAlienCrossBulletDrawn = false;
 uint32_t alienBulletCounter;
 void spaceInvaders_tick(){
 
-	uint16_t saucerX;
-	point_t saucer;
+	//uint16_t saucerX;
+	//point_t saucer;
 	uint8_t isSaucerDrawn = RESET;
 	point_t bunk_pos;
 	uint8_t bunkerNumber;
 	uint8_t blockNumber;
 
-	interruptCounter++;
-	xil_printf("%d\n\r", interruptCounter);
+	//interruptCounter++;
+	//xil_printf("%d\n\r", interruptCounter);
 
 	//State actions
 	switch(currentState){
@@ -262,13 +276,16 @@ void spaceInvaders_tick(){
 			updateBulletCounter++;
 		}
 
+		if(drawSaucerScoreFlag){
+			saucerScoreFlashCounter++;
+		}
 
 		if(drawSaucerFlag){ // If the saucer is supposed to be drawn
 			saucerMoveCounter++; // Increment the time for how long between when we move the saucer
 		}
 		else{ // Otherwise there is no saucer on the screen
 			saucerRandValueCounter++; // So we have to count between when the next suacer get's drawn.
-			if(saucerMoveCounter >= saucerRandValueMax){ // If we get above our saucer random max then
+			if(saucerRandValueCounter >= saucerRandValueMax){ // If we get above our saucer random max then
 				drawSaucerFlag = true; // We'll need to set our draw saucer flag to true
 				saucerRandValueMax = rand() % SAUCER_MAX_TIME; // We'll need to generate a new random saucer max
 				saucerRandValueCounter = RESET; // We'll need to reset the saucer rand value counter.
@@ -344,17 +361,27 @@ void spaceInvaders_tick(){
 		if(didTankKillAlien()){
 			killAlien(calculateAlienNumber(getDeadAlienPosition()));
 			computeScore(calculateAlienNumber(getDeadAlienPosition()));
+			drawScore();
 			setDidTankKillAlienFlag(false);
 		}
 		if(didTankKillSaucer()){
 			computeScore(SAUCER_NUMBER);
-			saucerX = getSaucerPosition();
-			saucer.x = saucerX;
-			saucer.y = SAUCER_Y_POSITION;
-			eraseSaucer(setUpdatedTopLeftSaucer(getDeadSaucerPosition()));//said saucer also said calculateHit
-			setDidTankKillSaucertoFalse();
-			//isSaucerDrawn = false;//Not sure if we need this or it is correct
+			drawScore();
+			eraseSaucer();//said saucer also said calculateHit
+			setDidTankKillSaucerFlag(false);
 			drawSaucerFlag = false;
+			drawSaucerScoreFlag = true;
+		}
+		break;
+	case flash_saucer_score_st:
+		if(eraseSaucerScoreFlag){
+			eraseSaucerScore();
+			numberOfFlashes++;
+			eraseSaucerScoreFlag = false;
+		}
+		else{
+			drawSaucerScore();
+			eraseSaucerScoreFlag = true;
 		}
 		break;
 	case bunker_st:
@@ -440,11 +467,20 @@ void spaceInvaders_tick(){
 		else if(alienCounter >= ALIEN_MOVE_MAX_COUNTER){ //Check for time to move aliens
 			currentState = move_aliens_st;
 		}
-		else if(drawSaucerFlag && saucerMoveCounter >= SAUCER_MOVE_MAX_COUNTER){
+		else if(drawSaucerScoreFlag && (saucerScoreFlashCounter >= SAUCER_SCORE_MAX_COUNTER)  && (numberOfFlashes < SAUCER_SCORE_MAX_DRAWS)){
+			xil_printf("Entering flash saucer state\n\r");
+			currentState = flash_saucer_score_st;
+			saucerScoreFlashCounter = RESET;
+		}
+		else if(drawSaucerFlag && (saucerMoveCounter >= SAUCER_MOVE_MAX_COUNTER)){
 			saucerMoveCounter = RESET;
 			currentState = draw_saucer_st;
 		}
 		else{
+			if(numberOfFlashes >= SAUCER_SCORE_MAX_DRAWS){
+				drawSaucerScoreFlag = false;
+				numberOfFlashes = RESET;
+			}
 			currentState = idle_st;
 		}
 		break;
@@ -471,6 +507,9 @@ void spaceInvaders_tick(){
 		}
 		break;
 	case dead_alien_st:
+		currentState = idle_st;
+		break;
+	case flash_saucer_score_st:
 		currentState = idle_st;
 		break;
 	case bunker_st:

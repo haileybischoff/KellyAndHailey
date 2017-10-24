@@ -40,6 +40,15 @@
 #define LIVES_MESSAGE_HEIGHT 10
 #define LIVES_MESSAGE_WIDTH 24
 
+#define SCORE_MESSAGE_HEIGHT 10
+#define SCORE_MESSAGE_WIDTH 30
+
+#define NUMBER_HEIGHT 10
+#define NUMBER_WIDTH 10
+
+#define COMMA_HEIGHT 14
+#define COMMA_WIDTH 6
+
 // Definition of the packword. It just puts 32 bits together.
 #define packWord32(b31,b30,b29,b28,b27,b26,b25,b24,b23,b22,b21,b20,b19,b18,b17,b16,b15,b14,b13,b12,b11,b10,b9,b8,b7,b6,b5,b4,b3,b2,b1,b0) \
 	((b31 << 31) | (b30 << 30) | (b29 << 29) | (b28 << 28) | (b27 << 27) | (b26 << 26) | (b25 << 25) | (b24 << 24) | \
@@ -64,6 +73,10 @@
 #define packWord12(b11,b10,b9,b8,b7,b6,b5,b4,b3,b2,b1,b0) \
 	((b11 << 11) | (b10 << 10) | (b9  << 9 ) | (b8  << 8 ) | (b7  << 7 ) | (b6  << 6 ) | \
 	 (b5  << 5 ) | (b4  << 4 ) | (b3  << 3 ) | (b2  << 2 ) | (b1  << 1 ) | (b0  << 0 ))
+
+// Definition of the packword. It just puts 10 bits together.
+#define packWord10(b9,b8,b7,b6,b5,b4,b3,b2,b1,b0) \
+	((b9  << 9 ) | (b8  << 8 ) | (b7  << 7 ) | (b6  << 6 ) | (b5  << 5 ) | (b4  << 4 ) | (b3  << 3 ) | (b2  << 2 ) | (b1  << 1 ) | (b0  << 0 ))
 
 // Definition of the packword. It just puts 6 bits together.
 #define packWord6(b5,b4,b3,b2,b1,b0) ((b5  << 5 ) | (b4  << 4 ) | (b3  << 3 ) | (b2  << 2 ) | (b1  << 1 ) | (b0  << 0 ))
@@ -579,6 +592,204 @@ static const uint32_t lives_message_2[LIVES_MESSAGE_HEIGHT] =
 	packWord24(0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1),
 	packWord24(0,0,1,1,1,1,1,1,1,1,1,1,0,0,1,1,1,1,1,1,1,1,0,0),
 	packWord24(0,0,1,1,1,1,1,1,1,1,1,1,0,0,1,1,1,1,1,1,1,1,0,0)
+};
+
+// First half of the word score
+static const uint32_t score_message_1[SCORE_MESSAGE_HEIGHT] =
+{
+		packWord30(0,0,0,1,1,1,1,1,1,1,1,0,0,0,0,1,1,1,1,1,1,1,1,0,0,0,0,1,1,1),
+		packWord30(0,0,0,1,1,1,1,1,1,1,1,0,0,0,0,1,1,1,1,1,1,1,1,0,0,0,0,1,1,1),
+		packWord30(0,1,1,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0),
+		packWord30(0,1,1,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0),
+		packWord30(0,0,0,1,1,1,1,1,1,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0),
+		packWord30(0,0,0,1,1,1,1,1,1,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0),
+		packWord30(0,0,0,0,0,0,0,0,0,1,1,0,0,1,1,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0),
+		packWord30(0,0,0,0,0,0,0,0,0,1,1,0,0,1,1,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0),
+		packWord30(0,1,1,1,1,1,1,1,1,0,0,0,0,0,0,1,1,1,1,1,1,1,1,0,0,0,0,1,1,1),
+		packWord30(0,1,1,1,1,1,1,1,1,0,0,0,0,0,0,1,1,1,1,1,1,1,1,0,0,0,0,1,1,1)
+};
+
+// First half of the word score
+static const uint32_t score_message_2[SCORE_MESSAGE_HEIGHT] =
+{
+		packWord30(1,1,1,0,0,0,0,1,1,1,1,1,1,1,1,0,0,0,0,1,1,1,1,1,1,1,1,1,1,0),
+		packWord30(1,1,1,0,0,0,0,1,1,1,1,1,1,1,1,0,0,0,0,1,1,1,1,1,1,1,1,1,1,0),
+		packWord30(0,0,0,1,1,0,0,1,1,0,0,0,0,0,0,1,1,0,0,1,1,0,0,0,0,0,0,0,0,0),
+		packWord30(0,0,0,1,1,0,0,1,1,0,0,0,0,0,0,1,1,0,0,1,1,0,0,0,0,0,0,0,0,0),
+		packWord30(0,0,0,1,1,0,0,1,1,1,1,1,1,1,1,0,0,0,0,1,1,1,1,1,1,1,1,0,0,0),
+		packWord30(0,0,0,1,1,0,0,1,1,1,1,1,1,1,1,0,0,0,0,1,1,1,1,1,1,1,1,0,0,0),
+		packWord30(0,0,0,1,1,0,0,1,1,0,0,0,0,0,0,1,1,0,0,1,1,0,0,0,0,0,0,0,0,0),
+		packWord30(0,0,0,1,1,0,0,1,1,0,0,0,0,0,0,1,1,0,0,1,1,0,0,0,0,0,0,0,0,0),
+		packWord30(1,1,1,0,0,0,0,1,1,0,0,0,0,0,0,1,1,0,0,1,1,1,1,1,1,1,1,1,1,0),
+		packWord30(1,1,1,0,0,0,0,1,1,0,0,0,0,0,0,1,1,0,0,1,1,1,1,1,1,1,1,1,1,0)
+};
+
+// Bitmap for zero
+static const uint32_t zero[NUMBER_HEIGHT] =
+{
+	packWord10(0,0,1,1,1,1,0,0,0,0),
+	packWord10(0,0,1,1,1,1,0,0,0,0),
+	packWord10(1,1,0,0,0,0,1,1,0,0),
+	packWord10(1,1,0,0,0,0,1,1,0,0),
+	packWord10(1,1,0,0,0,0,1,1,0,0),
+	packWord10(1,1,0,0,0,0,1,1,0,0),
+	packWord10(1,1,0,0,0,0,1,1,0,0),
+	packWord10(1,1,0,0,0,0,1,1,0,0),
+	packWord10(0,0,1,1,1,1,0,0,0,0),
+	packWord10(0,0,1,1,1,1,0,0,0,0)
+};
+
+// Bitmap for one
+static const uint32_t one[NUMBER_HEIGHT] =
+{
+	packWord10(0,0,1,1,1,1,0,0,0,0),
+	packWord10(0,0,1,1,1,1,0,0,0,0),
+	packWord10(0,0,0,0,1,1,0,0,0,0),
+	packWord10(0,0,0,0,1,1,0,0,0,0),
+	packWord10(0,0,0,0,1,1,0,0,0,0),
+	packWord10(0,0,0,0,1,1,0,0,0,0),
+	packWord10(0,0,0,0,1,1,0,0,0,0),
+	packWord10(0,0,0,0,1,1,0,0,0,0),
+	packWord10(0,0,0,0,1,1,0,0,0,0),
+	packWord10(0,0,0,0,1,1,0,0,0,0)
+};
+
+// Bitmap for two
+static const uint32_t two[NUMBER_HEIGHT] =
+{
+	packWord10(1,1,1,1,1,1,0,0,0,0),
+	packWord10(1,1,1,1,1,1,0,0,0,0),
+	packWord10(0,0,0,0,0,0,1,1,0,0),
+	packWord10(0,0,0,0,0,0,1,1,0,0),
+	packWord10(0,0,1,1,1,1,1,1,0,0),
+	packWord10(0,0,1,1,1,1,1,1,0,0),
+	packWord10(1,1,0,0,0,0,0,0,0,0),
+	packWord10(1,1,0,0,0,0,0,0,0,0),
+	packWord10(1,1,1,1,1,1,1,1,0,0),
+	packWord10(1,1,1,1,1,1,1,1,0,0)
+};
+
+// Bitmap for three
+static const uint32_t three[NUMBER_HEIGHT] =
+{
+	packWord10(1,1,1,1,1,1,0,0,0,0),
+	packWord10(1,1,1,1,1,1,0,0,0,0),
+	packWord10(0,0,0,0,0,0,1,1,0,0),
+	packWord10(0,0,0,0,0,0,1,1,0,0),
+	packWord10(0,0,1,1,1,1,1,1,0,0),
+	packWord10(0,0,1,1,1,1,1,1,0,0),
+	packWord10(0,0,0,0,0,0,1,1,0,0),
+	packWord10(0,0,0,0,0,0,1,1,0,0),
+	packWord10(1,1,1,1,1,1,0,0,0,0),
+	packWord10(1,1,1,1,1,1,0,0,0,0)
+};
+
+// Bitmap for four
+static const uint32_t four[NUMBER_HEIGHT] =
+{
+	packWord10(1,1,0,0,0,0,1,1,0,0),
+	packWord10(1,1,0,0,0,0,1,1,0,0),
+	packWord10(1,1,0,0,0,0,1,1,0,0),
+	packWord10(1,1,0,0,0,0,1,1,0,0),
+	packWord10(1,1,1,1,1,1,1,1,0,0),
+	packWord10(1,1,1,1,1,1,1,1,0,0),
+	packWord10(0,0,0,0,0,0,1,1,0,0),
+	packWord10(0,0,0,0,0,0,1,1,0,0),
+	packWord10(0,0,0,0,0,0,1,1,0,0),
+	packWord10(0,0,0,0,0,0,1,1,0,0)
+};
+
+// Bitmap for five
+static const uint32_t five[NUMBER_HEIGHT] =
+{
+	packWord10(1,1,1,1,1,1,1,1,0,0),
+	packWord10(1,1,1,1,1,1,1,1,0,0),
+	packWord10(1,1,0,0,0,0,0,0,0,0),
+	packWord10(1,1,0,0,0,0,0,0,0,0),
+	packWord10(1,1,1,1,1,1,0,0,0,0),
+	packWord10(1,1,1,1,1,1,0,0,0,0),
+	packWord10(0,0,0,0,0,0,1,1,0,0),
+	packWord10(0,0,0,0,0,0,1,1,0,0),
+	packWord10(1,1,1,1,1,1,0,0,0,0),
+	packWord10(1,1,1,1,1,1,0,0,0,0)
+};
+
+// Bitmap for six
+static const uint32_t six[NUMBER_HEIGHT] =
+{
+	packWord10(0,0,1,1,1,1,1,1,0,0),
+	packWord10(0,0,1,1,1,1,1,1,0,0),
+	packWord10(1,1,0,0,0,0,0,0,0,0),
+	packWord10(1,1,0,0,0,0,0,0,0,0),
+	packWord10(1,1,1,1,1,1,0,0,0,0),
+	packWord10(1,1,1,1,1,1,0,0,0,0),
+	packWord10(1,1,0,0,0,0,1,1,0,0),
+	packWord10(1,1,0,0,0,0,1,1,0,0),
+	packWord10(0,0,1,1,1,1,0,0,0,0),
+	packWord10(0,0,1,1,1,1,0,0,0,0)
+};
+
+// Bitmap for seven
+static const uint32_t seven[NUMBER_HEIGHT] =
+{
+	packWord10(1,1,1,1,1,1,1,1,0,0),
+	packWord10(1,1,1,1,1,1,1,1,0,0),
+	packWord10(0,0,0,0,0,0,1,1,0,0),
+	packWord10(0,0,0,0,0,0,1,1,0,0),
+	packWord10(0,0,0,0,0,0,1,1,0,0),
+	packWord10(0,0,0,0,0,0,1,1,0,0),
+	packWord10(0,0,0,0,1,1,0,0,0,0),
+	packWord10(0,0,0,0,1,1,0,0,0,0),
+	packWord10(0,0,0,0,1,1,0,0,0,0),
+	packWord10(0,0,0,0,1,1,0,0,0,0)
+};
+
+// Bitmap for eight
+static const uint32_t eight[NUMBER_HEIGHT] =
+{
+	packWord10(0,0,1,1,1,1,0,0,0,0),
+	packWord10(0,0,1,1,1,1,0,0,0,0),
+	packWord10(1,1,0,0,0,0,1,1,0,0),
+	packWord10(1,1,0,0,0,0,1,1,0,0),
+	packWord10(0,0,1,1,1,1,0,0,0,0),
+	packWord10(0,0,1,1,1,1,0,0,0,0),
+	packWord10(1,1,0,0,0,0,1,1,0,0),
+	packWord10(1,1,0,0,0,0,1,1,0,0),
+	packWord10(0,0,1,1,1,1,0,0,0,0),
+	packWord10(0,0,1,1,1,1,0,0,0,0)
+};
+
+// Bitmap for nine
+static const uint32_t nine[NUMBER_HEIGHT] =
+{
+	packWord10(0,0,1,1,1,1,0,0,0,0),
+	packWord10(0,0,1,1,1,1,0,0,0,0),
+	packWord10(1,1,0,0,0,0,1,1,0,0),
+	packWord10(1,1,0,0,0,0,1,1,0,0),
+	packWord10(0,0,1,1,1,1,1,1,0,0),
+	packWord10(0,0,1,1,1,1,1,1,0,0),
+	packWord10(0,0,0,0,0,0,1,1,0,0),
+	packWord10(0,0,0,0,0,0,1,1,0,0),
+	packWord10(1,1,1,1,1,1,0,0,0,0),
+	packWord10(1,1,1,1,1,1,0,0,0,0)
+};
+
+static const uint32_t comma[COMMA_HEIGHT] =
+{
+	packWord6(0,0,0,0,0,0),
+	packWord6(0,0,0,0,0,0),
+	packWord6(0,0,0,0,0,0),
+	packWord6(0,0,0,0,0,0),
+	packWord6(0,0,0,0,0,0),
+	packWord6(0,0,0,0,0,0),
+	packWord6(0,0,0,0,0,0),
+	packWord6(0,0,0,0,0,0),
+	packWord6(0,0,1,1,0,0),
+	packWord6(0,0,1,1,0,0),
+	packWord6(0,0,1,1,0,0),
+	packWord6(0,0,1,1,0,0),
+	packWord6(1,1,0,0,0,0),
+	packWord6(1,1,0,0,0,0)
 };
 
 #endif /* IMAGES_H_ */
