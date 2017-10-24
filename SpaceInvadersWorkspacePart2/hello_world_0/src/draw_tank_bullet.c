@@ -31,6 +31,23 @@ point_t getTankBulletPosition(){ //get position of the tank bullet
 	return tankBulletPosition;
 }
 
+uint8_t getBulletDrawn(){
+	return tank_Bullet_Drawn;
+}
+
+void eraseTheTankBullet(){
+	if(tank_Bullet_Drawn){
+		point_t updateBullet = getTankBulletPosition();
+		uint8_t line, pixel;
+		for(line = 0; line < TANK_BULLET_HEIGHT; line++){ //Height
+			for(pixel = 0; pixel < TANK_BULLET_WORD_WIDTH; pixel++){ //Width
+				frame_pointer[(line + updateBullet.y)*SCREEN_WIDTH + (pixel + updateBullet.x)] = BLACK; //Set to red
+				tank_Bullet_Drawn = false;
+			}
+		}
+	}
+}
+
 void drawTankBullet(){
 	if(!tank_Bullet_Drawn){ //If not fired
 		tank_Bullet_Drawn = true; //Set drawn to true
@@ -57,119 +74,84 @@ void eraseTankBullet(point_t bullet_pos){
 	}
 }
 
+uint8_t tankMayErodeBunker(uint8_t bunkerNumber, uint8_t blockNumber, uint8_t pixel, uint8_t line, point_t new_tank_bullet_position){
+	if(getErosionStage(bunkerNumber, blockNumber) != 3){
+		setDidTankKillBunkerFlag(true);
+		point_t bunkerPosition;
+		bunkerPosition.x = pixel + new_tank_bullet_position.x;
+		bunkerPosition.y = line + new_tank_bullet_position.y;
+		setShotBunkerPosition(bunkerPosition);
+		return true;
+	}
+	else{
+		return false;
+	}
+}
+
+uint8_t whichBunkerNumber(point_t tank, uint8_t pixel, uint8_t line, point_t new_tank_bullet_position){
+	uint8_t stop = false;
+	uint8_t bunkerNumber = calculateBunkerNumber(tank);
+	uint8_t blockNumber = calculateBlockNumber(bunkerNumber, tank);
+	if((calculateBunkerNumber(tank) == BUNKER1 && calculateBlockNumber(BUNKER1, tank) != WRONG_BUNKER)
+			|| (calculateBunkerNumber(tank) == BUNKER2 && calculateBlockNumber(BUNKER2, tank) != WRONG_BUNKER)
+			|| (calculateBunkerNumber(tank) == BUNKER3 && calculateBlockNumber(BUNKER3, tank) != WRONG_BUNKER)
+			|| (calculateBunkerNumber(tank) == BUNKER4 && calculateBlockNumber(BUNKER4, tank) != WRONG_BUNKER)){
+		stop = tankMayErodeBunker(bunkerNumber, blockNumber, pixel, line, new_tank_bullet_position);
+	}
+	return stop;
+}
+
+/*uint8_t tankHitsSaucer(uint8_t pixel, uint8_t line, point_t new_tank_bullet_position, point_t tank){
+	uint8_t stop = false;
+	if(calculateHitSaucer(tank)){
+		stop = true;
+		point_t deadSaucer;
+		deadSaucer.x = pixel + new_tank_bullet_position.x;
+		deadSaucer.y = line + new_tank_bullet_position.y;
+		setDeadSaucerPosition(deadSaucer);
+	}
+	return stop;
+}*/
+
+uint8_t tankHitsAliens(uint8_t pixel, uint8_t line, point_t new_tank_bullet_position, point_t tank){
+	uint8_t stop = false;
+	if(isAlienAlive(calculateAlienNumber(tank))){
+		stop = true;
+		setDidTankKillAlienFlag(true);
+		point_t deadAlienPosition;
+		deadAlienPosition.x = pixel + new_tank_bullet_position.x;
+		deadAlienPosition.y = line + new_tank_bullet_position.y;
+		setDeadAlienPosition(deadAlienPosition);
+	}
+	return stop;
+}
+
 uint8_t updateTankBullet(){
 	if(tank_Bullet_Drawn){
 		point_t old_tank_bullet_position = getTankBulletPosition(); //Get tank bullet position
-		old_tank_bullet_position.y -= (FOUR_GAME_PIXELS); //Increment by 8 pixels
-		setTankBulletPosition(old_tank_bullet_position); //Set tank bullet position
+		point_t temp = old_tank_bullet_position;
+		temp.y -= (FOUR_GAME_PIXELS); //Increment by 8 pixels
+		setTankBulletPosition(temp); //Set tank bullet position
 		point_t new_tank_bullet_position = getTankBulletPosition(); //Get tank bullet position
 		uint8_t line, pixel;
 		uint8_t stop = false;
 		for(line = 0; line < TANK_BULLET_HEIGHT; line++){ //Height
 			for(pixel = 0; pixel < TANK_BULLET_WORD_WIDTH; pixel++){ //Width
-				if(old_tank_bullet_position.y > ELEVEN_GAME_PIXELS && !stop){
+				if(new_tank_bullet_position.y > ELEVEN_GAME_PIXELS && !stop){
 					point_t tank;
 					tank.x = pixel + new_tank_bullet_position.x;
 					tank.y = line + new_tank_bullet_position.y;
 					if(calculateBunkerNumber(tank) != WRONG_BUNKER){
-						if(calculateBunkerNumber(tank) == BUNKER1){
-							if(calculateBlockNumber(BUNKER1, tank) != WRONG_BUNKER){
-								uint8_t bunkerNumber = calculateBunkerNumber(tank);
-							    uint8_t blockNumber = calculateBlockNumber(bunkerNumber, tank);
-								if(getErosionStage(bunkerNumber, blockNumber) != 3){
-									stop = true;
-									setDidTankKillBunkerFlag(true);
-									point_t bunkerPosition;
-									bunkerPosition.x = pixel + new_tank_bullet_position.x;
-									bunkerPosition.y = line + new_tank_bullet_position.y;
-									setShotBunkerPosition(bunkerPosition);
-								}
-							}
-						}
-						else if(calculateBunkerNumber(tank) == BUNKER2){
-							if(calculateBlockNumber(BUNKER2, tank) != WRONG_BUNKER){
-								uint8_t bunkerNumber = calculateBunkerNumber(tank);
-							    uint8_t blockNumber = calculateBlockNumber(bunkerNumber, tank);
-								if(getErosionStage(bunkerNumber, blockNumber) != 3){
-									stop = true;
-									setDidTankKillBunkerFlag(true);
-									point_t bunkerPosition;
-									bunkerPosition.x = pixel + new_tank_bullet_position.x;
-									bunkerPosition.y = line + new_tank_bullet_position.y;
-									setShotBunkerPosition(bunkerPosition);
-								}
-							}
-						}
-						else if(calculateBunkerNumber(tank) == BUNKER3){
-							if(calculateBlockNumber(BUNKER3, tank) != WRONG_BUNKER){
-								uint8_t bunkerNumber = calculateBunkerNumber(tank);
-							    uint8_t blockNumber = calculateBlockNumber(bunkerNumber, tank);
-								if(getErosionStage(bunkerNumber, blockNumber) != 3){
-									stop = true;
-									setDidTankKillBunkerFlag(true);
-									point_t bunkerPosition;
-									bunkerPosition.x = pixel + new_tank_bullet_position.x;
-									bunkerPosition.y = line + new_tank_bullet_position.y;
-									setShotBunkerPosition(bunkerPosition);
-								}
-							}
-						}
-						else if(calculateBunkerNumber(tank) == BUNKER4){
-							if(calculateBlockNumber(BUNKER4, tank) != WRONG_BUNKER){
-								uint8_t bunkerNumber = calculateBunkerNumber(tank);
-							    uint8_t blockNumber = calculateBlockNumber(bunkerNumber, tank);
-								if(getErosionStage(bunkerNumber, blockNumber) != 3){
-									stop = true;
-									setDidTankKillBunkerFlag(true);
-									point_t bunkerPosition;
-									bunkerPosition.x = pixel + new_tank_bullet_position.x;
-									bunkerPosition.y = line + new_tank_bullet_position.y;
-									setShotBunkerPosition(bunkerPosition);
-								}
-							}
-						}
-						//if((calculateBlockNumber(calculateBunkerNumber(tank), tank) != WRONG_BUNKER) && ){
-
-						//}
+						stop =  whichBunkerNumber(tank, pixel, line, new_tank_bullet_position);
 					}
 					if(calculateAlienNumber(tank) != WRONG_ALIEN){
-						if(isAlienAlive(calculateAlienNumber(tank))){
-							stop = true;
-							setDidTankKillAlienFlag(true);
-							point_t deadAlienPosition;
-							deadAlienPosition.x = pixel + new_tank_bullet_position.x;
-							deadAlienPosition.y = line + new_tank_bullet_position.y;
-							setDeadAlienPosition(deadAlienPosition);
-						}
+						stop = tankHitsAliens(pixel, line, new_tank_bullet_position, tank);
 					}
 					if(frame_pointer[(line + new_tank_bullet_position.y) * SCREEN_WIDTH + (pixel + new_tank_bullet_position.x)] == RED){
-						//xil_printf("Did we come in here???? \n\r");
 						if(calculateHitSaucer(tank)){
 							stop = true;
 						}
 					}
-					if(frame_pointer[(line + new_tank_bullet_position.y) * SCREEN_WIDTH + (pixel + new_tank_bullet_position.x)] == WHITE){//!RED
-						stop = true;
-						setDidTankKillAlienFlag(true);
-						point_t deadAlienPosition;
-						deadAlienPosition.x = pixel + new_tank_bullet_position.x;
-						deadAlienPosition.y = line + new_tank_bullet_position.y;
-						setDeadAlienPosition(deadAlienPosition);
-						//frame_pointer[(line + new_tank_bullet_position.y) * SCREEN_WIDTH + (pixel + new_tank_bullet_position.x)] = RED; //Set to red
-					}
-
-					else if(frame_pointer[(line + new_tank_bullet_position.y) * SCREEN_WIDTH + (pixel + new_tank_bullet_position.x)] == GREEN){//!RED
-						stop = true;
-						setDidTankKillBunkerFlag(true);
-						point_t bunkerPosition;
-						bunkerPosition.x = pixel + new_tank_bullet_position.x;
-						bunkerPosition.y = line + new_tank_bullet_position.y;
-						setShotBunkerPosition(bunkerPosition);
-						//	frame_pointer[(line + new_tank_bullet_position.y) * SCREEN_WIDTH + (pixel + new_tank_bullet_position.x)] = RED; //Set to red
-					}
-					//else if(frame_pointer[(line + new_tank_bullet_position.y) * SCREEN_WIDTH + (pixel + new_tank_bullet_position.x)] == GREEN){//!RED
-					//	frame_pointer[(line + new_tank_bullet_position.y) * SCREEN_WIDTH + (pixel + new_tank_bullet_position.x)] = RED; //Set to red
-					//}
 					else if(frame_pointer[(line + new_tank_bullet_position.y) * SCREEN_WIDTH + (pixel + new_tank_bullet_position.x)] == BLACK){//!RED
 						frame_pointer[(line + new_tank_bullet_position.y) * SCREEN_WIDTH + (pixel + new_tank_bullet_position.x)] = RED; //Set to red
 					}
@@ -182,8 +164,7 @@ uint8_t updateTankBullet(){
 					tank_Bullet_Drawn = false; //Bullet set to false
 				}
 				if(stop){
-					eraseTankBullet(old_tank_bullet_position);
-					//frame_pointer[(line + TANK_HALF_HEIGHT + new_tank_bullet_position.y) * SCREEN_WIDTH + (pixel + new_tank_bullet_position.x)] = BLACK; //Make the last pixel black
+					eraseTankBullet(new_tank_bullet_position);
 					tank_Bullet_Drawn = false; //Bullet set to false
 				}
 			}

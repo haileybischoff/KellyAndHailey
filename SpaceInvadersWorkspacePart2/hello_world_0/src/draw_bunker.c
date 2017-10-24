@@ -36,6 +36,7 @@ static uint8_t bunker_4_block_erosion[BUNKER_NUMBER_TOTAL_BLOCKS] = {0,0,0,0,0,0
 static point_t bunker_shot;
 
 static bool tank_killed_bunker = false;
+static bool alien_killed_bunker = false;
 
 extern unsigned int * frame_pointer;
 
@@ -118,8 +119,16 @@ uint8_t didTankKillBunker(){
 	return tank_killed_bunker;
 }
 
+uint8_t didAlienKillBunker(){
+	return alien_killed_bunker;
+}
+
 void setDidTankKillBunkerFlag(bool tankKilledBunkerFlag){
 	tank_killed_bunker = tankKilledBunkerFlag;
+}
+
+void setDidAlienKillBunkerFlag(bool alienKilledBunkerFlag){
+	alien_killed_bunker = alienKilledBunkerFlag;
 }
 
 void drawBunker(uint16_t x_position, uint16_t y_position){
@@ -131,6 +140,41 @@ void drawBunker(uint16_t x_position, uint16_t y_position){
 			}
 			if((bunker_right_half[line] & (SHIFT<<(BUNKER_WORD_WIDTH-SHIFT-pixel)))){
 				frame_pointer[(line + y_position)*SCREEN_WIDTH + (pixel + BUNKER_WORD_WIDTH + x_position)] = GREEN; //Set to green
+			}
+		}
+	}
+}
+
+void eraseBunkers(){
+	uint8_t number;
+	for(number = 0; number < 4; number++){
+		point_t bunker;
+		bunker.y = BUNKER_Y_POSITION;
+		if(number == 0){
+			bunker.x = BUNKER_1_X_POSITION;
+		}
+		else if(number == 1){
+			bunker.x = BUNKER_2_X_POSITION;
+		}
+		else if(number == 2){
+			bunker.x = BUNKER_3_X_POSITION;
+		}
+		else {
+			bunker.x = BUNKER_4_X_POSITION;
+		}
+		uint8_t line, pixel;
+		for(line = 0; line < BUNKER_HEIGHT; line++){ //Height
+			for(pixel = 0; pixel < BUNKER_WORD_WIDTH; pixel++){ //Width
+				if((bunker_left_half[line] & (SHIFT<<(BUNKER_WORD_WIDTH-SHIFT-pixel)))){
+					if(frame_pointer[(line + bunker.y)*SCREEN_WIDTH + (pixel + bunker.x)] != BLACK){ //Set to green
+						frame_pointer[(line + bunker.y)*SCREEN_WIDTH + (pixel + bunker.x)] = BLACK; //Set to green
+					}
+				}
+				if((bunker_right_half[line] & (SHIFT<<(BUNKER_WORD_WIDTH-SHIFT-pixel)))){
+					if(frame_pointer[(line + bunker.y)*SCREEN_WIDTH + (pixel + BUNKER_WORD_WIDTH + bunker.x)] != BLACK){
+						frame_pointer[(line + bunker.y)*SCREEN_WIDTH + (pixel + BUNKER_WORD_WIDTH + bunker.x)] = BLACK; //Set to green
+					}
+				}
 			}
 		}
 	}

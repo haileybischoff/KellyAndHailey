@@ -183,6 +183,41 @@ void eraseCommas(uint16_t erase_width, point_t position){
 	}
 }
 
+void drawGameOverMessage(){
+	uint8_t line, pixel;
+	point_t position;
+	position.x = 200;
+	position.y = 200;
+	for(line = 0; line < GAME_OVER_MESSAGE_HEIGHT; line++){ //For height
+		for(pixel = 0; pixel < GAME_OVER_MESSAGE_WIDTH; pixel++){ //For width
+			if((gameOverMessage_1[line] & (SHIFT<<(GAME_OVER_MESSAGE_WIDTH-SHIFT-pixel)))){
+				frame_pointer[(line + position.y)*SCREEN_WIDTH + (pixel + position.x)] = WHITE; //Set to green
+			}
+		}
+	}
+	for(line = 0; line < GAME_OVER_MESSAGE_HEIGHT; line++){ //For height
+		for(pixel = 0; pixel < GAME_OVER_MESSAGE_WIDTH; pixel++){ //For width
+			if((gameOverMessage_2[line] & (SHIFT<<(GAME_OVER_MESSAGE_WIDTH-SHIFT-pixel)))){
+				frame_pointer[(line + position.y)*SCREEN_WIDTH + (pixel + position.x + GAME_OVER_MESSAGE_WIDTH)] = WHITE; //Set to green
+			}
+		}
+	}
+	for(line = 0; line < GAME_OVER_MESSAGE_HEIGHT; line++){ //For height
+		for(pixel = 0; pixel < GAME_OVER_MESSAGE_WIDTH; pixel++){ //For width
+			if((gameOverMessage_3[line] & (SHIFT<<(GAME_OVER_MESSAGE_WIDTH-SHIFT-pixel)))){
+				frame_pointer[(line + position.y)*SCREEN_WIDTH + (pixel + position.x + (2 * GAME_OVER_MESSAGE_WIDTH))] = WHITE; //Set to green
+			}
+		}
+	}
+	for(line = 0; line < GAME_OVER_MESSAGE_HEIGHT; line++){ //For height
+		for(pixel = 0; pixel < GAME_OVER_MESSAGE_WIDTH; pixel++){ //For width
+			if((gameOverMessage_4[line] & (SHIFT<<(GAME_OVER_MESSAGE_WIDTH-SHIFT-pixel)))){
+				frame_pointer[(line + position.y)*SCREEN_WIDTH + (pixel + position.x + (3 * GAME_OVER_MESSAGE_WIDTH))] = WHITE; //Set to green
+			}
+		}
+	}
+}
+
 void eraseSaucerScore(){
 	uint16_t position = getSaucerDeathPosition();
 
@@ -329,7 +364,7 @@ void computeScore(uint8_t alien_number){
 		alien_Score = getSaucerPoints();
 	}
 	setScore(alien_Score);
-	xil_printf("Score is: %d\n\r", getScore());
+	//xil_printf("Score is: %d\n\r", getScore());
 
 }
 

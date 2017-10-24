@@ -54,6 +54,8 @@ static uint8_t alien_block[ALIEN_AMOUNT] = {1,1,1,1,1,1,1,1,1,1,1, \
 		1,1,1,1,1,1,1,1,1,1,1, \
 		1,1,1,1,1,1,1,1,1,1,1};
 
+static uint16_t alienCount = 55;
+
 static uint8_t alien_row_dead[ALIEN_MAX_COL] = {ALIEN_MAX_ROW,ALIEN_MAX_ROW,ALIEN_MAX_ROW,ALIEN_MAX_ROW,ALIEN_MAX_ROW,ALIEN_MAX_ROW,ALIEN_MAX_ROW,ALIEN_MAX_ROW,ALIEN_MAX_ROW,ALIEN_MAX_ROW,ALIEN_MAX_ROW};
 
 // This keeps track of the alien that shoots.
@@ -73,6 +75,58 @@ static point_t alien_dead;
 static bool tank_killed_alien = false;
 
 extern unsigned int * frame_pointer;
+
+uint16_t getAlienCount(){
+	return alienCount;
+}
+
+int8_t chooseRow(int16_t alien){
+	int8_t row;
+	if(alien < ALIEN_ROW_1 && alien >= 0){
+		row = ALIEN_ROW_1;
+	}
+	else if((alien >= ALIEN_ROW_1) && (alien < ALIEN_ROW_2)){
+		row = ALIEN_ROW_2;
+	}
+	else if((alien >= ALIEN_ROW_2) && (alien < ALIEN_ROW_3)){
+		row = ALIEN_ROW_3;	}
+	else if((alien >= ALIEN_ROW_3) && (alien < ALIEN_ROW_4)){
+		row = ALIEN_ROW_4;	}
+	else if((alien >= ALIEN_ROW_4) && (alien < ALIEN_ROW_5)){
+		row = ALIEN_ROW_5;	}
+	else{
+		row = -1;
+	}
+	// Get the x_position for all the aliens.
+return row;
+}
+
+uint8_t lowestAlien(){
+	uint8_t number, index;
+	int16_t maxAlien; // = my_alien_row_dead[1];
+	int8_t lowRow = 0; //Start from the top
+	for(number = 0; number < 11; number++){
+		maxAlien = my_alien_row_dead[number];
+		int8_t temp = chooseRow(maxAlien);
+		if(temp > lowRow){
+			index = number;
+			lowRow = temp;
+		}
+	}
+	return  my_alien_row_dead[index];
+}
+
+bool cantGoLower(){
+	bool cant = false;
+	uint8_t lowAlien = lowestAlien();
+	point_t pos = calculateAlienPosition(lowAlien);
+	point_t update;
+	update.y = pos.y + 20;
+	if(update.y >= 410){ //410 is decent
+		cant = true;
+	}
+	return cant;
+}
 
 void initializeAlienBlock(){
 	alienBlockPosition.x = ALIEN_INITIAL_X_POSITION; //Alien x
@@ -197,6 +251,22 @@ uint16_t getRightAlienBorder(){ //Get the right border for the aliens
 	return right_position;
 }
 
+void eraseAllAliens(){
+	uint8_t number;
+	for(number = 0; number < 55; number++){
+		if(alien_block[number]){
+			point_t position = calculateAlienPosition(number);
+			uint8_t line, pixel;
+			for(line = 0; line < ALIEN_HEIGHT; line++){ //Height
+				for(pixel = 0; pixel < ALIEN_WORD_WIDTH; pixel++){ //Width
+					if(frame_pointer[(line + position.y)*SCREEN_WIDTH + (pixel + position.x)] == WHITE)
+						frame_pointer[(line + position.y)*SCREEN_WIDTH + (pixel + position.x)] = BLACK; //Set to black
+				}
+			}
+		}
+	}
+}
+
 void eraseAlien(uint16_t x_position, uint16_t y_position, uint8_t alien_type){
 	uint8_t line, pixel;
 	for(line = 0; line < ALIEN_HEIGHT; line++){ //Height
@@ -219,7 +289,9 @@ void killAlien(uint8_t alien_number){
 	if(alien_row_dead[alien_column] != ALIEN_COLUMN_EMPTY){ //If column is not empty
 		alien_row_dead[alien_column] = --new_alien_number; //Decrement alien number
 	}
-	if(my_alien_row_dead[alien_column] != ALIEN_NULL){ //If column is not null
+
+	/*
+		if(my_alien_row_dead[alien_column] != ALIEN_NULL){ //If column is not null
 		if(my_new_alien_number == alien_number){ //If the number is the same
 			uint8_t i;
 			for(i = 1; i < ALIEN_MAX_ROW; i++){
@@ -234,6 +306,33 @@ void killAlien(uint8_t alien_number){
 			}
 		}
 	}
+	 */
+
+	if(my_alien_row_dead[alien_column] != ALIEN_NULL){ //If column is not null
+		if(my_new_alien_number == alien_number){ //If the number is the same
+			uint8_t i;
+			for(i = 1; i < ALIEN_MAX_ROW && !found ; i++){
+				if(alien_block[get_alien_num - (i * ALIEN_MAX_COL)] != false){
+					//xil_printf("Alien column is: %d \t and the alien it shoots from is: %d\n\r", alienColumn, getMyAlienNumber(alienColumn));
+					uint8_t h = i;
+					if(my_new_alien_number - (h * ALIEN_MAX_COL) < 0){
+						my_alien_row_dead[alien_column] = ALIEN_NULL;
+						found = true; //Set found to true
+					}
+					else{
+						my_alien_row_dead[alien_column] = my_new_alien_number - (h * ALIEN_MAX_COL); //Create new number
+						//xil_printf("Bottom alien is now: %d\n\r", alienColumn, getMyAlienNumber(alienColumn));
+						found = true; //Set found to true
+					}
+					//break;
+				}
+			}
+			if(found == false){ //If false
+				my_alien_row_dead[alien_column] = ALIEN_NULL; //Set to null
+			}
+		}
+	}
+	alienCount--;
 	alien_block[alien_number] = ALIEN_ERASE; //Erase alien
 	uint8_t line, pixel;
 	for(line = 0; line < ALIEN_EXPLOSION_HEIGHT; line++){ //Height

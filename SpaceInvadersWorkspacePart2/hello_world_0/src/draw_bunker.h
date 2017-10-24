@@ -34,7 +34,13 @@ uint8_t calculateBunkerNumber(point_t bunkerPosition);
 
 void setDidTankKillBunkerFlag(bool tankKilledBunkerFlag);
 
+void setDidAlienKillBunkerFlag(bool alienKilledBunkerFlag);
+
+void eraseBunkers();
+
 uint8_t didTankKillBunker();
+
+uint8_t didAlienKillBunker();
 
 void drawBunker(uint16_t x_position, uint16_t y_position);
 

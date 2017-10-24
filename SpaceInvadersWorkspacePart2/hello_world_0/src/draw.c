@@ -19,6 +19,40 @@
 
 unsigned int * frame_pointer = (unsigned int *) FRAME_BUFFER_0_ADDR_BASE;
 
+void eraseLives(uint8_t lives){
+	point_t life;
+	life.y = LIFE_Y_POSITION;
+	if(lives == 2){
+		life.x = LIFE_3_X_POSITION;
+	}
+	else if(lives == 1){
+		life.x = LIFE_2_X_POSITION;
+	}
+	else if(lives == 0){
+		life.x = LIFE_1_X_POSITION;
+	}
+	uint8_t line, pixel;
+	for(line = 0; line < TANK_HEIGHT; line++){ //For height
+		for(pixel = 0; pixel < TANK_WORD_WIDTH; pixel++){ //For width
+			if((tank_symbol[line] & (SHIFT<<(TANK_WORD_WIDTH-SHIFT-pixel)))){
+				frame_pointer[(line + life.y)*SCREEN_WIDTH + (pixel + life.x)] = BLACK; //Set to green
+			}
+		}
+	}
+	//drawLife(LIFE_1_X_POSITION, LIFE_Y_POSITION); //Draw life 1
+}
+
+void clearScreen(){
+	uint16_t pixel, line;
+	for(line = 29; line <444; line++){
+		for(pixel = 0; pixel < SCREEN_WIDTH; pixel++){
+			if(frame_pointer[(line)*SCREEN_WIDTH + (pixel)] != BLACK){ //Set to green
+				frame_pointer[(line)*SCREEN_WIDTH + (pixel)] = BLACK; //Set to green
+			}
+		}
+	}
+}
+
 unsigned int * draw_start_screen(){
 	setTankPosition(TANK_INITIAL_X_POSITION); //Set tank position
 	uint16_t row, col;

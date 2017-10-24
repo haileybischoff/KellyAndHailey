@@ -28,6 +28,8 @@ void drawLifeMessage(uint16_t x_position, uint16_t y_position);
 
 void drawNumber(point_t position, const uint32_t* number);
 
+void drawGameOverMessage();
+
 void eraseSaucerScore();
 
 void drawSaucerScore();

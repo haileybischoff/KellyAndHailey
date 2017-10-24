@@ -15,6 +15,10 @@ void setTankBulletPosition(point_t val); // This sets the tank's bullet position
 
 point_t getTankBulletPosition(); // This gets the tank's bullet position.
 
+uint8_t getBulletDrawn();
+
+void eraseTheTankBullet();
+
 void drawTankBullet(); // This draws the tank's bullet.
 
 uint8_t updateTankBullet(); // Updates the tank's bullet.

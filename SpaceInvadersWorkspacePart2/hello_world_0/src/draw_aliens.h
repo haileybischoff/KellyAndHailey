@@ -26,11 +26,15 @@ void initializeAlienBlock(); // This initializes the alien block position.
 
 int8_t getMyAlienNumber(int8_t alienIndex); // This get's the aliens number.
 
+uint16_t getAlienCount();
+
 bool isAlienAlive(uint8_t alienIndex); // This returns true if the given alien is alive.
 
 bool didTankKillAlien();
 
 void setDeadAlienPosition(point_t deadAlienPosition);
+
+void eraseAllAliens();
 
 point_t getDeadAlienPosition();
 
@@ -39,6 +43,8 @@ void setDidTankKillAlienFlag(bool killAlien);
 void setAlienBlockPosition(point_t val); // This sets the aliens' block position.
 
 point_t getAlienBlockPosition(); // This gets the aliens' block position
+
+bool cantGoLower();
 
 point_t calculateAlienPosition(uint8_t alien_number); // This calculates an individual aliens position.
 

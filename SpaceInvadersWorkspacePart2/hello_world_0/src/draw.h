@@ -51,6 +51,10 @@ typedef struct point_t { // A new data structure to hold the x and y coordinates
 
 typedef struct point_t point_t; // Andy you put this here because according to Kelly you didn't like my declaration of point_t I'm gonna have to ask you about that later.
 
+void eraseLives(uint8_t lives);
+
+void clearScreen();
+
 unsigned int * draw_start_screen(); // This draws the initial start screen.
 
 #endif /* DRAW_H_ */

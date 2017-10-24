@@ -11,22 +11,26 @@
 #include <stdint.h>
 #include "draw.h"
 
-uint8_t updateCrossAlienBullet();
+uint8_t getAlienBulletCount();
 
-void setAlienCrossBulletPosition(point_t val); // This sets the tank's bullet position.
+void setAlienBulletPosition(point_t val, uint8_t bullet_number);
 
-point_t getAlienCrossBulletPosition(); // This gets the tank's bullet position.
+point_t getAlienBulletPosition(uint8_t bullet_number);
 
-void drawCrossAlienBullet(uint8_t alienNumber);
+void drawAlienBullet(uint8_t alienNumber, uint8_t type);
 
-void setAlienBulletPosition(point_t val, uint8_t bullet_number); // This sets the alien's bullet position for a given bullet number.
+void drawBullet(const uint32_t* alien_cross_bullet, point_t updateBullet, uint8_t width);
 
-point_t getAlienBulletPosition(uint8_t bullet_number); // This gets the alien's bullet position for a given bullet numbe.r
+uint8_t alienMayErodeBunker(uint8_t bunkerNumber, uint8_t blockNumber, uint8_t pixel, uint8_t line, point_t new_bullet_position);
 
-void fireAlienBullet(uint8_t alien_number, uint8_t bullet_type); // Draws the alien's bullet.
+uint8_t whichAlienBunkerNumber(point_t bullet, uint8_t pixel, uint8_t line, point_t new_bullet_position);
 
-void drawAlienBullet(uint8_t alien_number, uint8_t bullet_type); // Draws the alien's bullet.
+void eraseAlienBullet(const uint32_t* alien_cross_bullet, point_t bullet_pos, uint8_t width);
 
-uint8_t updateAlienBullet(); // Updates the aliens bullet.
+void eraseAllAlienBullets();
+
+uint8_t generalUpdateBullet(const uint32_t* alien_cross_bullet, uint8_t bulletNum, uint8_t type);
+
+uint8_t updateEachBullet();
 
 #endif /* DRAW_ALIEN_BULLET_H_ */
