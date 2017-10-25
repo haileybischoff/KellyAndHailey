@@ -80,6 +80,25 @@ void explodeTank(){
 	}
 }
 
+void explodeTankTwo(){
+	uint8_t line, pixel;
+	//xil_printf("Can we explode the tank??\n\r");
+	for(line = 0; line < TANK_HEIGHT; line++){
+		for(pixel = 0; pixel < TANK_WORD_WIDTH; pixel++){
+			if((tank_explosion2[line] & (SHIFT<<(TANK_WORD_WIDTH-SHIFT-pixel)))){
+				if(frame_pointer[(line + TANK_Y_POSITION)*SCREEN_WIDTH + (pixel + getTankPosition())] != WHITE){
+					frame_pointer[(line + TANK_Y_POSITION)*SCREEN_WIDTH + (pixel + getTankPosition())] = WHITE; //Set to green
+				}
+			}
+			else{
+				if(frame_pointer[(line + TANK_Y_POSITION)*SCREEN_WIDTH + (pixel + getTankPosition())] != BLACK){
+					frame_pointer[(line + TANK_Y_POSITION)*SCREEN_WIDTH + (pixel + getTankPosition())] = BLACK; //Set to green
+				}
+			}
+		}
+	}
+}
+
 uint8_t didAlienKillTank(){
 	return alien_killed_tank;
 }

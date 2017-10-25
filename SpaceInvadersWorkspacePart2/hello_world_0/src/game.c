@@ -33,9 +33,8 @@
 
 
 //ALIEN STUFF
-#define MAX_ALIEN_BULLET 50
-#define MAX_ALIEN_MOVE_TIME 100
-#define MAX_ALIEN_BULLET_TIME 10
+#define MAX_ALIEN_BULLET 100
+#define MIN_ALIEN_BULLET 50
 
 //BULLET STUFF
 #define BULLET_UPDATE_TIME 100
@@ -44,11 +43,11 @@
 #define TYPES_OF_ALIEN_BULLETS 2
 
 //TANK STUFF
-#define MAX_MOVE_TANK 3
 #define MAX_TANK_BULLET_TIME 100
-#define MAX_TANK_DEATH_TIME 100
+#define MAX_TANK_DEATH_TIME 8
 #define MOVE_LEFT 4 //move left by 4
 #define MOVE_RIGHT 26 //move right by 26
+#define MAX_EXPLOSION_COUNT 20
 
 //BUNKER STUFF
 #define BLANK_BLOCK_1 9 //This is the blank block for the bunkers
@@ -76,10 +75,11 @@
 #define TOP_BUTTON_MASK 16 //This is the mask for the top push button it will be used fro incrementing volume eventually
 #define BOTTOM_BUTTON_MASK 4 //This is the mask for the bottom push button it will be used for decrementing volume eventually
 
-#define TANK_MOVE_MAX_COUNTER 5 // 5 is a 50th of a second
-#define ALIEN_MOVE_MAX_COUNTER 50 // 50 is a half second since the interrupt happens every 10 mS.
+#define MAX_MOVE_TANK 3
+#define MAX_ALIEN_MOVE_TIME 50
 #define SAUCER_SCORE_MAX_COUNTER 20 // 20 is a fifth of a second this is for flashing the score.
-#define SAUCER_MOVE_MAX_COUNTER 10 // 10 is a tenth of a second for moving the saucer.
+#define MAX_ALIEN_BULLET_TIME 10
+#define SAUCER_MOVE_MAX_COUNTER 5 // 10 is a tenth of a second for moving the saucer.
 
 uint16_t alienDeathCounter = RESET; //Alien Death Counter initialized to 0
 uint32_t updateBulletCounter = RESET;
@@ -93,6 +93,8 @@ uint8_t alienColumn = RESET;
 uint8_t alienBulletType = RESET;
 uint16_t alien_bullets = RESET; //Count for the number of alien bullets on the screen
 uint32_t alienCounter = RESET; //Alien counter initialized to 0
+
+uint8_t max_alien_bullet = RESET;
 
 uint32_t randomCounter = RESET;
 
@@ -108,6 +110,8 @@ uint16_t debounceCounter = RESET; //Debounce counter initialized to 0
 /****************** DRAW TANK STUFF ************************************/
 uint16_t tankMoveCounter = RESET; //Tank move counter initialized to 0
 uint8_t moveTankCounter = RESET;
+
+uint8_t tankExplosionCounter = RESET;
 
 bool moveLeftFlag = false;
 bool moveRightFlag = false;
@@ -166,6 +170,7 @@ enum SpaceInvadersControl_st{
 	flash_saucer_score_st,
 	bunker_st,
 	dead_tank_st,
+	explosion_tank_st,
 	move_tank_right_st,
 	move_tank_left_st,
 	draw_saucer_st,
@@ -263,8 +268,10 @@ void spaceInvaders_tick(){
 		debounceCounter = RESET; //Debounce counter initialized to 0
 		alienDeathCounter = RESET; //Alien Death Counter initialized to 0
 		tankDeathCounter = RESET; //Tank death counter initialized to 0
+		tankExplosionCounter = RESET;
 		tankBulletFiredMinCounter = RESET; //Bullet Fired Min Counter initialized to 0
 		alienBulletFiredMinCounter = RESET; //Bullet Fired Min Counter initialized to 0
+		max_alien_bullet = RESET; // The max for shooting a random bullet.
 		saucerMoveCounter = RESET; //Saucer counter initialized to 0
 		saucerRandValueCounter = RESET; // Reset this random value saucer counter.
 		alienBulletCounter = RESET;
@@ -307,7 +314,7 @@ void spaceInvaders_tick(){
 			saucerRandValueCounter++; // So we have to count between when the next suacer get's drawn.
 			if(saucerRandValueCounter >= saucerRandValueMax){ // If we get above our saucer random max then
 				drawSaucerFlag = true; // We'll need to set our draw saucer flag to true
-				saucerRandValueMax = rand() % SAUCER_MAX_TIME; // We'll need to generate a new random saucer max
+				saucerRandValueMax = + (rand() % SAUCER_MAX_TIME); // We'll need to generate a new random saucer max
 				saucerRandValueCounter = RESET; // We'll need to reset the saucer rand value counter.
 			}
 		}
@@ -317,7 +324,8 @@ void spaceInvaders_tick(){
 			drawTankBullet();
 		}
 		if((getAlienBulletCount() < MAX_NUMBER_ALIEN_BULLETS)){//needs to say less than 4
-			if(alienBulletCounter >= MAX_ALIEN_BULLET){
+			if(alienBulletCounter >= max_alien_bullet){
+				max_alien_bullet = MIN_ALIEN_BULLET + (rand() % MAX_ALIEN_BULLET);
 				//xil_printf("ALIEN BULLET count is: %d\n\r", getAlienBulletCount());
 				shootAlienCrossBulletFlag = true;
 			}
@@ -407,13 +415,23 @@ void spaceInvaders_tick(){
 		setDidAlienKillBunkerFlag(false);
 		break;
 	case dead_tank_st:
-		tankDeathCounter++;
-		explodeTank();
+		if(tankExplosionCounter == RESET){
+			explodeTank();
+		}
+		tankExplosionCounter++;
+		break;
+	case explosion_tank_st:
+		if(tankExplosionCounter == RESET){
+			explodeTankTwo();
+		}
+		tankExplosionCounter++;
 		break;
 	case move_tank_right_st:
+		moveTankCounter++;
 		drawTank(TANK_RIGHT);
 		break;
 	case move_tank_left_st:
+		moveTankCounter++;
 		drawTank(TANK_LEFT);
 		break;
 	case draw_saucer_st:
@@ -466,6 +484,12 @@ void spaceInvaders_tick(){
 			}
 		 */
 
+         /*#define MAX_MOVE_TANK 3
+           #define MAX_ALIEN_MOVE_TIME 50
+           #define SAUCER_SCORE_MAX_COUNTER 20 // 20 is a fifth of a second this is for flashing the score.
+           #define MAX_ALIEN_BULLET_TIME 10
+           #define SAUCER_MOVE_MAX_COUNTER 5 // 10 is a tenth of a second for moving the saucer.*/
+
 		if(lives == RESET || getAlienCount() == RESET ){//|| cantGoLower()
 			currentState = game_over_st;
 		}
@@ -479,9 +503,6 @@ void spaceInvaders_tick(){
 			moveLeftFlag = false; // Reset the flag.
 			currentState = move_tank_left_st; // We need to go move the tank left.
 		}
-		else if((updateBulletCounter >= MAX_ALIEN_BULLET_TIME)){//5 MAX_ALIEN_BULLET_TIME
-			currentState = update_bullet_st;
-		}
 		//initializeAlienBlock
 		else if(alienCounter >= MAX_ALIEN_MOVE_TIME){ //Check for time to move aliens 50
 			currentState = move_aliens_st;
@@ -490,6 +511,9 @@ void spaceInvaders_tick(){
 			xil_printf("Entering flash saucer state\n\r");
 			currentState = flash_saucer_score_st;
 			saucerScoreFlashCounter = RESET;
+		}
+		else if((updateBulletCounter >= MAX_ALIEN_BULLET_TIME)){//5 MAX_ALIEN_BULLET_TIME
+			currentState = update_bullet_st;
 		}
 		else if(drawSaucerFlag && (saucerMoveCounter >= SAUCER_MOVE_MAX_COUNTER)){
 			saucerMoveCounter = RESET;
@@ -542,12 +566,21 @@ void spaceInvaders_tick(){
 		currentState = idle_st;
 		break;
 	case dead_tank_st:
+		if(tankExplosionCounter >= MAX_EXPLOSION_COUNT){
+			tankExplosionCounter = RESET;
+			tankDeathCounter++;
+			currentState = explosion_tank_st;
+		}
+		break;
+	case explosion_tank_st:
 		if(tankDeathCounter >= MAX_TANK_DEATH_TIME){
 			lives--;
 			eraseLives(lives);
 			currentState = idle_st;
 		}
-		else{
+		if(tankExplosionCounter >= MAX_EXPLOSION_COUNT){
+			tankExplosionCounter = RESET;
+			tankDeathCounter++;
 			currentState = dead_tank_st;
 		}
 		break;

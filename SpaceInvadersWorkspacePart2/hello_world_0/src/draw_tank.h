@@ -33,6 +33,8 @@ void eraseExplosion();
 
 void eraseTank();
 
+void explodeTankTwo();
+
 void explodeTank();
 
 void drawTank(uint8_t direction); // This draws the tank. TANK_RIGHT or TANK_LEFT is the direction we pass in.
