@@ -22,27 +22,27 @@
 #define BUNKER_Y_POSITION 367 //Y position for bunkers
 #define WRONG_BUNKER 13
 
-void setShotBunkerPosition(point_t bunkerPosition);
+void setShotBunkerPosition(point_t bunkerPosition); //Set the position for the shot bunker
 
-point_t getShotBunkerPosition();
+point_t getShotBunkerPosition(); // get the shot bunker position
 
-uint8_t getErosionStage(uint8_t bunkerNum, uint8_t blockNumber);
+uint8_t getErosionStage(uint8_t bunkerNum, uint8_t blockNumber); //Get the erosion stage for a bunker and block
 
-uint8_t calculateBlockNumber(uint8_t bunkerNum, point_t bunkerPosition);
+uint8_t calculateBlockNumber(uint8_t bunkerNum, point_t bunkerPosition); //Calculate the block number
 
-uint8_t calculateBunkerNumber(point_t bunkerPosition);
+uint8_t calculateBunkerNumber(point_t bunkerPosition); //Calculate the bunker number
 
-void setDidTankKillBunkerFlag(bool tankKilledBunkerFlag);
+void setDidTankKillBunkerFlag(bool tankKilledBunkerFlag); //Set the flag for the tank killed bunker
 
-void setDidAlienKillBunkerFlag(bool alienKilledBunkerFlag);
+void setDidAlienKillBunkerFlag(bool alienKilledBunkerFlag); //Set the flag for the alien killed bunker
 
-void eraseBunkers();
+void eraseBunkers(); //Erase bunkers
 
-uint8_t didTankKillBunker();
+uint8_t didTankKillBunker(); //Did tank kill a bunker
 
-uint8_t didAlienKillBunker();
+uint8_t didAlienKillBunker(); //did alien killa bunker
 
-void drawBunker(uint16_t x_position, uint16_t y_position);
+void drawBunker(uint16_t x_position, uint16_t y_position); //Draw a bunker
 
 void erodeBunker(uint8_t bunker_number, uint8_t block_number); // This erodes a certain block in a certain bunker.
 

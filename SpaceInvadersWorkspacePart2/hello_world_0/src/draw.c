@@ -15,27 +15,32 @@
 
 #define FRAME_BUFFER_0_ADDR_BASE 0xC1000000  // Starting location in DDR where we will store the images that we display.
 
+#define TWO_LIVES 2
+#define ONE_LIFE 1
+#define NO_LIVES 0
+#define TOP_CLEAR_SCREEN_Y 29
+#define BOTTOM_CLEAR_SCREEN_Y 444
 #define SCREEN_HEIGHT 480 //Height of screen
 
 unsigned int * frame_pointer = (unsigned int *) FRAME_BUFFER_0_ADDR_BASE;
 
-void eraseLives(uint8_t lives){
+void eraseLives(uint8_t lives){ //Erase the lives
 	point_t life;
 	life.y = LIFE_Y_POSITION;
-	if(lives == 2){
+	if(lives == TWO_LIVES){ //If we now have two lives erase the one on right
 		life.x = LIFE_3_X_POSITION;
 	}
-	else if(lives == 1){
+	else if(lives == ONE_LIFE){ // We have one life erase the middle
 		life.x = LIFE_2_X_POSITION;
 	}
-	else if(lives == 0){
+	else if(lives == NO_LIVES){ //No lives  erase the left
 		life.x = LIFE_1_X_POSITION;
 	}
 	uint8_t line, pixel;
 	for(line = 0; line < TANK_HEIGHT; line++){ //For height
 		for(pixel = 0; pixel < TANK_WORD_WIDTH; pixel++){ //For width
-			if((tank_symbol[line] & (SHIFT<<(TANK_WORD_WIDTH-SHIFT-pixel)))){
-				frame_pointer[(line + life.y)*SCREEN_WIDTH + (pixel + life.x)] = BLACK; //Set to green
+			if((tank_symbol[line] & (SHIFT<<(TANK_WORD_WIDTH-SHIFT-pixel)))){ //If pixel is a 1
+				frame_pointer[(line + life.y)*SCREEN_WIDTH + (pixel + life.x)] = BLACK; //Set to black
 			}
 		}
 	}
@@ -44,10 +49,10 @@ void eraseLives(uint8_t lives){
 
 void clearScreen(){
 	uint16_t pixel, line;
-	for(line = 29; line <444; line++){
-		for(pixel = 0; pixel < SCREEN_WIDTH; pixel++){
-			if(frame_pointer[(line)*SCREEN_WIDTH + (pixel)] != BLACK){ //Set to green
-				frame_pointer[(line)*SCREEN_WIDTH + (pixel)] = BLACK; //Set to green
+	for(line = TOP_CLEAR_SCREEN_Y; line < BOTTOM_CLEAR_SCREEN_Y; line++){ //height
+		for(pixel = 0; pixel < SCREEN_WIDTH; pixel++){ //width
+			if(frame_pointer[(line)*SCREEN_WIDTH + (pixel)] != BLACK){ //Set to black
+				frame_pointer[(line)*SCREEN_WIDTH + (pixel)] = BLACK; //Set to black
 			}
 		}
 	}
@@ -56,8 +61,8 @@ void clearScreen(){
 unsigned int * draw_start_screen(){
 	setTankPosition(TANK_INITIAL_X_POSITION); //Set tank position
 	uint16_t row, col;
-	for(row=0; row < SCREEN_HEIGHT; row++) {
-		for(col=0; col < SCREEN_WIDTH; col++) {
+	for(row = 0; row < SCREEN_HEIGHT; row++) {//row
+		for(col = 0; col < SCREEN_WIDTH; col++) { //col
 			if(row == GROUND_LEVEL || row == (GROUND_LEVEL - INCREMENT_OR_DECREMENT)){ //This is to draw the bottom line of the game
 				frame_pointer[row*SCREEN_WIDTH + col] = GREEN;
 			}

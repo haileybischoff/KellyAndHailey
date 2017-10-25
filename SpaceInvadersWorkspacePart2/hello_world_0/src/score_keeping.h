@@ -22,26 +22,26 @@
 #define SCORE_X 73
 #define SCORE_Y 11
 
-void drawScoreMessage(uint16_t x_position, uint16_t y_position);
+void drawScoreMessage(uint16_t x_position, uint16_t y_position); //Draw the score message
 
-void drawLifeMessage(uint16_t x_position, uint16_t y_position);
+void drawLifeMessage(uint16_t x_position, uint16_t y_position); //Draw the life message
 
-void drawNumber(point_t position, const uint32_t* number);
+void drawNumber(point_t position, const uint32_t* number); //Draw a number
 
-void drawGameOverMessage();
+void drawGameOverMessage(); //Draw game over message
 
-void eraseSaucerScore();
+void eraseSaucerScore(); //Erase the saucer score
 
-void drawSaucerScore();
+void drawSaucerScore(); //Draw the saucer score
 
-void drawScore();
+void drawScore(); //Draw the score
 
-void computeScore(uint8_t alien_number);
+void computeScore(uint8_t alien_number); //Compute the score
 
-uint32_t getScore();
+uint32_t getScore(); //Get the score
 
-void setScore(uint32_t score);
+void setScore(uint32_t score); //Set the score
 
-void drawLife(uint16_t x_position, uint16_t y_position);
+void drawLife(uint16_t x_position, uint16_t y_position); //Draw a life
 
 #endif /* SCORE_KEEPING_H_ */

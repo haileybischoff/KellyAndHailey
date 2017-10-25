@@ -11,26 +11,26 @@
 #include <stdint.h>
 #include "draw.h"
 
-uint8_t getAlienBulletCount();
+uint8_t getAlienBulletCount(); //Get the count of bullets
 
-void setAlienBulletPosition(point_t val, uint8_t bullet_number);
+void setAlienBulletPosition(point_t val, uint8_t bullet_number); //Set the bullet position
 
-point_t getAlienBulletPosition(uint8_t bullet_number);
+point_t getAlienBulletPosition(uint8_t bullet_number); //Get the bullet position
 
-void drawAlienBullet(uint8_t alienNumber, uint8_t type);
+void drawAlienBullet(uint8_t alienNumber, uint8_t type); //Draw the alien bullet
 
-void drawBullet(const uint32_t* alien_cross_bullet, point_t updateBullet, uint8_t width);
+void drawBullet(const uint32_t* alien_cross_bullet, point_t updateBullet, uint8_t width); //Draw a bullet
 
-uint8_t alienMayErodeBunker(uint8_t bunkerNumber, uint8_t blockNumber, uint8_t pixel, uint8_t line, point_t new_bullet_position);
+uint8_t alienMayErodeBunker(uint8_t bunkerNumber, uint8_t blockNumber, uint8_t pixel, uint8_t line, point_t new_bullet_position); //Erode a bunker
 
-uint8_t whichAlienBunkerNumber(point_t bullet, uint8_t pixel, uint8_t line, point_t new_bullet_position);
+uint8_t whichAlienBunkerNumber(point_t bullet, uint8_t pixel, uint8_t line, point_t new_bullet_position); //Which bunker to erode
 
-void eraseAlienBullet(const uint32_t* alien_cross_bullet, point_t bullet_pos, uint8_t width);
+void eraseAlienBullet(const uint32_t* alien_cross_bullet, point_t bullet_pos, uint8_t width); //Erase alien bullet
 
-void eraseAllAlienBullets();
+void eraseAllAlienBullets(); //Erase all alien bullets
 
-uint8_t generalUpdateBullet(const uint32_t* alien_cross_bullet, uint8_t bulletNum, uint8_t type);
+uint8_t generalUpdateBullet(const uint32_t* alien_cross_bullet, uint8_t bulletNum, uint8_t type); //Update bullets
 
-uint8_t updateEachBullet();
+uint8_t updateEachBullet(); //Update each bullet
 
 #endif /* DRAW_ALIEN_BULLET_H_ */

@@ -14,21 +14,21 @@
 
 #define SAUCER_Y_POSITION 29 // This is the Y position for when we draw the saucer.
 
-uint16_t getSaucerPosition();
+uint16_t getSaucerPosition(); //Get the saucer position
 
-uint16_t getSaucerDeathPosition();
+uint16_t getSaucerDeathPosition(); //Get the saucer death position
 
-void setSaucerDeathPosition(uint16_t deathPosition);
+void setSaucerDeathPosition(uint16_t deathPosition); //Set the saucer death position
 
-void setDidTankKillSaucerFlag(bool saucerFlag);
+void setDidTankKillSaucerFlag(bool saucerFlag); //Set the flag
 
-bool didTankKillSaucer();
+bool didTankKillSaucer(); //Did tank kill saucer
 
-void setSaucerPosition(uint16_t val);
+void setSaucerPosition(uint16_t val); //Set the saucer position
 
-bool calculateHitSaucer(point_t some_point);
+bool calculateHitSaucer(point_t some_point); //Calculate whether a saucer was hit
 
-void eraseSaucer();
+void eraseSaucer(); //Erase the saucer
 
 bool drawSaucer(); // If it is done moving across the screen then it returns TRUE aka 1 and if it isn't it returns FALSE;
 
