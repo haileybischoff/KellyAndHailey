@@ -1,0 +1,16 @@
+/*
+ * sound.h
+ *
+ *  Created on: Nov 3, 2017
+ *      Author: superman
+ */
+
+#ifndef SOUND_H_
+#define SOUND_H_
+
+void sound_init_AC_97();
+
+void sound_run();
+
+
+#endif /* SOUND_H_ */

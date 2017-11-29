@@ -1,0 +1,310 @@
+/*
+ * soundTest.c
+ *
+ *  Created on: Oct 24, 2016
+ *      Author: superman
+ */
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <stdint.h>
+#include "xac97_l.h"
+#include "platform.h"
+#include "xparameters.h"
+#include "xaxivdma.h"
+#include "xio.h"
+#include "time.h"
+#include "unistd.h"
+#include "xgpio.h"
+#include "mb_interface.h"
+#include "xintc_l.h"
+
+#define MID_BUTTON 0x1
+#define RIGHT_BUTTON 0x2
+#define BOTTOM_BUTTON 0x4
+#define LEFT_BUTTON 0x8
+#define TOP_BUTTON 0x10
+#define VOL_DIFF 250
+#define SOUND_OFFSET 30
+
+extern int32_t tankFireSoundRate;
+extern int32_t tankFireSoundFrames;
+extern int32_t tankFireSound[];
+
+
+
+extern int32_t tankFire_sampleRate;
+extern int32_t tankFire_length;
+extern int32_t tankFire_data[];
+
+
+
+
+
+
+extern int16_t tankFireSampleRate;
+extern int16_t tankFireNumSamples;
+extern int32_t tankFireSoundData[];
+
+extern int16_t tankDeathSampleRate;
+extern int16_t tankDeathNumSamples;
+extern int32_t tankDeathSoundData[];
+
+extern int16_t killAlienSampleRate;
+extern int16_t killAlienNumSamples;
+extern int32_t killAlienSoundData[];
+
+extern int16_t alienMove1SampleRate;
+extern int16_t alienMove1NumSamples;
+extern int32_t alienMove1SoundData;
+
+extern int16_t alienMove2SampleRate;
+extern int16_t alienMove2NumSamples;
+extern int32_t alienMove2SoundData;
+
+extern int16_t alienMove3SampleRate;
+extern int16_t alienMove3NumSamples;
+extern int32_t alienMove3SoundData;
+
+extern int16_t alienMove4SampleRate;
+extern int16_t alienMove4NumSamples;
+extern int32_t alienMove4SoundData;
+
+extern int16_t saucerHighSampleRate;
+extern int16_t saucerHighNumSamples;
+extern int32_t saucerHighSoundData[];
+
+extern int16_t saucerLowSampleRate;
+extern int16_t saucerLowNumSamples;
+extern int32_t saucerLowSoundData[];
+
+XGpio gpLED; //LED handler
+XGpio gpPB; //push button handler
+
+u32 currentButtonState;
+int16_t currentVolume;
+u8 alienMove = 0;
+
+struct soundIt_st {
+	u32 alienMove1_it;
+	u32 alienMove2_it;
+	u32 alienMove3_it;
+	u32 alienMove4_it;
+	u32 killAlien_it;
+	u32 tankDeath_it;
+	u32 tankFire_it;
+	u32 saucerHigh_it;
+	u32 saucerLow_it;
+} soundIt;
+
+void playAudio(Xuint32 StartAddress, Xuint32 EndAddress) {
+	Xuint32 sample;
+	volatile Xuint32 *sound_ptr = (Xuint32*) StartAddress;
+
+	/** Wait for the ready signal **/
+	XAC97_AwaitCodecReady(XPAR_AXI_AC97_0_BASEADDR);
+
+	/** Clear FIFOs **/
+	XAC97_ClearFifos(XPAR_AXI_AC97_0_BASEADDR);
+
+	while( sound_ptr < (Xuint32*) EndAddress ) {
+		sample = *sound_ptr;
+		sound_ptr = sound_ptr + 1;
+		while(XAC97_isInFIFOFull(XPAR_AXI_AC97_0_BASEADDR));
+		XAC97_mSetInFifoData(XPAR_AXI_AC97_0_BASEADDR, sample);
+		//XAC97_WriteFifo(BaseAddress, sample);
+	}
+	//clear once again
+	XAC97_ClearFifos(XPAR_AXI_AC97_0_BASEADDR);
+}
+
+void writeVol(u16 newVolume) {
+	XAC97_WriteReg(XPAR_AXI_AC97_0_BASEADDR, AC97_MasterVol, newVolume);
+	XAC97_WriteReg(XPAR_AXI_AC97_0_BASEADDR, AC97_AuxOutVol, newVolume);
+	XAC97_WriteReg(XPAR_AXI_AC97_0_BASEADDR, AC97_MasterVolMono, newVolume);
+	XAC97_WriteReg(XPAR_AXI_AC97_0_BASEADDR, AC97_PCBeepVol, newVolume);
+	XAC97_WriteReg(XPAR_AXI_AC97_0_BASEADDR, AC97_PCMOutVol, newVolume);
+	XAC97_WriteReg(XPAR_AXI_AC97_0_BASEADDR, AC97_LineInVol, newVolume);
+	XAC97_WriteReg(XPAR_AXI_AC97_0_BASEADDR, AC97_MicVol, newVolume);
+}
+
+void resetSoundIt() {
+	soundIt.alienMove1_it = 0;
+	soundIt.alienMove2_it = 0;
+	soundIt.alienMove3_it = 0;
+	soundIt.alienMove4_it = 0;
+	soundIt.killAlien_it = 0;
+	soundIt.tankDeath_it = 0;
+	soundIt.tankFire_it = 0;
+	soundIt.saucerHigh_it = 0;
+	soundIt.saucerLow_it = 0;
+}
+
+void initSound() {
+	//hard reset
+	XAC97_HardReset(XPAR_AXI_AC97_0_BASEADDR);
+	XAC97_InitAudio(XPAR_AXI_AC97_0_BASEADDR, 0);
+	//await codec
+	XAC97_AwaitCodecReady(XPAR_AXI_AC97_0_BASEADDR);
+	//enable VRA
+	XAC97_WriteReg(XPAR_AXI_AC97_0_BASEADDR, AC97_ExtendedAudioStat, AC97_EXTENDED_AUDIO_CONTROL_VRA);
+	//set frequency DAC
+	XAC97_WriteReg(XPAR_AXI_AC97_0_BASEADDR, AC97_PCM_DAC_Rate, tankFireSoundRate);
+	//set volumes
+	XAC97_WriteReg(XPAR_AXI_AC97_0_BASEADDR, AC97_PCMOutVol, AC97_VOL_MID);
+	//clear FIFO
+	XAC97_ClearFifos(XPAR_AXI_AC97_0_BASEADDR);
+	//set control bit to cause IN_FIFO interrupts
+	XAC97_mSetControl(XPAR_AXI_AC97_0_BASEADDR, AC97_ENABLE_IN_FIFO_INTERRUPT);
+
+	currentVolume = AC97_VOL_MAX;
+
+	/** Play Volume Settings **/
+	writeVol(currentVolume);
+
+	resetSoundIt();
+}
+
+void timer_interrupt_handler() {
+	// nothin here, boss
+}
+
+void pb_interrupt_handler() {
+	XGpio_InterruptGlobalDisable(&gpPB); //turn off interrupts
+	currentButtonState = XGpio_DiscreteRead(&gpPB, 1); //get button state
+	if(currentButtonState != 0) {//& LEFT_MID_RIGHT_MASK) //only care about 3 buttons
+		if(currentButtonState & TOP_BUTTON) {/// up button pressed
+			// increase volume to a limit of AC97_VOL_MAX
+			if((currentVolume - VOL_DIFF) < AC97_VOL_MAX) {
+				currentVolume = AC97_VOL_MAX;
+			} else {
+				currentVolume = currentVolume - VOL_DIFF;
+			}
+			writeVol(currentVolume);
+		} else if(currentButtonState & BOTTOM_BUTTON) {/// down button pressed
+			// decrease volume to a limit of AC97_VOL_MIN
+			if((currentVolume + VOL_DIFF) > AC97_VOL_MIN) {
+				currentVolume = AC97_VOL_MIN;
+			} else {
+				currentVolume = currentVolume + VOL_DIFF;
+			}
+			writeVol(currentVolume);
+		}
+	}
+	XGpio_InterruptClear(&gpPB, 0xFFFFFFFF); //acknowledge interrupt
+	XGpio_InterruptGlobalEnable(&gpPB); //re-enable interrupts
+}
+
+void sound_interrupt_handler() {
+	/*
+	if(saucerFlag()) {
+		add saucer info
+		inc saucer it
+	} else if (tankFireFlag() | tankFireIt != 0) {
+
+	} else if (tankDeathFlag() | tankDeathIt != 0) {
+
+	} else if (alienDeathFlag() | alienDeathIt != 0) {
+
+	} else if (alienMoveFlag() | alienMoveIt != 0) {
+
+	} else {
+
+	}
+	*/
+
+	u8 i;
+	/*for(i = 0; i < 100; i++) {
+		if(soundIt.saucerLow_it >= saucerLowNumSamples) {
+			soundIt.saucerLow_it = 0;
+		}
+		XAC97_mSetInFifoData(XPAR_AXI_AC97_0_BASEADDR, saucerLowSoundData[soundIt.saucerLow_it]);
+		soundIt.saucerLow_it++;
+	}*/
+}
+
+//Main interrupt handler, checks which peripheral fired
+//and dispatch accordingly
+
+
+void interrupt_handler_dispatcher(void* ptr) {
+	int intc_status = XIntc_GetIntrStatus(XPAR_INTC_0_BASEADDR);
+	//check FIT interrupt first
+	if(intc_status & XPAR_FIT_TIMER_0_INTERRUPT_MASK) {
+		XIntc_AckIntr(XPAR_INTC_0_BASEADDR, XPAR_FIT_TIMER_0_INTERRUPT_MASK);
+		timer_interrupt_handler();
+	}
+	//look for a button press afterwards
+	if(intc_status & XPAR_PUSH_BUTTONS_5BITS_IP2INTC_IRPT_MASK) {
+		pb_interrupt_handler();
+		XIntc_AckIntr(XPAR_INTC_0_BASEADDR, XPAR_PUSH_BUTTONS_5BITS_IP2INTC_IRPT_MASK);
+	}
+
+	if(intc_status & XPAR_AXI_AC97_0_INTERRUPT_MASK) {
+		XIntc_AckIntr(XPAR_INTC_0_BASEADDR, XPAR_AXI_AC97_0_INTERRUPT_MASK);
+		sound_interrupt_handler();
+	}
+}
+
+int main() {
+	init_platform();
+	initSound(); //initialize things
+
+    //initialize GPIO peripherals
+    int success;
+    success = XGpio_Initialize(&gpPB, XPAR_PUSH_BUTTONS_5BITS_DEVICE_ID);
+    //set push button peripheral to input
+    XGpio_SetDataDirection(&gpPB, 1, 0x0000001F);
+    //enable global GPIO interrupt for buttons
+    XGpio_InterruptGlobalEnable(&gpPB);
+    //enable all button interrupts
+    XGpio_InterruptEnable(&gpPB, 0xFFFFFFFF);
+
+    microblaze_register_handler(interrupt_handler_dispatcher, NULL);
+    XIntc_EnableIntr(XPAR_INTC_0_BASEADDR,
+   		 (XPAR_FIT_TIMER_0_INTERRUPT_MASK |
+   				 XPAR_PUSH_BUTTONS_5BITS_IP2INTC_IRPT_MASK |
+   				 XPAR_AXI_AC97_0_INTERRUPT_MASK));
+    XIntc_MasterEnable(XPAR_INTC_0_BASEADDR);
+    microblaze_enable_interrupts();
+
+	while(1) {
+		xil_printf("VideoDMA Did not initialize.\r\n");
+		/*
+		switch(alienMove) {
+		case 0:
+			playAudio(&alienMove1SoundData, &alienMove1SoundData + alienMove1NumSamples);
+			alienMove = 1;
+			break;
+		case 1:
+			playAudio(&alienMove2SoundData, &alienMove2SoundData + alienMove2NumSamples);
+			alienMove = 2;
+			break;
+		case 2:
+			playAudio(&alienMove3SoundData, &alienMove3SoundData + alienMove3NumSamples);
+			alienMove = 3;
+			break;
+		case 3:
+			playAudio(&alienMove4SoundData, &alienMove4SoundData + alienMove4NumSamples);
+			alienMove = 0;
+			break;
+		default:
+			break;
+		}
+		*/
+		//tankFire_sampleRate
+//		playAudio(&tankFireSoundRate, &tankFireSoundRate + tankFireSoundFrames);
+
+		playAudio(&tankFire_sampleRate, &tankFire_sampleRate + tankFire_length);
+
+		//playAudio(&alienMove1SoundData, &alienMove1SoundData + alienMove1NumSamples);
+		u16 i, j;
+		for(i = 0; i < 1000; i++) {
+			for(j = 0; j < 5000; j++) {
+				//delay
+			}
+		}
+	}
+	return 0;
+}

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <workbench progressCount="20" version="2.0">
 <workbenchAdvisor/>
-<window height="1160" width="1897" x="3" y="1">
+<window height="1160" width="1809" x="90" y="0">
 <fastViewData fastViewLocation="1024"/>
 <perspectiveBar>
 <itemSize x="160"/>
@@ -30,69 +30,29 @@
 <info part="DefaultEditorWorkbook">
 <folder appearance="1" expanded="2">
 <presentation id="org.eclipse.ui.presentations.WorkbenchPresentationFactory">
-<part id="1"/>
 <part id="0"/>
+<part id="1"/>
 <part id="2"/>
 <part id="3"/>
-<part id="4"/>
-<part id="5"/>
-<part id="10"/>
-<part id="6"/>
-<part id="7"/>
-<part id="8"/>
-<part id="9"/>
-<part id="11"/>
 </presentation>
 </folder>
 </info>
 </editorArea>
-<editor id="org.eclipse.cdt.ui.editor.CEditor" name="draw.h" partName="draw.h" path="C:/Users/superman/Documents/GitHub/KellyAndHailey/SpaceInvadersWorkspacePart2/hello_world_0/src/draw.h" title="draw.h" tooltip="hello_world_0/src/draw.h" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/hello_world_0/src/draw.h"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="844" selectionTopPixel="218"/>
+<editor id="org.eclipse.cdt.ui.editor.CEditor" name="score_keeping.h" partName="score_keeping.h" path="C:/Users/superman/Documents/GitHub/KellyAndHailey/SpaceInvadersWorkspacePart2/hello_world_0/src/score_keeping.h" title="score_keeping.h" tooltip="hello_world_0/src/score_keeping.h" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/hello_world_0/src/score_keeping.h"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="1262" selectionTopPixel="133"/>
 </editor>
-<editor id="org.eclipse.cdt.ui.editor.CEditor" name="images.h" partName="images.h" path="C:/Users/superman/Documents/GitHub/KellyAndHailey/SpaceInvadersWorkspacePart2/hello_world_0/src/images.h" title="images.h" tooltip="hello_world_0/src/images.h" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/hello_world_0/src/images.h"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="15703" selectionTopPixel="138"/>
-</editor>
-<editor id="org.eclipse.cdt.ui.editor.CEditor" name="main_space_invaders.c" partName="main_space_invaders.c" path="C:/Users/superman/Documents/GitHub/KellyAndHailey/SpaceInvadersWorkspacePart2/hello_world_0/src/main_space_invaders.c" title="main_space_invaders.c" tooltip="hello_world_0/src/main_space_invaders.c" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/hello_world_0/src/main_space_invaders.c"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="496" selectionTopPixel="1889"/>
+<editor id="org.eclipse.cdt.ui.editor.CEditor" name="score_keeping.c" partName="score_keeping.c" path="C:/Users/superman/Documents/GitHub/KellyAndHailey/SpaceInvadersWorkspacePart2/hello_world_0/src/score_keeping.c" title="score_keeping.c" tooltip="hello_world_0/src/score_keeping.c" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/hello_world_0/src/score_keeping.c"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="0" selectionTopPixel="0"/>
 </editor>
 <editor id="org.eclipse.cdt.ui.editor.CEditor" name="game.c" partName="game.c" path="C:/Users/superman/Documents/GitHub/KellyAndHailey/SpaceInvadersWorkspacePart2/hello_world_0/src/game.c" title="game.c" tooltip="hello_world_0/src/game.c" workbook="DefaultEditorWorkbook">
 <input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/hello_world_0/src/game.c"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="205" selectionTopPixel="5559"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="0" selectionTopPixel="0"/>
 </editor>
-<editor id="org.eclipse.cdt.ui.editor.CEditor" name="draw_saucer.h" partName="draw_saucer.h" path="C:/Users/superman/Documents/GitHub/KellyAndHailey/SpaceInvadersWorkspacePart2/hello_world_0/src/draw_saucer.h" title="draw_saucer.h" tooltip="hello_world_0/src/draw_saucer.h" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/hello_world_0/src/draw_saucer.h"/>
-<editorState selectionHorizontalPixel="0" selectionLength="17" selectionOffset="345" selectionTopPixel="0"/>
-</editor>
-<editor id="org.eclipse.cdt.ui.editor.CEditor" name="draw_aliens.h" partName="draw_aliens.h" path="C:/Users/superman/Documents/GitHub/KellyAndHailey/SpaceInvadersWorkspacePart2/hello_world_0/src/draw_aliens.h" title="draw_aliens.h" tooltip="hello_world_0/src/draw_aliens.h" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/hello_world_0/src/draw_aliens.h"/>
-<editorState selectionHorizontalPixel="0" selectionLength="23" selectionOffset="1006" selectionTopPixel="167"/>
-</editor>
-<editor id="org.eclipse.cdt.ui.editor.CEditor" name="score_keeping.h" partName="score_keeping.h" path="C:/Users/superman/Documents/GitHub/KellyAndHailey/SpaceInvadersWorkspacePart2/hello_world_0/src/score_keeping.h" title="score_keeping.h" tooltip="hello_world_0/src/score_keeping.h" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/hello_world_0/src/score_keeping.h"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="368" selectionTopPixel="0"/>
-</editor>
-<editor id="org.eclipse.cdt.ui.editor.CEditor" name="draw_bunker.h" partName="draw_bunker.h" path="C:/Users/superman/Documents/GitHub/KellyAndHailey/SpaceInvadersWorkspacePart2/hello_world_0/src/draw_bunker.h" title="draw_bunker.h" tooltip="hello_world_0/src/draw_bunker.h" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/hello_world_0/src/draw_bunker.h"/>
-<editorState selectionHorizontalPixel="0" selectionLength="22" selectionOffset="605" selectionTopPixel="0"/>
-</editor>
-<editor id="org.eclipse.cdt.ui.editor.CEditor" name="draw_tank_bullet.h" partName="draw_tank_bullet.h" path="C:/Users/superman/Documents/GitHub/KellyAndHailey/SpaceInvadersWorkspacePart2/hello_world_0/src/draw_tank_bullet.h" title="draw_tank_bullet.h" tooltip="hello_world_0/src/draw_tank_bullet.h" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/hello_world_0/src/draw_tank_bullet.h"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="172" selectionTopPixel="0"/>
-</editor>
-<editor id="org.eclipse.cdt.ui.editor.CEditor" name="draw_alien_bullet.h" partName="draw_alien_bullet.h" path="C:/Users/superman/Documents/GitHub/KellyAndHailey/SpaceInvadersWorkspacePart2/hello_world_0/src/draw_alien_bullet.h" title="draw_alien_bullet.h" tooltip="hello_world_0/src/draw_alien_bullet.h" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/hello_world_0/src/draw_alien_bullet.h"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="915" selectionTopPixel="0"/>
-</editor>
-<editor activePart="true" focus="true" id="org.eclipse.cdt.ui.editor.CEditor" name="draw_aliens.c" partName="draw_aliens.c" path="C:/Users/superman/Documents/GitHub/KellyAndHailey/SpaceInvadersWorkspacePart2/hello_world_0/src/draw_aliens.c" title="draw_aliens.c" tooltip="hello_world_0/src/draw_aliens.c" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/hello_world_0/src/draw_aliens.c"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="9727" selectionTopPixel="3832"/>
-</editor>
-<editor id="org.eclipse.cdt.ui.editor.CEditor" name="draw.c" partName="draw.c" path="C:/Users/superman/Documents/GitHub/KellyAndHailey/SpaceInvadersWorkspacePart2/hello_world_0/src/draw.c" title="draw.c" tooltip="hello_world_0/src/draw.c" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/hello_world_0/src/draw.c"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="0" selectionTopPixel="167"/>
+<editor activePart="true" focus="true" id="org.eclipse.cdt.ui.editor.CEditor" name="game.h" partName="game.h" path="C:/Users/superman/Documents/GitHub/KellyAndHailey/SpaceInvadersWorkspacePart2/hello_world_0/src/game.h" title="game.h" tooltip="hello_world_0/src/game.h" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/hello_world_0/src/game.h"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="0" selectionTopPixel="0"/>
 </editor>
 </editors>
 <views>
@@ -103,14 +63,20 @@
 <viewState/>
 </view>
 <view id="org.eclipse.cdt.make.ui.views.MakeView" partName="Make Target"/>
+<view id="org.eclipse.search.ui.views.SearchView" partName="Search">
+<viewState isPinned="false">
+<view IMemento.internal.id="" org.eclipse.search.lastActivation="0"/>
+<view IMemento.internal.id="org.eclipse.cdt.ui.pdomSearchViewPage" definitionColumnWidth="150" locationColumnWidth="300" matchColumnWidth="300" org.eclipse.search.lastActivation="1" org.eclipse.search.resultpage.layout="2" showEnclosingDefinitions="true"/>
+</viewState>
+</view>
 <view id="org.eclipse.tm.terminal.view.TerminalView" partName="Terminal 1">
 <viewState Title="Terminal 1" _keys_="Title,connectionManageractive,connectionManagerconnection0HasCommandInputField,connectionManagerconnection0PartName,connectionManagersize" connectionManageractive="connection0" connectionManagerconnection0HasCommandInputField="false" connectionManagerconnection0PartName="Terminal 1" connectionManagersize="1"/>
 </view>
 <view id="org.eclipse.ui.views.ProblemView" partName="Problems">
 <viewState PRIMARY_SORT_FIELD="org.eclipse.ui.ide.severityAndDescriptionField" categoryGroup="org.eclipse.ui.ide.severity" markerContentGenerator="org.eclipse.ui.ide.problemsGenerator" partName="Problems">
-<expanded>
-<category IMemento.internal.id="Warnings"/>
+<expanded>&#x0A;<category IMemento.internal.id="Warnings (4 items)"/>
 <category IMemento.internal.id="Errors"/>
+<category IMemento.internal.id="Warnings"/>
 </expanded>
 <columnWidths org.eclipse.ui.ide.locationField="0" org.eclipse.ui.ide.markerType="0" org.eclipse.ui.ide.pathField="0" org.eclipse.ui.ide.resourceField="0" org.eclipse.ui.ide.severityAndDescriptionField="0"/>
 <visible IMemento.internal.id="org.eclipse.ui.ide.severityAndDescriptionField"/>
@@ -193,6 +159,7 @@
 <view id="org.eclipse.ui.console.ConsoleView"/>
 <view id="org.eclipse.ui.views.PropertySheet"/>
 <view id="org.eclipse.tm.terminal.view.TerminalView"/>
+<view id="org.eclipse.search.ui.views.SearchView"/>
 <view id="org.eclipse.ui.views.ContentOutline"/>
 <view id="org.eclipse.cdt.make.ui.views.MakeView"/>
 <fastViewBars/>
@@ -225,12 +192,14 @@
 <page content="org.eclipse.ui.console.ConsoleView" label="Console"/>
 <page content="org.eclipse.ui.views.PropertySheet" label="Properties"/>
 <page content="org.eclipse.tm.terminal.view.TerminalView" label="Terminal 1"/>
+<page content="org.eclipse.search.ui.views.SearchView" label="Search"/>
 <presentation id="org.eclipse.ui.presentations.WorkbenchPresentationFactory">
 <part id="0"/>
 <part id="1"/>
 <part id="2"/>
 <part id="3"/>
 <part id="4"/>
+<part id="5"/>
 </presentation>
 </folder>
 </info>
@@ -251,167 +220,177 @@
 <workingSets/>
 <navigationHistory>
 <editors>
-<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/hello_world_0/src/draw.c"/>
-<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/hello_world_0/src/draw_bunker.c"/>
-<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/hello_world_0/src/draw_tank_bullet.c"/>
 <editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/hello_world_0/src/draw.h"/>
-<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/hello_world_0/src/game.c"/>
-<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/hello_world_0/src/draw_alien_bullet.h"/>
-<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/hello_world_0/src/draw_alien_bullet.c"/>
-<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/hello_world_0/src/game.h"/>
-<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/hello_world_0/src/draw_aliens.c"/>
-<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/hello_world_0/src/draw_aliens.h"/>
 <editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/hello_world_0/src/images.h"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/hello_world_0/src/draw_aliens.c"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/hello_world_0/src/draw_bunker.c"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/hello_world_0/src/draw_alien_bullet.c"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/hello_world_0/src/draw_alien_bullet.h"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/hello_world_0/src/game.c"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/hello_world_0/src/score_keeping.h"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/hello_world_0/src/draw_tank.h"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/hello_world_0/src/draw_tank.c"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/hello_world_0/src/images.c"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/hello_world_0/src/draw.c"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/hello_world_0/src/draw_aliens.h"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/hello_world_0/src/draw_bunker.h"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/hello_world_0/src/draw_saucer.c"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/hello_world_0/src/draw_saucer.h"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/hello_world_0/src/draw_tank_bullet.c"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/hello_world_0/src/draw_tank_bullet.h"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/hello_world_0/src/score_keeping.c"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/hello_world_0/src/game.c"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/hello_world_0/src/game.h"/>
 </editors>
-<item historyLabel="draw_tank_bullet.c" index="2">
-<position info="not_deleted" x="6936" y="0"/>
+<item historyLabel="game.c" index="6">
+<position info="not_deleted" x="16613" y="0"/>
 </item>
-<item historyLabel="game.c" index="4">
-<position info="not_deleted" x="310" y="0"/>
+<item historyLabel="game.c" index="6">
+<position info="not_deleted" x="11762" y="0"/>
 </item>
-<item historyLabel="game.c" index="4">
-<position info="not_deleted" x="7556" y="0"/>
+<item historyLabel="images.h" index="1">
+<position info="not_deleted" x="26132" y="0"/>
 </item>
-<item historyLabel="game.c" index="4">
-<position info="not_deleted" x="12913" y="0"/>
-</item>
-<item historyLabel="draw.c" index="0">
+<item historyLabel="score_keeping.h" index="7">
 <position/>
 </item>
-<item historyLabel="draw_alien_bullet.h" index="5">
+<item historyLabel="game.c" index="6">
+<position info="not_deleted" x="11762" y="0"/>
+</item>
+<item historyLabel="draw_tank.h" index="8">
 <position info="not_deleted" x="0" y="0"/>
 </item>
-<item historyLabel="draw_alien_bullet.c" index="6">
-<position info="not_deleted" x="0" y="0"/>
-</item>
-<item historyLabel="draw.c" index="0">
+<item historyLabel="draw_tank.c" index="9">
 <position/>
 </item>
-<item historyLabel="draw.h" index="3">
-<position info="not_deleted" x="1953" y="0"/>
+<item historyLabel="draw_tank.h" index="8">
+<position info="not_deleted" x="800" y="0"/>
 </item>
-<item historyLabel="draw_alien_bullet.h" index="5">
-<position info="not_deleted" x="915" y="0"/>
+<item historyLabel="draw_tank.c" index="9">
+<position/>
 </item>
-<item historyLabel="draw.c" index="0">
-<position info="not_deleted" x="642" y="0"/>
+<item historyLabel="game.c" index="6">
+<position info="not_deleted" x="11762" y="0"/>
 </item>
-<item historyLabel="draw_alien_bullet.c" index="6">
-<position info="not_deleted" x="114" y="0"/>
+<item historyLabel="game.c" index="6">
+<position info="not_deleted" x="14417" y="0"/>
 </item>
-<item historyLabel="draw_alien_bullet.h" index="5">
-<position info="not_deleted" x="915" y="0"/>
+<item historyLabel="game.c" index="6">
+<position info="not_deleted" x="14687" y="0"/>
 </item>
-<item historyLabel="draw_alien_bullet.c" index="6">
-<position info="not_deleted" x="114" y="0"/>
-</item>
-<item historyLabel="draw_alien_bullet.c" index="6">
-<position info="not_deleted" x="170" y="0"/>
-</item>
-<item historyLabel="draw_bunker.c" index="1">
-<position info="not_deleted" x="1857" y="36"/>
-</item>
-<item historyLabel="draw_alien_bullet.c" index="6">
-<position info="not_deleted" x="193" y="0"/>
-</item>
-<item historyLabel="draw.c" index="0">
-<position info="not_deleted" x="371" y="0"/>
-</item>
-<item historyLabel="draw.h" index="3">
-<position info="not_deleted" x="844" y="0"/>
-</item>
-<item historyLabel="draw_alien_bullet.c" index="6">
-<position info="not_deleted" x="193" y="0"/>
-</item>
-<item historyLabel="draw_alien_bullet.c" index="6">
-<position info="not_deleted" x="219" y="0"/>
-</item>
-<item historyLabel="draw.c" index="0">
-<position info="not_deleted" x="371" y="0"/>
-</item>
-<item historyLabel="draw_alien_bullet.c" index="6">
-<position info="not_deleted" x="22847" y="25"/>
-</item>
-<item historyLabel="game.c" index="4">
-<position info="not_deleted" x="373" y="0"/>
-</item>
-<item historyLabel="draw.c" index="0">
-<position info="not_deleted" x="371" y="0"/>
-</item>
-<item historyLabel="draw_alien_bullet.c" index="6">
-<position info="not_deleted" x="22847" y="25"/>
-</item>
-<item historyLabel="draw_bunker.c" index="1">
-<position info="not_deleted" x="1857" y="36"/>
-</item>
-<item historyLabel="draw_tank_bullet.c" index="2">
-<position info="not_deleted" x="6936" y="0"/>
-</item>
-<item historyLabel="draw_bunker.c" index="1">
-<position info="not_deleted" x="1857" y="36"/>
-</item>
-<item historyLabel="draw.c" index="0">
-<position info="not_deleted" x="371" y="0"/>
-</item>
-<item historyLabel="game.c" index="4">
-<position info="not_deleted" x="373" y="0"/>
-</item>
-<item historyLabel="game.h" index="7">
-<position info="not_deleted" x="169" y="0"/>
-</item>
-<item historyLabel="game.c" index="4">
-<position info="not_deleted" x="205" y="0"/>
-</item>
-<item historyLabel="draw.c" index="0">
-<position info="not_deleted" x="371" y="0"/>
-</item>
-<item historyLabel="game.c" index="4">
-<position info="not_deleted" x="205" y="0"/>
-</item>
-<item historyLabel="draw_aliens.c" index="8">
-<position info="not_deleted" x="14439" y="0"/>
-</item>
-<item historyLabel="draw_aliens.h" index="9">
-<position info="not_deleted" x="740" y="0"/>
-</item>
-<item historyLabel="draw_aliens.c" index="8">
-<position info="not_deleted" x="14514" y="0"/>
-</item>
-<item historyLabel="draw_aliens.h" index="9">
-<position info="not_deleted" x="1006" y="23"/>
-</item>
-<item historyLabel="draw_aliens.c" index="8">
-<position info="not_deleted" x="507" y="17"/>
-</item>
-<item historyLabel="draw.c" index="0">
+<item historyLabel="images.c" index="10">
 <position info="not_deleted" x="0" y="0"/>
 </item>
-<item historyLabel="draw_aliens.c" index="8">
-<position info="not_deleted" x="627" y="0"/>
+<item historyLabel="game.c" index="6">
+<position info="not_deleted" x="14687" y="0"/>
 </item>
-<item historyLabel="images.h" index="10">
-<position info="not_deleted" x="584" y="0"/>
+<item historyLabel="images.h" index="1">
+<position info="not_deleted" x="25596" y="0"/>
 </item>
-<item historyLabel="draw_aliens.c" index="8">
-<position info="not_deleted" x="14577" y="0"/>
+<item historyLabel="draw.c" index="11">
+<position info="not_deleted" x="3327" y="0"/>
 </item>
-<item historyLabel="images.h" index="10">
-<position info="not_deleted" x="1310" y="0"/>
+<item historyLabel="images.h" index="1">
+<position info="not_deleted" x="25596" y="0"/>
 </item>
-<item historyLabel="draw_aliens.c" index="8">
-<position info="not_deleted" x="18565" y="0"/>
+<item historyLabel="draw.h" index="0">
+<position info="not_deleted" x="2151" y="0"/>
 </item>
-<item historyLabel="images.h" index="10">
-<position info="not_deleted" x="14085" y="15"/>
+<item historyLabel="images.h" index="1">
+<position info="not_deleted" x="25596" y="0"/>
 </item>
-<item historyLabel="draw_aliens.c" index="8">
-<position info="not_deleted" x="9961" y="0"/>
+<item historyLabel="draw_alien_bullet.c" index="4">
+<position info="not_deleted" x="1980" y="0"/>
 </item>
-<item historyLabel="images.h" index="10">
-<position info="not_deleted" x="15703" y="0"/>
+<item historyLabel="images.h" index="1">
+<position info="not_deleted" x="25596" y="0"/>
 </item>
-<item active="true" historyLabel="draw_aliens.c" index="8">
-<position info="not_deleted" x="9961" y="0"/>
+<item historyLabel="draw_alien_bullet.h" index="5">
+<position info="not_deleted" x="1295" y="0"/>
+</item>
+<item historyLabel="images.h" index="1">
+<position info="not_deleted" x="25596" y="0"/>
+</item>
+<item historyLabel="draw_aliens.c" index="2">
+<position info="not_deleted" x="21865" y="0"/>
+</item>
+<item historyLabel="images.h" index="1">
+<position info="not_deleted" x="25596" y="0"/>
+</item>
+<item historyLabel="draw_aliens.h" index="12">
+<position info="not_deleted" x="1781" y="0"/>
+</item>
+<item historyLabel="images.h" index="1">
+<position info="not_deleted" x="25596" y="0"/>
+</item>
+<item historyLabel="draw_bunker.c" index="3">
+<position info="not_deleted" x="11978" y="0"/>
+</item>
+<item historyLabel="images.h" index="1">
+<position info="not_deleted" x="25596" y="0"/>
+</item>
+<item historyLabel="draw_bunker.h" index="13">
+<position info="not_deleted" x="1637" y="0"/>
+</item>
+<item historyLabel="images.h" index="1">
+<position info="not_deleted" x="25596" y="0"/>
+</item>
+<item historyLabel="draw_saucer.c" index="14">
+<position info="not_deleted" x="8143" y="0"/>
+</item>
+<item historyLabel="images.h" index="1">
+<position info="not_deleted" x="25596" y="0"/>
+</item>
+<item historyLabel="draw_saucer.h" index="15">
+<position info="not_deleted" x="973" y="0"/>
+</item>
+<item historyLabel="images.h" index="1">
+<position info="not_deleted" x="25596" y="0"/>
+</item>
+<item historyLabel="draw_tank.c" index="9">
+<position info="not_deleted" x="6117" y="0"/>
+</item>
+<item historyLabel="game.c" index="6">
+<position info="not_deleted" x="13915" y="20"/>
+</item>
+<item historyLabel="draw_tank.c" index="9">
+<position info="not_deleted" x="5451" y="0"/>
+</item>
+<item historyLabel="game.c" index="6">
+<position info="not_deleted" x="13915" y="20"/>
+</item>
+<item historyLabel="draw_tank_bullet.c" index="16">
+<position info="not_deleted" x="6844" y="0"/>
+</item>
+<item historyLabel="game.c" index="6">
+<position info="not_deleted" x="13915" y="20"/>
+</item>
+<item historyLabel="draw_tank_bullet.h" index="17">
+<position info="not_deleted" x="150" y="2"/>
+</item>
+<item historyLabel="game.c" index="6">
+<position info="not_deleted" x="13915" y="20"/>
+</item>
+<item historyLabel="images.h" index="1">
+<position info="not_deleted" x="67354" y="0"/>
+</item>
+<item historyLabel="game.c" index="6">
+<position info="not_deleted" x="13915" y="20"/>
+</item>
+<item historyLabel="score_keeping.h" index="7">
+<position/>
+</item>
+<item historyLabel="score_keeping.c" index="18">
+<position info="not_deleted" x="0" y="0"/>
+</item>
+<item historyLabel="score_keeping.h" index="7">
+<position/>
+</item>
+<item historyLabel="game.c" index="19">
+<position info="not_deleted" x="0" y="0"/>
+</item>
+<item active="true" historyLabel="game.h" index="20">
+<position info="not_deleted" x="0" y="0"/>
 </item>
 </navigationHistory>
 <input factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/" type="8"/>
@@ -419,12 +398,6 @@
 <workbenchWindowAdvisor/>
 <actionBarAdvisor/>
 <trimLayout>
-<trimArea IMemento.internal.id="16384">
-<trimItem IMemento.internal.id="topLeft"/>
-</trimArea>
-<trimArea IMemento.internal.id="131072">
-<trimItem IMemento.internal.id="topRight"/>
-</trimArea>
 <trimArea IMemento.internal.id="128">
 <trimItem IMemento.internal.id="org.eclipse.ui.internal.WorkbenchWindow.topBar"/>
 </trimArea>
@@ -432,55 +405,54 @@
 <trimItem IMemento.internal.id="org.eclise.ui.internal.FastViewBar"/>
 <trimItem IMemento.internal.id="org.eclipse.jface.action.StatusLineManager"/>
 <trimItem IMemento.internal.id="org.eclipse.ui.internal.progress.ProgressRegion"/>
-<trimItem IMemento.internal.id="bottom"/>
 </trimArea>
 </trimLayout>
 </window>
 <mruList>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="draw.c" tooltip="hello_world_0/src/draw.c">
-<persistable path="/hello_world_0/src/draw.c"/>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="game.h" tooltip="hello_world_0/src/game.h">
+<persistable path="/hello_world_0/src/game.h"/>
 </file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="draw_aliens.c" tooltip="hello_world_0/src/draw_aliens.c">
-<persistable path="/hello_world_0/src/draw_aliens.c"/>
-</file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="draw_alien_bullet.c" tooltip="hello_world_0/src/draw_alien_bullet.c">
-<persistable path="/hello_world_0/src/draw_alien_bullet.c"/>
-</file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="draw_alien_bullet.h" tooltip="hello_world_0/src/draw_alien_bullet.h">
-<persistable path="/hello_world_0/src/draw_alien_bullet.h"/>
-</file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="draw_tank.h" tooltip="hello_world_0/src/draw_tank.h">
-<persistable path="/hello_world_0/src/draw_tank.h"/>
-</file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="draw_tank.c" tooltip="hello_world_0/src/draw_tank.c">
-<persistable path="/hello_world_0/src/draw_tank.c"/>
-</file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="draw_bunker.c" tooltip="hello_world_0/src/draw_bunker.c">
-<persistable path="/hello_world_0/src/draw_bunker.c"/>
-</file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="draw_tank_bullet.c" tooltip="hello_world_0/src/draw_tank_bullet.c">
-<persistable path="/hello_world_0/src/draw_tank_bullet.c"/>
-</file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="draw_tank_bullet.h" tooltip="hello_world_0/src/draw_tank_bullet.h">
-<persistable path="/hello_world_0/src/draw_tank_bullet.h"/>
-</file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="draw_bunker.h" tooltip="hello_world_0/src/draw_bunker.h">
-<persistable path="/hello_world_0/src/draw_bunker.h"/>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="game.c" tooltip="hello_world_0/src/game.c">
+<persistable path="/hello_world_0/src/game.c"/>
 </file>
 <file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="score_keeping.c" tooltip="hello_world_0/src/score_keeping.c">
 <persistable path="/hello_world_0/src/score_keeping.c"/>
 </file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="score_keeping.h" tooltip="hello_world_0/src/score_keeping.h">
-<persistable path="/hello_world_0/src/score_keeping.h"/>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="draw_tank_bullet.h" tooltip="hello_world_0/src/draw_tank_bullet.h">
+<persistable path="/hello_world_0/src/draw_tank_bullet.h"/>
+</file>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="draw_tank_bullet.c" tooltip="hello_world_0/src/draw_tank_bullet.c">
+<persistable path="/hello_world_0/src/draw_tank_bullet.c"/>
+</file>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="draw_saucer.h" tooltip="hello_world_0/src/draw_saucer.h">
+<persistable path="/hello_world_0/src/draw_saucer.h"/>
 </file>
 <file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="draw_saucer.c" tooltip="hello_world_0/src/draw_saucer.c">
 <persistable path="/hello_world_0/src/draw_saucer.c"/>
 </file>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="draw_bunker.h" tooltip="hello_world_0/src/draw_bunker.h">
+<persistable path="/hello_world_0/src/draw_bunker.h"/>
+</file>
 <file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="draw_aliens.h" tooltip="hello_world_0/src/draw_aliens.h">
 <persistable path="/hello_world_0/src/draw_aliens.h"/>
 </file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="aliens_draw.c" tooltip="hello_world_0/src/aliens_draw.c">
-<persistable path="/hello_world_0/src/aliens_draw.c"/>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="draw_aliens.c" tooltip="hello_world_0/src/draw_aliens.c">
+<persistable path="/hello_world_0/src/draw_aliens.c"/>
+</file>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="draw_alien_bullet.h" tooltip="hello_world_0/src/draw_alien_bullet.h">
+<persistable path="/hello_world_0/src/draw_alien_bullet.h"/>
+</file>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="draw_alien_bullet.c" tooltip="hello_world_0/src/draw_alien_bullet.c">
+<persistable path="/hello_world_0/src/draw_alien_bullet.c"/>
+</file>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="draw.h" tooltip="hello_world_0/src/draw.h">
+<persistable path="/hello_world_0/src/draw.h"/>
+</file>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="draw.c" tooltip="hello_world_0/src/draw.c">
+<persistable path="/hello_world_0/src/draw.c"/>
+</file>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="draw_tank.c" tooltip="hello_world_0/src/draw_tank.c">
+<persistable path="/hello_world_0/src/draw_tank.c"/>
 </file>
 </mruList>
 </workbench>
