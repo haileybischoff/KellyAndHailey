@@ -18,10 +18,11 @@ src/main_space_invaders.d src/main_space_invaders.o:  \
   ../../hello_world_bsp_0/microblaze_0/include/xparameters.h \
   ../../hello_world_bsp_0/microblaze_0/include/xgpio.h \
   ../../hello_world_bsp_0/microblaze_0/include/xgpio_l.h ../src/game.h \
-  ../src/draw.h ../src/alien_bullet_state_machine.h \
-  ../src/aliens_move_state_machine.h ../src/tank_bullet_state_machine.h \
-  ../src/tank_move_state_machine.h ../src/saucer_state_machine.h \
-  ../src/pit.h ../../hello_world_bsp_0/microblaze_0/include/xstatus.h \
+  ../src/draw.h ../src/draw_tank_bullet.h \
+  ../src/alien_bullet_state_machine.h ../src/aliens_move_state_machine.h \
+  ../src/tank_bullet_state_machine.h ../src/tank_move_state_machine.h \
+  ../src/saucer_state_machine.h ../src/pit.h \
+  ../../hello_world_bsp_0/microblaze_0/include/xstatus.h \
   ../../hello_world_bsp_0/microblaze_0/include/xil_io.h ../src/sound.h
 
 ../src/xac97_l.h:
@@ -67,6 +68,8 @@ src/main_space_invaders.d src/main_space_invaders.o:  \
 ../src/game.h:
 
 ../src/draw.h:
+
+../src/draw_tank_bullet.h:
 
 ../src/alien_bullet_state_machine.h:
 

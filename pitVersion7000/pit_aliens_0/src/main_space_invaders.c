@@ -20,6 +20,7 @@
 #include "xgpio.h"          // Provides access to PB GPIO driver.
 #include "game.h"
 #include "draw.h"
+#include "draw_tank_bullet.h"
 #include "alien_bullet_state_machine.h"
 #include "aliens_move_state_machine.h"
 #include "tank_bullet_state_machine.h"
@@ -43,6 +44,8 @@
 
 bool debug = true;
 uint32_t currentButtonState = 0;
+
+uint32_t switches = 0;
 
 /***************** INTERRUPT HANDLER STUFF *****************************/
 XGpio gpPB;   // This is a handle for the push-button GPIO block.
@@ -220,13 +223,21 @@ int main()
 		}
 	 */
 	//}
+	uint32_t previousSwitches = 0;
 
 	while(1){  // Program never ends.
-		uint32_t switches = XIo_In32(XPAR_SWITCH_GPIO_0_BASEADDR);
+		switches = XIo_In32(XPAR_SWITCH_GPIO_0_BASEADDR);
+		if(switches != previousSwitches){
+			previousSwitches = switches;
+			setBulletType();
+		}
+
+
+		//uint32_t switches = XIo_In32(XPAR_SWITCH_GPIO_0_BASEADDR);
 
 		//xil_printf("this is the value for switches: %d\n\r", switches);
 
-/*
+		/*
 		uint32_t temp_int = 0;
 		char temp_char = getchar();
 		while(temp_char != '\r'){
@@ -236,7 +247,7 @@ int main()
 		}
 		xil_printf("number is: %d\n\r", temp_int);
 		PIT_mWriteSlaveReg1 (XPAR_PIT_0_BASEADDR, temp_int);	// 10x a second
-		*/
+		 */
 		/*
 		char input = getchar();
 		if(debug) xil_printf("input is: %d\n\r", input);
@@ -285,7 +296,7 @@ int main()
 			if(debug) xil_printf("you have not selected a number\n\r");
 			break;
 		}
-		*/
+		 */
 	}
 
 	cleanup_platform();

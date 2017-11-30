@@ -61,12 +61,14 @@ void saucerAction_tick(){
 
 	switch(saucer_currentState){
 	case init_st:
+		//xil_printf("we are in the saucer init state\n\r");
 		drawSaucerFlag = false; //Saucer flag set to false
 		saucerMoveCounter = RESET; //Saucer counter initialized to 0
 		saucerRandValueCounter = RESET; // Reset this random value saucer counter.
 		saucerRandValueMax = RESET; //TODO initialize to rand() % x
 		break;
 	case idle_st:
+		//xil_printf("we are in the saucer idle state\n\r");
 		if(drawSaucerScoreFlag){
 			saucerScoreFlashCounter++;
 		}
@@ -83,9 +85,11 @@ void saucerAction_tick(){
 		}
 		break;
 	case saucer_shot_st:
+		//xil_printf("we are in the saucer shot state\n\r");
 		setSaucerGotShot(false);
 		break;
 	case dead_saucer_st:
+		//xil_printf("we are in the dead saucer state\n\r");
 		if(didTankKillSaucer()){
 			computeScore(SAUCER_NUMBER);
 			drawScore();
@@ -96,6 +100,7 @@ void saucerAction_tick(){
 		}
 		break;
 	case flash_saucer_score_st:
+		//xil_printf("we are in the saucer flash score state\n\r");
 		if(eraseSaucerScoreFlag){
 			eraseSaucerScore();
 			numberOfFlashes++;
@@ -107,6 +112,7 @@ void saucerAction_tick(){
 		}
 		break;
 	case draw_saucer_st:
+		//xil_printf("we are in the draw saucer state\n\r");
 		isSaucerDrawn = drawSaucer();
 		if(!isSaucerDrawn){
 			sound_saucer_stop();
@@ -137,7 +143,7 @@ void saucerAction_tick(){
 			saucerMoveCounter = RESET;
 			saucer_currentState = draw_saucer_st;
 		}
-		if(getGameOverStatus()){
+		else if(getGameOverStatus()){
 			xil_printf("The game is over\n\r");
 			saucer_currentState = game_over_st;
 		}

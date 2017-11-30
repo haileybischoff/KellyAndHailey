@@ -308,7 +308,7 @@ void eraseAllAliens(){ //Erase all of the aliens
 	}
 }
 
-void eraseAlien(uint16_t x_position, uint16_t y_position, uint8_t alien_type){ //Erase the alien
+void eraseAlien(uint16_t x_position, uint16_t y_position){ //, uint8_t alien_type){ //Erase the alien
 	uint8_t line, pixel;
 	for(line = 0; line < ALIEN_HEIGHT; line++){ //Height
 		for(pixel = 0; pixel < ALIEN_WORD_WIDTH; pixel++){ //Width
@@ -571,7 +571,7 @@ void drawAlienBlock(){ //Draw alien block
 			drawAlien(alien_x_position, alien_y_position, alien_type);
 		}
 		else{
-			eraseAlien(alien_x_position, alien_y_position, alien_type); //Erase what ever is in that square
+			eraseAlien(alien_x_position, alien_y_position);//, alien_type); //Erase what ever is in that square
 		}
 	}
 	if(erase_top_row_flag){ //We need to erase the top row

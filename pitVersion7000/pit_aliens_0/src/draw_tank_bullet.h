@@ -12,6 +12,14 @@
 #include <stdbool.h>
 #include "draw.h"
 
+#define SCORE_0 10
+#define SCORE_1 20
+#define SCORE_2 30
+#define SCORE_3 40
+#define SCORE_4 50
+#define SCORE_5 110
+#define SCORE_6 200
+
 void setTankBulletPosition(point_t val); // This sets the tank's bullet position.
 
 point_t getTankBulletPosition(); // This gets the tank's bullet position.
@@ -19,6 +27,8 @@ point_t getTankBulletPosition(); // This gets the tank's bullet position.
 uint8_t getBulletDrawn(); //Get the bullet drawn
 
 void eraseTheTankBullet(); //Erase the tank bullet
+
+bool getFreezeAliens();
 
 void drawTankBullet(); // This draws the tank's bullet.
 
@@ -33,6 +43,8 @@ void drawTankLaserBullet(); // This draws the tank's bullet.
 void setTankLaserBullet(bool value);
 
 bool getTankLaserBullet();
+
+void setBulletType();
 
 bool getRogueAlienBullet();
 

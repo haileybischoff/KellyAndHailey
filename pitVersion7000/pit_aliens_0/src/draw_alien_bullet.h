@@ -19,7 +19,7 @@ void setRogueBullet(bool value);
 
 bool getRogueBullet();
 
-void setRogueAlienNumber(point_t value);
+void setRogueAlienNumber(uint8_t value);
 
 uint8_t getRogueAlienNumber();
 

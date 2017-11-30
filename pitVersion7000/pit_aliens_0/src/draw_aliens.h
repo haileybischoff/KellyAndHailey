@@ -34,6 +34,8 @@ bool didTankKillAlien(); //Set if tank killed an alien
 
 void setDeadAlienPosition(point_t deadAlienPosition); //Set the position of the dead alien
 
+void eraseAlien(uint16_t x_position, uint16_t y_position); //, uint8_t alien_type);
+
 void eraseAllAliens(); //Erase all of the aliens
 
 point_t getDeadAlienPosition(); //Get the position of the dead alien

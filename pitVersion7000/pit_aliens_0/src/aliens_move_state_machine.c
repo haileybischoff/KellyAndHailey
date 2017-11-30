@@ -58,6 +58,9 @@ void AlienInvaders_tick(){
 		alien_currentState = alien_idle_st;
 		break;
 	case alien_idle_st:
+		if(getFreezeAliens()){
+			alien_currentState = game_over_st;
+		}
 		if(cantGoLower()){
 			setGameOverStatus(true);
 			clearScreen();

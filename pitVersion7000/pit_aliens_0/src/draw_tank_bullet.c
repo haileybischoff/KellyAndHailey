@@ -23,7 +23,28 @@
 #define THREE_EROSION_PATTERNS 3
 #define COLOR_CHOICES 10
 
-static bool fun_bullets = true;
+#define SWITCH_0 128
+#define SWITCH_1 64
+#define SWITCH_2 32
+#define SWITCH_3 16
+#define SWITCH_4 8
+#define SWITCH_5 4
+#define SWITCH_6 2
+#define SWITCH_7 1
+
+extern uint32_t switches;
+
+static uint32_t point_threshold = 0;
+
+static bool score_0_firstPass = true;
+static bool score_1_firstPass = true;
+static bool score_2_firstPass = true;
+static bool score_3_firstPass = true;
+static bool score_4_firstPass = true;
+static bool score_5_firstPass = true;
+static bool score_6_firstPass = true;
+
+static bool fun_bullets = false;
 
 bool getFunBulletStatus(){
 	return fun_bullets;
@@ -45,7 +66,9 @@ static bool tank_Laser_Bullet = false;
 
 static bool tank_Explosion_Bullet = false;
 
-static bool tank_multiple_bullet = false;
+static bool tank_multiple_bullet = false; //TODO ERASE
+
+static bool freeze_aliens = false;
 
 static bool tank_Guided_Bullet = false;
 
@@ -53,10 +76,18 @@ static bool tank_Color_Bullet = false;//TODO
 
 static bool colorAliens = false;
 
-static bool rogueAlienBullet = true;
+static bool rogueAlienBullet = false;
+
+bool getFreezeAliens(){
+	return freeze_aliens;
+}
+
+void setFreezeAliens(bool value){
+	freeze_aliens = true;
+}
 
 void setTankLaserBullet(bool value){
-	tank_Laser_Bullet = true;
+	tank_Laser_Bullet = value;
 }
 
 bool getTankMultipleBullets(){
@@ -99,16 +130,200 @@ void setRogueAlienBullet(bool value){
 	rogueAlienBullet = value;
 }
 
-/*
-TURQUOISE 0x0000f5ff
-PINK 0x00ffb5c5
-ORANGE 0x00ffa500
-LIME 0x00c0ff3e
-SKY 0x0087cefa
-GOLD 0x00ffd700
-PURPLE 0x00bf3eff
-BLUE 0x000000ff
- */
+
+void resetThresholdScoreFirstPass(){
+	score_0_firstPass = false;
+	score_1_firstPass = false;
+	score_2_firstPass = false;
+	score_3_firstPass = false;
+	score_4_firstPass = false;
+	score_5_firstPass = false;
+	score_6_firstPass = false;
+}
+
+void setBulletType(){
+	if(score_0_firstPass){
+		point_threshold += SCORE_0;
+		score_0_firstPass = false;
+	}
+
+	if(switches & SWITCH_7){
+		fun_bullets = true;
+		if(switches & SWITCH_0){
+			tank_Color_Bullet = true;
+			colorAliens = false;
+			tank_Guided_Bullet = false;
+			tank_Laser_Bullet = false;
+			rogueAlienBullet = false;
+			tank_Explosion_Bullet = false;
+			freeze_aliens = false;
+		}
+		else if(switches & SWITCH_1){
+			tank_Color_Bullet = true;
+			colorAliens = true;
+			tank_Guided_Bullet = false;
+			tank_Laser_Bullet = false;
+			rogueAlienBullet = false;
+			tank_Explosion_Bullet = false;
+			freeze_aliens = false;
+		}
+		else if(switches & SWITCH_2){
+			tank_Color_Bullet = false;
+			colorAliens = false;
+			tank_Guided_Bullet = true;
+			tank_Laser_Bullet = false;
+			rogueAlienBullet = false;
+			tank_Explosion_Bullet = false;
+			freeze_aliens = false;
+		}
+		else if(switches & SWITCH_3){
+			tank_Color_Bullet = false;
+			colorAliens = false;
+			tank_Guided_Bullet = false;
+			tank_Laser_Bullet = true;
+			rogueAlienBullet = false;
+			tank_Explosion_Bullet = false;
+			freeze_aliens = false;
+		}
+		else if(switches & SWITCH_4){
+			tank_Color_Bullet = false;
+			colorAliens = false;
+			tank_Guided_Bullet = false;
+			tank_Laser_Bullet = false;
+			rogueAlienBullet = true;
+			tank_Explosion_Bullet = false;
+			freeze_aliens = false;
+		}
+		else if(switches & SWITCH_5){
+			tank_Color_Bullet = false;
+			colorAliens = false;
+			tank_Guided_Bullet = false;
+			tank_Laser_Bullet = false;
+			rogueAlienBullet = false;
+			tank_Explosion_Bullet = true;
+			freeze_aliens = false;
+		}
+		else if(switches & SWITCH_6){
+			tank_Color_Bullet = false;
+			colorAliens = false;
+			tank_Guided_Bullet = false;
+			tank_Laser_Bullet = false;
+			rogueAlienBullet = false;
+			tank_Explosion_Bullet = false;
+			freeze_aliens = true;
+		}
+	}
+	else if((switches & SWITCH_0) && getScore() >= point_threshold){
+		fun_bullets = false;
+		tank_Color_Bullet = true;
+		colorAliens = false;
+		tank_Guided_Bullet = false;
+		tank_Laser_Bullet = false;
+		rogueAlienBullet = false;
+		tank_Explosion_Bullet = false;
+		freeze_aliens = false;
+	}
+	else if((switches & SWITCH_1) && getScore() >= point_threshold){
+		if(score_1_firstPass){
+			point_threshold += SCORE_1;
+			score_1_firstPass = false;
+		}
+		fun_bullets = false;
+		tank_Color_Bullet = true;
+		colorAliens = true;
+		tank_Guided_Bullet = false;
+		tank_Laser_Bullet = false;
+		rogueAlienBullet = false;
+		tank_Explosion_Bullet = false;
+		freeze_aliens = false;
+	}
+	else if((switches & SWITCH_2) && getScore() >= point_threshold){
+		if(score_2_firstPass){
+			point_threshold += SCORE_2;
+			score_2_firstPass = false;
+		}
+
+		fun_bullets = false;
+		tank_Color_Bullet = false;
+		colorAliens = false;
+		tank_Guided_Bullet = true;
+		tank_Laser_Bullet = false;
+		rogueAlienBullet = false;
+		tank_Explosion_Bullet = false;
+		freeze_aliens = false;
+	}
+	else if((switches & SWITCH_3) && getScore() >= point_threshold){
+		if(score_3_firstPass){
+			point_threshold += SCORE_3;
+			score_3_firstPass = false;
+		}
+
+		fun_bullets = false;
+		tank_Color_Bullet = false;
+		colorAliens = false;
+		tank_Guided_Bullet = false;
+		tank_Laser_Bullet = true;
+		rogueAlienBullet = false;
+		tank_Explosion_Bullet = false;
+		freeze_aliens = false;
+	}
+	else if((switches & SWITCH_4) && getScore() >= point_threshold){
+		if(score_4_firstPass){
+			point_threshold += SCORE_4;
+			score_4_firstPass = false;
+		}
+
+		fun_bullets = false;
+		tank_Color_Bullet = false;
+		colorAliens = false;
+		tank_Guided_Bullet = false;
+		tank_Laser_Bullet = false;
+		rogueAlienBullet = true;
+		tank_Explosion_Bullet = false;
+		freeze_aliens = false;
+	}
+	else if((switches & SWITCH_5) && getScore() >= point_threshold){
+		if(score_5_firstPass){
+			point_threshold += SCORE_5;
+			score_5_firstPass = false;
+		}
+
+		fun_bullets = false;
+		tank_Color_Bullet = false;
+		colorAliens = false;
+		tank_Guided_Bullet = false;
+		tank_Laser_Bullet = false;
+		rogueAlienBullet = false;
+		tank_Explosion_Bullet = true;
+		freeze_aliens = false;
+	}
+	else if((switches & SWITCH_6) && getScore() >= point_threshold){
+		if(score_6_firstPass){
+			point_threshold += SCORE_6;
+			score_6_firstPass = false;
+		}
+
+		fun_bullets = false;
+		tank_Color_Bullet = false;
+		colorAliens = false;
+		tank_Guided_Bullet = false;
+		tank_Laser_Bullet = false;
+		rogueAlienBullet = false;
+		tank_Explosion_Bullet = false;
+		freeze_aliens = true;
+	}
+	else{
+		fun_bullets = false;
+		tank_Color_Bullet = false;
+		colorAliens = false;
+		tank_Guided_Bullet = false;
+		tank_Laser_Bullet = false;
+		rogueAlienBullet = false;
+		tank_Explosion_Bullet = false;
+		freeze_aliens = false;
+	}
+}
+
 
 uint32_t previous_tank_bullet_color = RED;
 uint32_t tank_bullet_color = RED;
@@ -117,7 +332,7 @@ void setTankBulletColor(){
 	bool check = true;
 	if(tank_Color_Bullet){
 		if(getFunBulletStatus() == false){
-			check = decrementScore(5);
+			check = decrementScore(SCORE_0);
 			drawScore();
 		}
 		if(check){
@@ -218,13 +433,13 @@ void drawTankBullet(){
 			bool stop = false;
 			for(i = 0; !stop && i < 5; i++){
 				if(!getWhichBulletDrawn(i)){
-					xil_printf("we found an empty bullet %d\n\r", i);
+					//xil_printf("we found an empty bullet %d\n\r", i);
 					bullet_number = i;
 					stop = true;
 				}
 			}
 			if(bullet_number != 33){
-				xil_printf(" we have a real bullet number\n\r");
+				//xil_printf(" we have a real bullet number\n\r");
 				countNumberUp++;
 				setTankBulletColor();
 				sound_init_tank_fire();
@@ -248,9 +463,10 @@ void drawTankBullet(){
 	}
 	//tankBulletsDrawn
 
-	if(!multipleCheck || !getTankMultipleBullets()){
+	//if(!multipleCheck || !getTankMultipleBullets()){
 		if(!tank_Bullet_Drawn){ //If not fired
-			xil_printf("back to normal\n\r");
+			//setFreezeAliens(true);
+			//xil_printf("back to normal\n\r");
 			setTankBulletColor();
 			sound_init_tank_fire();
 			tank_Bullet_Drawn = true; //Set drawn to true
@@ -268,7 +484,7 @@ void drawTankBullet(){
 			///setTankGuidedBullet(true); //We need this to run the guided bullet especially for the updated bullet
 			if(tank_Guided_Bullet){
 				if(getFunBulletStatus() == false){
-					check = decrementScore(20);
+					check = decrementScore(SCORE_2);
 					drawScore();
 				}
 				if(check){
@@ -288,7 +504,7 @@ void drawTankBullet(){
 				}
 			}
 		}
-	}
+	//}
 }
 
 void eraseTankBullet(point_t bullet_pos){
@@ -330,13 +546,13 @@ uint8_t whichBunkerNumber(point_t tank, uint8_t pixel, uint8_t line, point_t new
 uint8_t tankHitsAliens(uint8_t pixel, uint8_t line, point_t new_tank_bullet_position, point_t tank){ //Tank hits an alien
 	uint8_t stop = false;
 	bool check = true;
-	bool rogueCheck = true;
+	bool rogueCheck = false;
 	if(isAlienAlive(calculateAlienNumber(tank))){ //is the alien alive
 		if(colorAliens){
 			//eraseAlienBlock
 			//eraseAllAliens();
 			if(getFunBulletStatus() == false){
-				check = decrementScore(5);
+				check = decrementScore(SCORE_1);
 				drawScore();
 			}
 			if(check){
@@ -345,17 +561,17 @@ uint8_t tankHitsAliens(uint8_t pixel, uint8_t line, point_t new_tank_bullet_posi
 		}
 		if(getRogueAlienBullet()){
 			if(!getFunBulletStatus()){
-				rogueCheck = decrementScore(30);
+				rogueCheck = decrementScore(SCORE_4);
 				drawScore();
 			}
-			if(rogueCheck){
+			if(rogueCheck || getFunBulletStatus()){
 				stop = true;////Not sure about this
 				setRogueBullet(true);
 				point_t rogueAlienPosition;
 				rogueAlienPosition.x = pixel + new_tank_bullet_position.x;
 				rogueAlienPosition.y = line + new_tank_bullet_position.y;
 				point_t rogueAlienBulletPosition = rogueAlienPosition;
-				setRogueAlienNumber(rogueAlienPosition);
+				setRogueAlienNumber(calculateAlienNumber(tank));
 				rogueAlienBulletPosition.y -= ALIEN_HEIGHT; //We are now above the alien
 				rogueAlienBulletPosition.y -= ALIEN_BULLET_HEIGHT; //This should be the top of the alien bullet
 				setRogueBulletPosition(rogueAlienBulletPosition);
@@ -417,6 +633,7 @@ uint8_t updateTankBullet(){ //Update the tank bullet
 						stop =  whichBunkerNumber(tank, pixel, line, new_tank_bullet_position);
 					}
 					if(calculateAlienNumber(tank) != WRONG_ALIEN){ //Calculate the alien number
+						//xil_printf("do we kill an alien\n\r");
 						stop = tankHitsAliens(pixel, line, new_tank_bullet_position, tank);
 					}
 					//if(frame_pointer[(line + new_tank_bullet_position.y) * SCREEN_WIDTH + (pixel + new_tank_bullet_position.x)] == tank_bullet_color){

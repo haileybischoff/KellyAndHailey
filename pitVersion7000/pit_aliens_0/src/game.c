@@ -65,7 +65,7 @@
 #define SAUCER_MAX_TIME 2000 // This is the max time before a saucer will go across the board again.
 
 #define SAUCER_SCORE_MAX_DRAWS 3 // This is how many times we will flash the score.
-*/
+ */
 
 #define DEBOUNCE_VALUE 0x0000001F
 
@@ -231,6 +231,8 @@ void debugStatePrint(){
 	}
 }
 uint8_t wait = 0;
+uint8_t alien;
+point_t alien_pos;
 
 void spaceInvaders_tick(){
 	//uint8_t isSaucerDrawn = RESET;
@@ -321,7 +323,7 @@ void spaceInvaders_tick(){
 			uint8_t deadAlien = calculateAlienNumber(getDeadAlienPosition());
 			if(getTankLaserBullet()){
 				if(getFunBulletStatus() == false){
-					check = decrementScore(100);
+					check = decrementScore(SCORE_3);
 					drawScore();
 				}
 				if(isAlienAlive(deadAlien) && check){
@@ -338,7 +340,7 @@ void spaceInvaders_tick(){
 			}
 			else if(getTankExplosionBullet()){
 				if(getFunBulletStatus() == false){
-					check = decrementScore(50);
+					check = decrementScore(SCORE_5);
 					drawScore();
 				}
 				if((isAlienAlive(deadAlien)) && check){
@@ -433,7 +435,6 @@ void spaceInvaders_tick(){
 				computeScore(calculateAlienNumber(getDeadAlienPosition()));
 			}
 			drawScore();
-			setDidTankKillAlienFlag(false);
 		}
 		/*if(didTankKillSaucer()){
 			computeScore(SAUCER_NUMBER);
@@ -535,6 +536,14 @@ void spaceInvaders_tick(){
 		}
 		break;
 	case dead_alien_st:
+		if(getFreezeAliens()){
+			alien = calculateAlienNumber(getDeadAlienPosition());
+			alien_pos = calculateAlienPosition(alien);
+			uint16_t x = alien_pos.x;
+			uint16_t y = alien_pos.y;
+			eraseAlien(x, y);
+		}
+		setDidTankKillAlienFlag(false);
 		//xil_printf("The number of aliens left is: %d\n\r", getAlienCount());
 		currentState = idle_st;
 		break;
