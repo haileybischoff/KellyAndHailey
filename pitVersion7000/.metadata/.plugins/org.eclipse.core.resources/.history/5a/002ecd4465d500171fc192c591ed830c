@@ -1,0 +1,155 @@
+/*
+ * saucer_state_machine.c
+ *
+ *  Created on: Nov 25, 2017
+ *      Author: superman
+ */
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
+#include "sound.h"
+#include "saucer_state_machine.h"
+#include "draw.h"
+#include "draw_saucer.h"
+#include "score_keeping.h"
+
+#define SAUCER_SCORE_MAX_COUNTER 20 // 20 is a fifth of a second this is for flashing the score.
+#define SAUCER_MOVE_MAX_COUNTER 5 // 10 is a tenth of a second for moving the saucer.
+
+#define SAUCER_NUMBER 66
+
+#define SAUCER_MAX_TIME 2000 // This is the max time before a saucer will go across the board again.
+
+#define SAUCER_SCORE_MAX_DRAWS 3 // This is how many times we will flash the score.
+
+/****************** DRAW SAUCER STUFF **********************************/
+uint16_t saucerMoveCounter = RESET; // This is the counter that counts how long between when we update saucer draw.
+uint16_t saucerRandValueCounter = RESET; // This is the time that we have between drawing saucers
+uint16_t saucerRandValueMax = RESET; // This value will hold the recalculated max for the Random Value counter
+
+bool drawSaucerFlag = false; // Tells us to draw the saucer
+
+/****************** DRAW SAUCER SCORE STUFF ****************************/
+uint8_t saucerScoreFlashCounter = RESET;
+uint8_t numberOfFlashes = RESET;
+
+bool drawSaucerScoreFlag = false;
+bool eraseSaucerScoreFlag = false;
+
+enum SpaceInvadersControl_st{
+	init_st,
+	idle_st,
+	dead_saucer_st,
+	flash_saucer_score_st,
+	draw_saucer_st,
+	game_over_st
+} currentState = init_st;
+
+void setSaucerDrawnFlag(bool value){
+	drawSaucerFlag = value;
+}
+
+void setSaucerScoreFlag(bool value){
+	drawSaucerScoreFlag = value;
+}
+
+void saucerAction_tick(){
+	uint8_t isSaucerDrawn = RESET;
+
+	switch(currentState){
+	case init_st:
+		drawSaucerFlag = false; //Saucer flag set to false
+		saucerMoveCounter = RESET; //Saucer counter initialized to 0
+		saucerRandValueCounter = RESET; // Reset this random value saucer counter.
+		saucerRandValueMax = RESET; //TODO initialize to rand() % x
+		break;
+	case idle_st:
+		if(drawSaucerScoreFlag){
+			saucerScoreFlashCounter++;
+		}
+		if(drawSaucerFlag){ // If the saucer is supposed to be drawn
+			saucerMoveCounter++; // Increment the time for how long between when we move the saucer
+		}
+		else{ // Otherwise there is no saucer on the screen
+			saucerRandValueCounter++; // So we have to count between when the next suacer get's drawn.
+			if(saucerRandValueCounter >= saucerRandValueMax){ // If we get above our saucer random max then
+				drawSaucerFlag = true; // We'll need to set our draw saucer flag to true
+				saucerRandValueMax = + (rand() % SAUCER_MAX_TIME); // We'll need to generate a new random saucer max
+				saucerRandValueCounter = RESET; // We'll need to reset the saucer rand value counter.
+			}
+		}
+		break;
+	case dead_saucer_st:
+		if(didTankKillSaucer()){
+			computeScore(SAUCER_NUMBER);
+			drawScore();
+			eraseSaucer();//said saucer also said calculateHit
+			setDidTankKillSaucerFlag(false);
+			drawSaucerFlag = false;
+			drawSaucerScoreFlag = true;
+		}
+		break;
+	case flash_saucer_score_st:
+		if(eraseSaucerScoreFlag){
+			eraseSaucerScore();
+			numberOfFlashes++;
+			eraseSaucerScoreFlag = false;
+		}
+		else{
+			drawSaucerScore();
+			eraseSaucerScoreFlag = true;
+		}
+		break;
+	case draw_saucer_st:
+		isSaucerDrawn = drawSaucer();
+		if(!isSaucerDrawn){
+			sound_saucer_stop();
+		}
+		if(!isSaucerDrawn || didTankKillSaucer()){
+			drawSaucerFlag = false;
+		}
+		break;
+	case game_over_st:
+		break;
+	default:
+		break;
+	}
+
+	switch(currentState){
+	case init_st:
+		currentState = idle_st;
+		break;
+	case idle_st:
+		if(drawSaucerScoreFlag && (saucerScoreFlashCounter >= SAUCER_SCORE_MAX_COUNTER)  && (numberOfFlashes < SAUCER_SCORE_MAX_DRAWS)){
+			currentState = flash_saucer_score_st;
+			saucerScoreFlashCounter = RESET;
+		}
+		else if(drawSaucerFlag && (saucerMoveCounter >= SAUCER_MOVE_MAX_COUNTER)){
+			saucerMoveCounter = RESET;
+			currentState = draw_saucer_st;
+		}
+		else{
+			if(numberOfFlashes >= SAUCER_SCORE_MAX_DRAWS){
+				drawSaucerScoreFlag = false;
+				numberOfFlashes = RESET;
+			}
+			currentState = idle_st;
+		}
+		break;
+	case dead_saucer_st:
+		currentState = idle_st;
+		break;
+	case flash_saucer_score_st:
+		currentState = idle_st;
+		break;
+	case draw_saucer_st:
+		currentState = idle_st;
+		break;
+	case game_over_st:
+		break;
+	default:
+		break;
+	}
+
+}

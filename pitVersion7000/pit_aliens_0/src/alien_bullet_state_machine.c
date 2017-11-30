@@ -9,14 +9,14 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <stdio.h>
-#include "draw_alien_bullet.h"
-#include "draw_aliens.h"
 #include "draw.h"
+#include "draw_aliens.h"
+#include "draw_alien_bullet.h"
 #include "draw_bunker.h"
 #include "draw_tank.h"
 #include "draw_tank_bullet.h"
-#include "score_keeping.h"
 #include "game.h"
+#include "score_keeping.h"
 
 #define RESET 0
 #define MAXIMUM_NUMBER_ALIEN_BULLETS 4
@@ -78,7 +78,6 @@ void AlienBullet_tick(){
 				alien_bullet_shot = true;
 			}
 		}
-
 		if(alien_bullet_shot){
 			alien_bullet_counter = RESET;
 			alien_bullet_shot = false;

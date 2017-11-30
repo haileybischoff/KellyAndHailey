@@ -53,6 +53,37 @@ uint8_t alien_zigzag[BULLET_MAX_COUNT] = {1, 1, 1, 1}; //Default is zigzag_1
 
 extern unsigned int * frame_pointer;
 
+uint8_t rogueBullet;
+
+point_t rogueBulletPosition;
+
+void setRogueBulletPosition(point_t value){
+	rogueBulletPosition = value;
+}
+
+point_t getRogueBulletPosition(){
+	return rogueBulletPosition;
+}
+
+void setRogueBullet(bool value){
+	rogueBullet = value;
+}
+
+bool getRogueBullet(){
+	return rogueBullet;
+}
+
+uint8_t rogueAlienNumber;
+
+void setRogueAlienNumber(point_t value){
+	rogueAlienNumber = calculateAlienNumber(value);
+}
+
+uint8_t getRogueAlienNumber(){
+	return rogueAlienNumber;
+}
+
+
 uint8_t getAlienBulletCount(){ //This returns the number of aliens on the screen
 	return alienBulletCount;
 }
@@ -126,6 +157,36 @@ void drawAlienBullet(uint8_t alienNumber, uint8_t type){
 		}
 	}
 }
+bool cross = false;
+uint8_t rogue_cross = 1;
+uint8_t rogue_zigzag = 1;
+uint8_t rogueBulletType;
+
+void drawRogueBullet(){
+	uint8_t width;
+	point_t pos = getRogueBulletPosition();
+	uint8_t number = getRogueAlienNumber();
+	const uint32_t* alien_bullet;
+	rogueBulletType = cross;
+	cross = !cross;
+	if(rogueBulletType == BULLET_TYPE_CROSS){ //If type is a cross
+		width = ALIEN_CROSS_BULLET_WORD_WIDTH; //Find width
+		alien_bullet = alien_cross_bullet_1;
+	}
+	else{
+		width = ALIEN_ZIGZAG_BULLET_WORD_WIDTH; //Find width
+		alien_bullet = alien_zig_zag_bullet_1;
+	}
+	uint8_t line, pixel;
+	for(line = 0; line < ALIEN_BULLET_HEIGHT; line++){ //For height
+		for(pixel = 0; pixel < width; pixel++){ //For width
+			if((alien_bullet[line] & (SHIFT<<(width-SHIFT-pixel)))){ //If pixel is a 1
+				frame_pointer[(line + pos.y) * SCREEN_WIDTH + (pixel + pos.x)] = RED; //Set to red
+			}
+		}
+	}
+}
+
 
 void drawBullet(const uint32_t* alien_cross_bullet, point_t updateBullet, uint8_t width){
 	uint8_t line, pixel;
@@ -288,6 +349,63 @@ uint8_t generalUpdateBullet(const uint32_t* alien_cross_bullet, uint8_t bulletNu
 	return bullet_drawn; //give bullet drawn
 }
 
+bool alienHitsAliens(int8_t pixel, uint8_t line, point_t new_alien_bullet_position, point_t alien){
+	setDidTankKillAlienFlag(true); //Set flag to true
+	point_t deadAlienPosition;
+	deadAlienPosition.x = pixel + new_alien_bullet_position.x;
+	deadAlienPosition.y = line + new_alien_bullet_position.y;
+	setDeadAlienPosition(deadAlienPosition); //Set dead alien position
+	drawRogueBullet();
+}
+
+
+void updateRogueBullet(const uint32_t* alien_cross_bullet, uint8_t type){
+	point_t my_updateBullet = getRogueBulletPosition();
+	point_t temp = my_updateBullet;
+	temp.y -= ALIEN_BULLET_HEIGHT; //Was 10
+	setRogueBulletPosition(temp);
+	point_t new_rogue_bullet_position = getRogueBulletPosition();
+	uint8_t line, pixel;
+	uint8_t stop = false;
+	for(line = 0; line < ALIEN_BULLET_HEIGHT; line++){ //Height
+		for(pixel = 0; pixel < ALIEN_CROSS_BULLET_WORD_WIDTH; pixel++){ //Width
+			if(((temp.y - ALIEN_BULLET_HEIGHT) > ELEVEN_GAME_PIXELS) && !stop){ //If we haven't hit the green line and stop is not true
+				point_t bullet;
+				bullet.x = pixel + temp.x;
+				bullet.y = line + temp.y;
+				if(calculateAlienNumber(bullet) != WRONG_ALIEN){
+					stop = alienHitsAliens(pixel, line, new_rogue_bullet_position, bullet);
+				}
+				if(frame_pointer[(my_updateBullet.y + line) * SCREEN_WIDTH + (pixel + my_updateBullet.x)] == RED){//Black out the last shape
+					frame_pointer[(my_updateBullet.y + line) * SCREEN_WIDTH + (pixel + my_updateBullet.x)] = BLACK; //Set to black
+				}
+				if((alien_cross_bullet[line] & (SHIFT<<(ALIEN_CROSS_BULLET_WORD_WIDTH-SHIFT-pixel)))){ //If pixel is a 1
+					frame_pointer[(line + temp.y) * SCREEN_WIDTH + (pixel + temp.x)] = RED; //Set to red
+				}
+				if(stop){
+					eraseAlienBullet(alien_cross_bullet, temp, ALIEN_CROSS_BULLET_WORD_WIDTH); //Erase the bullet
+					//bullet_drawn = ALIEN_NULL; //Bullet set to false
+					//rogueBulletType = ALIEN_NULL; //Turn off
+				}
+			}
+			else{
+				if(frame_pointer[(my_updateBullet.y + line) * SCREEN_WIDTH + (pixel + my_updateBullet.x)] == RED){//Black out the last shape
+					frame_pointer[(my_updateBullet.y + line) * SCREEN_WIDTH + (pixel + my_updateBullet.x)] = BLACK; //Set to black
+					//bullet_drawn = ALIEN_NULL;
+					//rogueBulletType = ALIEN_NULL;
+				}
+			}
+			if(stop){
+				frame_pointer[(my_updateBullet.y + line) * SCREEN_WIDTH + (pixel + my_updateBullet.x)] = BLACK; //Set to black
+				//bullet_drawn = ALIEN_NULL; //Bullet set to false
+				//rogueBulletType = ALIEN_NULL; //Turn off
+				setRogueBullet(false);
+			}
+		}
+	}
+}
+
+
 uint8_t updateEachBullet(){ //This is cool
 	uint8_t i;
 	uint8_t total = false;
@@ -337,5 +455,45 @@ uint8_t updateEachBullet(){ //This is cool
 			}
 		}
 	}
+	/*
+	bool cross = true;
+uint8_t rogue_cross = 1;
+uint8_t rogue_zigzag = 1;
+uint8_t rogueBulletType;
+
+	 */
+	if(getRogueBullet()){
+		if(rogueBulletType == BULLET_TYPE_CROSS){ //If the type is a cross
+			if(rogue_cross  == CROSS_1){
+				rogue_cross++;
+				updateRogueBullet(alien_cross_bullet_2, BULLET_TYPE_CROSS); //Update the bullet
+
+			}
+			else if(rogue_cross  == CROSS_2){
+				rogue_cross++;
+				updateRogueBullet(alien_cross_bullet_3, BULLET_TYPE_CROSS); //Update the bullet
+
+			}
+			else{
+				rogue_cross = CROSS_1;
+				updateRogueBullet(alien_cross_bullet_1, BULLET_TYPE_CROSS); //Update the bullet
+
+			}
+		}
+		else if(rogueBulletType == BULLET_TYPE_ZIGZAG){ //If the type is a zigzag
+			if(rogue_zigzag == ZIGZAG_1){
+				rogue_zigzag++;
+				updateRogueBullet(alien_zig_zag_bullet_2, BULLET_TYPE_ZIGZAG); //Update the bullet
+
+			}
+			else{
+				rogue_zigzag = ZIGZAG_1;
+				updateRogueBullet(alien_zig_zag_bullet_1, BULLET_TYPE_ZIGZAG); //Update the bullet
+
+			}
+		}
+	}
 	return alienBulletCount; //Return the number of bullets
 }
+
+

@@ -1,0 +1,19 @@
+/*
+ * saucer_state_machine.c
+ *
+ *  Created on: Nov 25, 2017
+ *      Author: superman
+ */
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
+
+void saucerAction_tick(){
+
+	/*switch(currentState){
+	case init_st:
+		break;
+	case idle_st:*/
+
+}

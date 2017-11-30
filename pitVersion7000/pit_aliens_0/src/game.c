@@ -31,7 +31,6 @@
 
 #define DEBOUNCE_COUNTER_MAX 5
 
-
 #define SAUCER_Y_POSITION 29 // This is the Y position for when we draw the saucer.
 
 #define RESET 0// Reset is 0
@@ -61,11 +60,12 @@
 
 #define MAX_DEBOUNCE_TIME 100
 
-#define SAUCER_NUMBER 66
+/*#define SAUCER_NUMBER 66
 
 #define SAUCER_MAX_TIME 2000 // This is the max time before a saucer will go across the board again.
 
 #define SAUCER_SCORE_MAX_DRAWS 3 // This is how many times we will flash the score.
+*/
 
 #define DEBOUNCE_VALUE 0x0000001F
 
@@ -77,11 +77,9 @@
 #define TOP_BUTTON_MASK 16 //This is the mask for the top push button it will be used fro incrementing volume eventually
 #define BOTTOM_BUTTON_MASK 4 //This is the mask for the bottom push button it will be used for decrementing volume eventually
 
-#define SAUCER_SCORE_MAX_COUNTER 20 // 20 is a fifth of a second this is for flashing the score.
+//#define SAUCER_SCORE_MAX_COUNTER 20 // 20 is a fifth of a second this is for flashing the score.
 #define MAX_ALIEN_BULLET_TIME 10
-#define SAUCER_MOVE_MAX_COUNTER 5 // 10 is a tenth of a second for moving the saucer.
-
-
+//#define SAUCER_MOVE_MAX_COUNTER 5 // 10 is a tenth of a second for moving the saucer.
 
 bool gameOver = 0;
 
@@ -117,20 +115,6 @@ uint32_t debouncedButtonState = 0;	// Saves the debounced button states
 /****************** DRAW TANK BULLET STUFF *****************************/
 bool shootTankBulletFlag = false;
 
-/****************** DRAW SAUCER STUFF **********************************/
-uint16_t saucerMoveCounter = RESET; // This is the counter that counts how long between when we update saucer draw.
-uint16_t saucerRandValueCounter = RESET; // This is the time that we have between drawing saucers
-uint16_t saucerRandValueMax = RESET; // This value will hold the recalculated max for the Random Value counter
-
-bool drawSaucerFlag = false; // Tells us to draw the saucer
-
-/****************** DRAW SAUCER SCORE STUFF ****************************/
-uint8_t saucerScoreFlashCounter = RESET;
-uint8_t numberOfFlashes = RESET;
-
-bool drawSaucerScoreFlag = false;
-bool eraseSaucerScoreFlag = false;
-
 /***************** FUNCTIONS *******************************************/
 bool downBtnFlag = false;
 bool upBtnFlag = false;
@@ -152,13 +136,13 @@ void debounce_buttons(){ //this takes the button and debounces it for us it also
 		shootTankBulletFlag = true;
 	}
 }
-void setSaucerDrawnFlag(bool value){
+/*void setSaucerDrawnFlag(bool value){
 	drawSaucerFlag = value;
 }
 
 void setSaucerScoreFlag(bool value){
 	drawSaucerScoreFlag = value;
-}
+}*/
 
 void setDownBtnFlag(bool val){
 	downBtnFlag = val;
@@ -174,6 +158,16 @@ bool getDownBtnFlag(){
 
 bool getUpBtnFlag(){
 	return upBtnFlag;
+}
+
+bool saucerIsShot = 0;
+
+bool getSaucerGotShot(){
+	return saucerIsShot;
+}
+
+bool setSaucerGotShot(bool val){
+	saucerIsShot = val;
 }
 
 enum SpaceInvadersControl_st{
@@ -239,7 +233,7 @@ void debugStatePrint(){
 uint8_t wait = 0;
 
 void spaceInvaders_tick(){
-	uint8_t isSaucerDrawn = RESET;
+	//uint8_t isSaucerDrawn = RESET;
 	point_t bunk_pos;
 	uint8_t bunkerNumber;
 	uint8_t blockNumber;
@@ -259,13 +253,13 @@ void spaceInvaders_tick(){
 		initial_sound_init_saucer_hit();
 		setGameOverStatus(false);
 		setTankStatus(false);
-		drawSaucerFlag = false; //Saucer flag set to false
-		saucerMoveCounter = RESET; //Saucer counter initialized to 0
-		saucerRandValueCounter = RESET; // Reset this random value saucer counter.
+		//drawSaucerFlag = false; //Saucer flag set to false
+		//saucerMoveCounter = RESET; //Saucer counter initialized to 0
+		//saucerRandValueCounter = RESET; // Reset this random value saucer counter.
 		lives = DEFAULT_LIVES;
 		randomCounter = RANDOM_COUNTER_TOTAL;//Increment the random counter
 		srand(randomCounter); //Pass the random counter as the seed to srand
-		saucerRandValueMax = RESET; //TODO initialize to rand() % x
+		//saucerRandValueMax = RESET; //TODO initialize to rand() % x
 		break;
 	case idle_st:
 		total_bullets = getAlienBulletCount() + getBulletDrawn();
@@ -293,7 +287,7 @@ void spaceInvaders_tick(){
 		if(total_bullets != RESET){
 			updateBulletCounter++;
 		}
-		if(drawSaucerScoreFlag){
+		/*if(drawSaucerScoreFlag){
 			saucerScoreFlashCounter++;
 		}
 		if(drawSaucerFlag){ // If the saucer is supposed to be drawn
@@ -306,7 +300,7 @@ void spaceInvaders_tick(){
 				saucerRandValueMax = + (rand() % SAUCER_MAX_TIME); // We'll need to generate a new random saucer max
 				saucerRandValueCounter = RESET; // We'll need to reset the saucer rand value counter.
 			}
-		}
+		}*/
 		if(shootTankBulletFlag && !getTankStatus()){
 			wait++;
 			if(wait >= 3){
@@ -441,17 +435,17 @@ void spaceInvaders_tick(){
 			drawScore();
 			setDidTankKillAlienFlag(false);
 		}
-		if(didTankKillSaucer()){
+		/*if(didTankKillSaucer()){
 			computeScore(SAUCER_NUMBER);
 			drawScore();
 			eraseSaucer();//said saucer also said calculateHit
 			setDidTankKillSaucerFlag(false);
 			drawSaucerFlag = false;
 			drawSaucerScoreFlag = true;
-		}
+		}*/
 		break;
 	case flash_saucer_score_st:
-		if(eraseSaucerScoreFlag){
+		/*if(eraseSaucerScoreFlag){
 			eraseSaucerScore();
 			numberOfFlashes++;
 			eraseSaucerScoreFlag = false;
@@ -459,7 +453,7 @@ void spaceInvaders_tick(){
 		else{
 			drawSaucerScore();
 			eraseSaucerScoreFlag = true;
-		}
+		}*/
 		break;
 	case bunker_st:
 		bunk_pos = getShotBunkerPosition();
@@ -469,7 +463,7 @@ void spaceInvaders_tick(){
 		setDidTankKillBunkerFlag(false);
 		break;
 	case draw_saucer_st:
-		isSaucerDrawn = drawSaucer();
+		/*isSaucerDrawn = drawSaucer();
 		if(!isSaucerDrawn){
 			sound_saucer_stop();
 		}
@@ -482,7 +476,7 @@ void spaceInvaders_tick(){
 		alienType = (rand()%TYPES_OF_ALIEN_BULLETS);
 		if(getMyAlienNumber(alienColumn) != ALIEN_NULL){
 			drawAlienBullet(alienColumn, alienType);
-		}
+		}*/
 		break;
 	case game_over_st:
 		setGameOverStatus(1);
@@ -509,14 +503,15 @@ void spaceInvaders_tick(){
 		if(lives == RESET || getAlienCount() == RESET || getGameOverStatus()){//|| cantGoLower()
 			currentState = game_over_st;
 		}
-		else if(drawSaucerScoreFlag && (saucerScoreFlashCounter >= SAUCER_SCORE_MAX_COUNTER)  && (numberOfFlashes < SAUCER_SCORE_MAX_DRAWS)){
+		/*else if(drawSaucerScoreFlag && (saucerScoreFlashCounter >= SAUCER_SCORE_MAX_COUNTER)  && (numberOfFlashes < SAUCER_SCORE_MAX_DRAWS)){
 			currentState = flash_saucer_score_st;
 			saucerScoreFlashCounter = RESET;
-		}
+		}*/
 		else if((updateBulletCounter >= 2)){//5 MAX_ALIEN_BULLET_TIME
+			setSaucerGotShot(true);
 			currentState = update_bullet_st;
 		}
-		else if(drawSaucerFlag && (saucerMoveCounter >= SAUCER_MOVE_MAX_COUNTER)){
+		/*else if(drawSaucerFlag && (saucerMoveCounter >= SAUCER_MOVE_MAX_COUNTER)){
 			saucerMoveCounter = RESET;
 			currentState = draw_saucer_st;
 		}
@@ -526,10 +521,10 @@ void spaceInvaders_tick(){
 				numberOfFlashes = RESET;
 			}
 			currentState = idle_st;
-		}
+		}*/
 		break;
 	case update_bullet_st:
-		if(didTankKillAlien() || didTankKillSaucer()){
+		if(didTankKillAlien() /*|| didTankKillSaucer()*/){
 			currentState = dead_alien_st;
 		}
 		else if(didTankKillBunker() ){ //|| didAlienKillBunker()){

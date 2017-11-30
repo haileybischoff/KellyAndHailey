@@ -34,6 +34,10 @@ void setTankLaserBullet(bool value);
 
 bool getTankLaserBullet();
 
+bool getRogueAlienBullet();
+
+void setRogueAlienBullet(bool value);
+
 void setTankGuidedBullet(bool value);
 
 void setTankExplosionBullet(bool value);

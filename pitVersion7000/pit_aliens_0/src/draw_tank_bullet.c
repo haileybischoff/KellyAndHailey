@@ -7,7 +7,9 @@
 
 #include <stdlib.h>
 #include <stdbool.h>
+#include <stdio.h>
 #include "draw_aliens.h"
+#include "draw_alien_bullet.h"
 #include "draw_bunker.h"
 #include "draw_saucer.h"
 #include "draw_tank.h"
@@ -20,7 +22,6 @@
 #define TANK_HALF_WIDTH 14 //Half of the width for the tank
 #define THREE_EROSION_PATTERNS 3
 #define COLOR_CHOICES 10
-
 
 static bool fun_bullets = true;
 
@@ -51,6 +52,8 @@ static bool tank_Guided_Bullet = false;
 static bool tank_Color_Bullet = false;//TODO
 
 static bool colorAliens = false;
+
+static bool rogueAlienBullet = true;
 
 void setTankLaserBullet(bool value){
 	tank_Laser_Bullet = true;
@@ -87,6 +90,15 @@ void setTankExplosionBullet(bool value){
 bool getTankExplosionBullet(){
 	return tank_Explosion_Bullet;
 }
+
+bool getRogueAlienBullet(){
+	return rogueAlienBullet;
+}
+
+void setRogueAlienBullet(bool value){
+	rogueAlienBullet = value;
+}
+
 /*
 TURQUOISE 0x0000f5ff
 PINK 0x00ffb5c5
@@ -318,6 +330,7 @@ uint8_t whichBunkerNumber(point_t tank, uint8_t pixel, uint8_t line, point_t new
 uint8_t tankHitsAliens(uint8_t pixel, uint8_t line, point_t new_tank_bullet_position, point_t tank){ //Tank hits an alien
 	uint8_t stop = false;
 	bool check = true;
+	bool rogueCheck = true;
 	if(isAlienAlive(calculateAlienNumber(tank))){ //is the alien alive
 		if(colorAliens){
 			//eraseAlienBlock
@@ -330,12 +343,36 @@ uint8_t tankHitsAliens(uint8_t pixel, uint8_t line, point_t new_tank_bullet_posi
 				setAlienColor();
 			}
 		}
-		stop = true;
-		setDidTankKillAlienFlag(true); //Set flag to true
-		point_t deadAlienPosition;
-		deadAlienPosition.x = pixel + new_tank_bullet_position.x;
-		deadAlienPosition.y = line + new_tank_bullet_position.y;
-		setDeadAlienPosition(deadAlienPosition); //Set dead alien position
+		if(getRogueAlienBullet()){
+			if(!getFunBulletStatus()){
+				rogueCheck = decrementScore(30);
+				drawScore();
+			}
+			if(rogueCheck){
+				stop = true;////Not sure about this
+				setRogueBullet(true);
+				point_t rogueAlienPosition;
+				rogueAlienPosition.x = pixel + new_tank_bullet_position.x;
+				rogueAlienPosition.y = line + new_tank_bullet_position.y;
+				point_t rogueAlienBulletPosition = rogueAlienPosition;
+				setRogueAlienNumber(rogueAlienPosition);
+				rogueAlienBulletPosition.y -= ALIEN_HEIGHT; //We are now above the alien
+				rogueAlienBulletPosition.y -= ALIEN_BULLET_HEIGHT; //This should be the top of the alien bullet
+				setRogueBulletPosition(rogueAlienBulletPosition);
+				drawRogueBullet();//fire rogue alien bullet
+				//make sure to update the rogue alien bullet
+				//in update, if rogue alien bullet hits alien, kill that alien and reset the alien bullet position to top of alien
+				//if rogue alien bullet hits the dead zone, kill alien and stop setting bullets
+			}
+		}
+		if(!rogueCheck || colorAliens){
+			stop = true;
+			setDidTankKillAlienFlag(true); //Set flag to true
+			point_t deadAlienPosition;
+			deadAlienPosition.x = pixel + new_tank_bullet_position.x;
+			deadAlienPosition.y = line + new_tank_bullet_position.y;
+			setDeadAlienPosition(deadAlienPosition); //Set dead alien position
+		}
 	}
 	return stop;
 }

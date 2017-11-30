@@ -26,6 +26,9 @@ void setUpBtnFlag(bool val);
 bool getDownBtnFlag();
 bool getUpBtnFlag();
 
+bool getSaucerGotShot();
+bool setSaucerGotShot(bool val);
+
 void setSaucerDrawnFlag(bool value);
 
 void setSaucerScoreFlag(bool value);

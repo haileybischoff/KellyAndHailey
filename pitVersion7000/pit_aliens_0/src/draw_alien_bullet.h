@@ -11,6 +11,21 @@
 #include <stdint.h>
 #include "draw.h"
 
+void setRogueBulletPosition(point_t value);
+
+point_t getRogueBulletPosition();
+
+void setRogueBullet(bool value);
+
+bool getRogueBullet();
+
+void setRogueAlienNumber(point_t value);
+
+uint8_t getRogueAlienNumber();
+
+void drawRogueBullet();
+
+
 uint8_t getAlienBulletCount(); //Get the count of bullets
 
 void setAlienBulletPosition(point_t val, uint8_t bullet_number); //Set the bullet position

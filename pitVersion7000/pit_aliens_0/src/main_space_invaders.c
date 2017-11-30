@@ -24,6 +24,7 @@
 #include "aliens_move_state_machine.h"
 #include "tank_bullet_state_machine.h"
 #include "tank_move_state_machine.h"
+#include "saucer_state_machine.h"
 #include "pit.h"
 #include "sound.h"
 
@@ -76,6 +77,7 @@ void interrupt_handler_dispatcher(void* ptr) {
 		AlienBullet_tick();
 		AlienInvaders_tick();
 		TankMove_tick();
+		saucerAction_tick();
 		spaceInvaders_tick(); //This is where we call the tick functions
 	}
 	// Check the push buttons.
@@ -222,7 +224,7 @@ int main()
 	while(1){  // Program never ends.
 		uint32_t switches = XIo_In32(XPAR_SWITCH_GPIO_0_BASEADDR);
 
-		xil_printf("this is the value for switches: %d\n\r", switches);
+		//xil_printf("this is the value for switches: %d\n\r", switches);
 
 /*
 		uint32_t temp_int = 0;
